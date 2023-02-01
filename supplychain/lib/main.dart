@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show MaterialApp, runApp;
 import 'package:supplychain/SignUpPage.dart';
 import 'package:supplychain/LogInPage.dart';
+import 'package:supplychain/OtpVerifyPage.dart';
+import 'package:supplychain/ProfileChooserPage.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -9,6 +11,8 @@ void main() {
     routes: {
       "/LoginPage": (context) => LogInPage(),
       "/SignUpPage": (context) => SignUpPage(),
+      "/OtpVerifyPage": (context) => OtpVerifyPage(),
+      "/ProfileChooserPage": (context) => ProfileChooserPage(),
     },
   ));
 }

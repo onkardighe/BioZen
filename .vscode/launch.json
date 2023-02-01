@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "supplychain",
+            "cwd": "supplychain",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "supplychain (profile mode)",
+            "cwd": "supplychain",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "supplychain (release mode)",
+            "cwd": "supplychain",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

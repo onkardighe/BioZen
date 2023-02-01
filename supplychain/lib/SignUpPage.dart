@@ -9,8 +9,8 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   TextEditingController _passController = TextEditingController();
   TextEditingController _passConfirmController = TextEditingController();
-  var _pass = '', _confirmPass = '';
-  String? _errorText = null;
+  TextEditingController _mobileController = TextEditingController();
+  String? _errorText;
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +59,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                         TextField(
                           textAlign: TextAlign.center,
+                          controller: _mobileController,
                           inputFormatters: [
                             LengthLimitingTextInputFormatter(10),
                           ],
@@ -114,7 +115,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             errorText: _errorText,
                             suffixIcon: const Icon(Icons.visibility),
                             label: Text("Confirm password"),
-                            border: OutlineInputBorder(
+                            border: const OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(10))),
                             hintStyle: TextStyle(color: Colors.black38),
@@ -146,8 +147,13 @@ class _SignUpPageState extends State<SignUpPage> {
                                 : null;
                             setState(() {});
 
-                            if (_errorText == null) {
+                            if (_errorText == null &&
+                                _passConfirmController.value.text.length > 0 &&
+                                _mobileController.value.text.length == 10) {
                               _SignUp();
+                            } else {
+                              _errorText = "Invalid Password";
+                              setState(() {});
                             }
                           },
                           child: const Text('Sign Up',
@@ -194,5 +200,7 @@ class _SignUpPageState extends State<SignUpPage> {
             )));
   }
 
-  void _SignUp() {}
+  void _SignUp() {
+    Navigator.pushNamed(context, "/OtpVerifyPage");
+  }
 }
