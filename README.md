@@ -13,11 +13,22 @@
 <br><br>
 
 
-![Screenshot 2023-01-31 at 1 18 25 PM](https://user-images.githubusercontent.com/72162692/215987176-4af11eb2-73c0-42c3-95d4-155b5643260b.png)
-![Screenshot 2023-02-01 at 1 44 18 PM](https://user-images.githubusercontent.com/72162692/215987453-d6c41cb1-f325-4770-b01b-3c959a4c1aaf.png)
 
-![Screenshot 2023-02-01 at 1 43 42 PM](https://user-images.githubusercontent.com/72162692/215987310-d1329560-828a-4a29-a2df-51ab8b34b9d1.png)
-![Screenshot 2023-02-01 at 1 43 27 PM](https://user-images.githubusercontent.com/72162692/215987257-9b10d9f9-15bf-468e-89ef-9518fc8b0237.png)
+* ## Login Module
+<div align="center">
+
+
+
+![Screen Recording 2023-02-02 at 11 00 01 AM](https://user-images.githubusercontent.com/72162692/216239987-0deee07c-2781-432a-b541-cc3d03a17c06.gif)
+![Screen Recording 2023-02-02 at 10 46 46 AM](https://user-images.githubusercontent.com/72162692/216238691-656b15d9-cc3a-4f01-a4f6-563102d19f10.gif)
+
+![Screen Recording 2023-02-02 at 10 46 46 AM 2](https://user-images.githubusercontent.com/72162692/216239002-7deb712b-d230-4a05-8460-b9efde144849.gif)
+![Screen Recording 2023-02-02 at 10 46 46 AM 3](https://user-images.githubusercontent.com/72162692/216239167-a60c876c-750b-4be7-b0da-9c364f80eb5f.gif)
+
+</div>
+
+
+
 
 
 
