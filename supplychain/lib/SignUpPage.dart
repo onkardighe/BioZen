@@ -10,7 +10,7 @@ class _SignUpPageState extends State<SignUpPage> {
   TextEditingController _passController = TextEditingController();
   TextEditingController _passConfirmController = TextEditingController();
   TextEditingController _mobileController = TextEditingController();
-  String? _errorText;
+  String? _errorTextPassNew, _errorTextPassConfirm, _errorTextMobile;
 
   @override
   Widget build(BuildContext context) {
@@ -62,14 +62,14 @@ class _SignUpPageState extends State<SignUpPage> {
                           controller: _mobileController,
                           inputFormatters: [
                             LengthLimitingTextInputFormatter(10),
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
                           ],
-                          decoration: const InputDecoration(
-                            label: Text("Mobile Number"),
-                            labelStyle: TextStyle(),
-                            border: OutlineInputBorder(
+                          decoration: InputDecoration(
+                            errorText: _errorTextMobile,
+                            label: const Text("Mobile Number"),
+                            border: const OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(10))),
-                            hintStyle: TextStyle(color: Colors.black38),
                           ),
                         ),
                         const SizedBox(
@@ -85,13 +85,14 @@ class _SignUpPageState extends State<SignUpPage> {
                             LengthLimitingTextInputFormatter(15),
                           ],
                           textAlign: TextAlign.center,
-                          decoration: const InputDecoration(
-                            suffixIcon: Icon(Icons.visibility),
-                            label: Text("Create new password"),
-                            border: OutlineInputBorder(
+                          decoration: InputDecoration(
+                            errorText: _errorTextPassNew,
+                            suffixIcon: const Icon(Icons.visibility),
+                            label: const Text("Create new password"),
+                            border: const OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(10))),
-                            hintStyle: TextStyle(color: Colors.black38),
+                            hintStyle: const TextStyle(color: Colors.black38),
                           ),
                         ),
                         const SizedBox(
@@ -100,11 +101,11 @@ class _SignUpPageState extends State<SignUpPage> {
                         TextField(
                           controller: _passConfirmController,
                           obscureText: true,
-                          onChanged: (value) {
-                            _errorText = _passConfirmController.value.text !=
-                                    _passController.value.text
-                                ? "Password does not match !"
-                                : null;
+                          onChanged: (passConfirmed) {
+                            _errorTextPassConfirm =
+                                passConfirmed != _passController.value.text
+                                    ? "Password does not match !"
+                                    : null;
                             setState(() {});
                           },
                           inputFormatters: [
@@ -112,13 +113,13 @@ class _SignUpPageState extends State<SignUpPage> {
                           ],
                           textAlign: TextAlign.center,
                           decoration: InputDecoration(
-                            errorText: _errorText,
+                            errorText: _errorTextPassConfirm,
                             suffixIcon: const Icon(Icons.visibility),
-                            label: Text("Confirm password"),
+                            label: const Text("Confirm password"),
                             border: const OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(10))),
-                            hintStyle: TextStyle(color: Colors.black38),
+                            hintStyle: const TextStyle(color: Colors.black38),
                           ),
                         ),
                         const SizedBox(
@@ -141,18 +142,19 @@ class _SignUpPageState extends State<SignUpPage> {
                                       side: const BorderSide(
                                           color: Colors.grey)))),
                           onPressed: () {
-                            _errorText = _passConfirmController.value.text !=
-                                    _passController.value.text
-                                ? "Password does not match !"
-                                : null;
+                            _errorTextPassConfirm =
+                                _passConfirmController.value.text !=
+                                        _passController.value.text
+                                    ? "Password does not match !"
+                                    : null;
                             setState(() {});
 
-                            if (_errorText == null &&
+                            if (_errorTextPassConfirm == null &&
                                 _passConfirmController.value.text.length > 0 &&
                                 _mobileController.value.text.length == 10) {
                               _SignUp();
                             } else {
-                              _errorText = "Invalid Password";
+                              _errorTextPassConfirm = "Invalid Password";
                               setState(() {});
                             }
                           },

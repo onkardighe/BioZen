@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
 
@@ -12,8 +14,13 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
       _otp3 = TextEditingController(),
       _otp4 = TextEditingController();
   var _errorOTP1, _errorOTP2, _errorOTP3, _errorOTP4;
+  late FocusNode _otp1FocusNode = FocusNode(),
+      _otp2FocusNode = FocusNode(),
+      _otp3FocusNode = FocusNode(),
+      _otp4FocusNode = FocusNode();
   var _mobileNumber = "+91 8999746484";
   var _name = '';
+  final _numericRegex = RegExp(r'^[0-9]+$');
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +63,12 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                     SizedBox(
                         width: 40,
                         child: TextField(
+                          onChanged: (val) => _checkNumeric(1, val),
                           controller: _otp1,
+                          focusNode: _otp1FocusNode,
                           inputFormatters: [
-                            LengthLimitingTextInputFormatter(1)
+                            LengthLimitingTextInputFormatter(1),
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
                           ],
                           decoration: InputDecoration(
                               border: OutlineInputBorder(),
@@ -68,9 +78,12 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                     SizedBox(
                         width: 40,
                         child: TextField(
+                          focusNode: _otp2FocusNode,
                           controller: _otp2,
+                          onChanged: (val) => _checkNumeric(2, val),
                           inputFormatters: [
-                            LengthLimitingTextInputFormatter(1)
+                            LengthLimitingTextInputFormatter(1),
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
                           ],
                           decoration: InputDecoration(
                               border: OutlineInputBorder(),
@@ -81,8 +94,11 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                         width: 40,
                         child: TextField(
                           controller: _otp3,
+                          focusNode: _otp3FocusNode,
+                          onChanged: (val) => _checkNumeric(3, val),
                           inputFormatters: [
-                            LengthLimitingTextInputFormatter(1)
+                            LengthLimitingTextInputFormatter(1),
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
                           ],
                           decoration: InputDecoration(
                               border: OutlineInputBorder(),
@@ -93,8 +109,11 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                         width: 40,
                         child: TextField(
                           controller: _otp4,
+                          focusNode: _otp4FocusNode,
+                          onChanged: (val) => _checkNumeric(4, val),
                           inputFormatters: [
-                            LengthLimitingTextInputFormatter(1)
+                            LengthLimitingTextInputFormatter(1),
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
                           ],
                           decoration: InputDecoration(
                               border: OutlineInputBorder(),
@@ -104,7 +123,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                   ],
                 ),
                 SizedBox(
-                  height: 40,
+                  height: 70,
                 ),
                 TextButton(
                     style: ButtonStyle(
@@ -120,11 +139,43 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ))),
-                Spacer(),
+                Spacer(
+                  flex: 2,
+                ),
               ],
             ),
           ))),
     );
+  }
+
+  void _checkNumeric(int idx, String val) {
+    if (val.length < 1) return;
+
+    if (idx == 1) {
+      if (_numericRegex.hasMatch(val)) {
+        _errorOTP1 = null;
+        _otp2FocusNode.requestFocus();
+      } else {
+        _errorOTP1 = '';
+      }
+    } else if (idx == 2) {
+      if (_numericRegex.hasMatch(val)) {
+        _errorOTP2 = null;
+        _otp3FocusNode.requestFocus();
+      } else {
+        _errorOTP2 = '';
+      }
+    } else if (idx == 3) {
+      if (_numericRegex.hasMatch(val)) {
+        _errorOTP3 = null;
+        _otp4FocusNode.requestFocus();
+      } else {
+        _errorOTP3 = '';
+      }
+    } else {
+      _errorOTP4 = _numericRegex.hasMatch(val) ? null : '';
+    }
+    setState(() {});
   }
 
   void _verify() {
@@ -142,3 +193,6 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
     }
   }
 }
+
+
+// <link href="https://file.myfontastic.com/G5YFy6LRn9Yw2ZK8uQcGBc/icons.css" rel="stylesheet">

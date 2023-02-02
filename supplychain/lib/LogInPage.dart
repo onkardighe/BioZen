@@ -7,7 +7,7 @@ class LogInPage extends StatefulWidget {
 }
 
 class _LogInPageState extends State<LogInPage> {
-  TextEditingController _usernameController = TextEditingController();
+  TextEditingController _mobileController = TextEditingController();
   TextEditingController _passController = TextEditingController();
 
   @override
@@ -57,12 +57,13 @@ class _LogInPageState extends State<LogInPage> {
                         ),
                         TextField(
                           textAlign: TextAlign.center,
-                          controller: _usernameController,
+                          controller: _mobileController,
                           inputFormatters: [
                             LengthLimitingTextInputFormatter(10),
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
                           ],
                           decoration: const InputDecoration(
-                            label: Text("Username"),
+                            label: Text("Mobile Number"),
                             labelStyle: TextStyle(),
                             border: OutlineInputBorder(
                                 borderRadius:
@@ -111,7 +112,7 @@ class _LogInPageState extends State<LogInPage> {
                                       side: const BorderSide(
                                           color: Colors.grey)))),
                           onPressed: () {
-                            if (_usernameController.value.text.isNotEmpty &&
+                            if (_mobileController.value.text.isNotEmpty &&
                                 _passController.value.text.isNotEmpty) {
                               // log in
                             }

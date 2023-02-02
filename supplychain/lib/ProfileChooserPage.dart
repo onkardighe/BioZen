@@ -10,6 +10,7 @@ class _ProfileChooserPageState extends State<ProfileChooserPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
         appBar: AppBar(
           centerTitle: true,
           title: const Text(
@@ -18,7 +19,6 @@ class _ProfileChooserPageState extends State<ProfileChooserPage> {
         ),
         body: Center(
           child: Container(
-            child: Flexible(
               child: Column(
                 children: [
                   Spacer(),
@@ -56,7 +56,7 @@ class _ProfileChooserPageState extends State<ProfileChooserPage> {
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  Spacer()
+                                  Spacer(),
                                 ],
                               ),
                             ),
@@ -172,13 +172,13 @@ class _ProfileChooserPageState extends State<ProfileChooserPage> {
                       ),
                     ],
                   ),
-                  Spacer(),
+                                  // Text("📦  🏭 🚚 🛡", style: TextStyle(fontSize: 60),),
                   Spacer()
                 ],
               ),
             ),
           ),
-        ));
+        );
   }
 
   void _buttonPressed() {}
