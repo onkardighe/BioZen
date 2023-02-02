@@ -193,6 +193,3 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
     }
   }
 }
-
-
-// <link href="https://file.myfontastic.com/G5YFy6LRn9Yw2ZK8uQcGBc/icons.css" rel="stylesheet">
