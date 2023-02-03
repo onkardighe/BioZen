@@ -65,6 +65,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             LengthLimitingTextInputFormatter(10),
                             FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
                           ],
+                          keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
                             errorText: _errorTextMobile,
                             label: const Text("Mobile Number"),
@@ -94,7 +95,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(10))),
                             hintStyle: const TextStyle(color: Colors.black38),
-                           ),
+                          ),
                         ),
                         const SizedBox(
                           height: 15,

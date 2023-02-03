@@ -68,6 +68,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                             LengthLimitingTextInputFormatter(1),
                             FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
                           ],
+                          keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
                               border: OutlineInputBorder(),
                               errorText: _errorOTP1),
@@ -83,6 +84,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                             LengthLimitingTextInputFormatter(1),
                             FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
                           ],
+                          keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
                               border: OutlineInputBorder(),
                               errorText: _errorOTP2),
@@ -98,6 +100,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                             LengthLimitingTextInputFormatter(1),
                             FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
                           ],
+                          keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
                               border: OutlineInputBorder(),
                               errorText: _errorOTP3),
@@ -113,6 +116,7 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                             LengthLimitingTextInputFormatter(1),
                             FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
                           ],
+                          keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
                               border: OutlineInputBorder(),
                               errorText: _errorOTP4),

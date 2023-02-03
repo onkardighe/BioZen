@@ -64,6 +64,7 @@ class _LogInPageState extends State<LogInPage> {
                             LengthLimitingTextInputFormatter(10),
                             FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
                           ],
+                          keyboardType: TextInputType.phone,
                           decoration: const InputDecoration(
                             label: Text("Mobile Number"),
                             labelStyle: TextStyle(),
@@ -167,5 +168,3 @@ class _LogInPageState extends State<LogInPage> {
             )));
   }
 }
-
-
