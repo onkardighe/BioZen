@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'utils/Authentication.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LogInPage extends StatefulWidget {
   @override
@@ -126,21 +128,26 @@ class _LogInPageState extends State<LogInPage> {
                         ),
                         const Text("Or Log in with "),
                         const SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            CircleAvatar(
-                              backgroundColor: Colors.white,
-                              backgroundImage: NetworkImage(
-                                  'https://cdn-icons-png.flaticon.com/64/281/281764.png'),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
                           height: 10,
-                        )
+                        ),
+                        FutureBuilder(
+                          future: Authentication.initializeFirebase(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              print(snapshot.error);
+                              return Text(
+                                  'Error initializing Firebase ${snapshot.error}');
+                            } else if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              return GoogleSignInButton();
+                            }
+                            return const CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.orange,
+                              ),
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -154,11 +161,11 @@ class _LogInPageState extends State<LogInPage> {
                           style: TextStyle(
                               color: Colors.blue,
                               fontWeight: FontWeight.bold))),
-                  const SizedBox(
-                    height: 40,
-                  ),
+                  Spacer()
                 ],
               )),
             )));
   }
 }
+
+

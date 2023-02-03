@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'utils/Authentication.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -93,7 +94,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(10))),
                             hintStyle: const TextStyle(color: Colors.black38),
-                          ),
+                           ),
                         ),
                         const SizedBox(
                           height: 15,
@@ -169,19 +170,24 @@ class _SignUpPageState extends State<SignUpPage> {
                         const SizedBox(
                           height: 20,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            CircleAvatar(
-                              backgroundColor: Colors.white,
-                              backgroundImage: NetworkImage(
-                                  'https://cdn-icons-png.flaticon.com/64/281/281764.png'),
-                            ),
-                          ],
+                        FutureBuilder(
+                          future: Authentication.initializeFirebase(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              print(snapshot.error);
+                              return Text(
+                                  'Error initializing Firebase ${snapshot.error}');
+                            } else if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              return GoogleSignInButton();
+                            }
+                            return const CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.orange,
+                              ),
+                            );
+                          },
                         ),
-                        const SizedBox(
-                          height: 10,
-                        )
                       ],
                     ),
                   ),

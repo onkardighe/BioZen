@@ -19,11 +19,14 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
+  <!-- <meta name="google-signin-client_id" content="1095588800639-joqi329tejcq20v0g5jcegmdovl4b60h.apps.googleusercontent.com"> -->
+
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="supplychain">
+
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
@@ -55,4 +58,26 @@
     });
   </script>
 </body>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-app.js";
+  // import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBZEufvyP1WDZ5i5bcxQ5HgN6c87yHnaEk",
+    authDomain: "biofuels-supplychain.firebaseapp.com",
+    projectId: "biofuels-supplychain",
+    storageBucket: "biofuels-supplychain.appspot.com",
+    messagingSenderId: "1095588800639",
+    appId: "1:1095588800639:web:256654ec2722f7f957374a",
+    measurementId: "G-SPBBZ1NZJV",
+    // clientId:"1095588800639-joqi329tejcq20v0g5jcegmdovl4b60h.apps.googleusercontent.com",
+    // key : "AIzaSyBZEufvyP1WDZ5i5bcxQ5HgN6c87yHnaEk",
+  };
+
+  // Initialize Firebase
+  const app = await initializeApp(firebaseConfig);
+  // const analytics = getAnalytics(app);
+</script>
 </html>
