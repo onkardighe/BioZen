@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/rendering.dart';
@@ -14,56 +16,85 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool _isAppbarVisible = true;
+  ScrollController _bodyScrollConroller = ScrollController();
+  var initial;
   User? thisUser;
   var myData = [
     {
       "fName": "Onkar",
       "lName": "Dighe",
+      "time": "01:00 PM",
+      "date": "22/02/2022",
     },
     {
       "fName": "Nadim",
       "lName": "Shah",
+      "time": "01:00 PM",
+      "date": "22/02/2022",
     },
     {
       "fName": "Om",
       "lName": "Kshirsagar",
+      "time": "01:00 PM",
+      "date": "22/02/2022",
+    },
+    {
+      "fName": "DhirajKumar",
+      "lName": "Sonawane",
+      "time": "01:00 PM",
+      "date": "22/02/2022",
     },
     {
       "fName": "Mohit",
       "lName": "Ahire",
+      "time": "01:00 PM",
+      "date": "22/02/2022",
     },
     {
       "fName": "Shri",
       "lName": "subramaniam",
+      "time": "01:00 PM",
+      "date": "22/02/2022",
     }
   ];
 
   @override
   void initState() {
     thisUser = widget._user;
-
     super.initState();
+
+    _bodyScrollConroller.addListener(() {
+      setState(() {
+        _isAppbarVisible = _bodyScrollConroller.offset == 0;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext Context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 15),
-            child: Icon(Icons.notifications_active),
-          )
-        ],
-        title: const Text(
-          "Suppy Chain",
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
+      appBar: _isAppbarVisible
+          ? AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              actions: const [
+                Padding(
+                  padding: EdgeInsets.only(right: 15),
+                  child: Icon(Icons.notifications_active),
+                )
+              ],
+              title: Text(
+                "Suppy Chain",
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+            )
+          : null,
       body: SingleChildScrollView(
+        controller: _bodyScrollConroller,
         child: Container(
           child: Stack(
             children: [
@@ -164,7 +195,9 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Center(
                     child: Column(children: [
-                      for (var thisData in myData) buildCard(thisData["fName"])
+                      for (var thisData in myData)
+                        buildCard(thisData["fName"], myData.indexOf(thisData),
+                            thisData["date"], thisData["time"])
                     ]),
                   )
                 ],
@@ -177,20 +210,80 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Container buildCard(String? str) {
-    return Container(
-      margin: EdgeInsets.all(5),
-      width: MediaQuery.of(context).size.width * 0.9,
-      padding: EdgeInsets.all(20),
-      height: 80,
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(
-            color: Colors.black26, blurRadius: 10, blurStyle: BlurStyle.normal)
-      ], color: Colors.white, borderRadius: BorderRadius.circular(90)),
-      child: Text(
-        "${str}",
-        style: TextStyle(color: Colors.black),
-      ),
+  Widget buildCard(String? str, int id, String? date, String? time) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Container(
+          margin: EdgeInsets.all(10),
+          // padding: EdgeInsets.all(5),
+          width: MediaQuery.of(context).size.width * 0.9,
+          height: 85,
+          decoration: BoxDecoration(boxShadow: [
+            BoxShadow(
+                color: Colors.black26,
+                blurRadius: 10,
+                blurStyle: BlurStyle.normal)
+          ], color: Colors.white, borderRadius: BorderRadius.circular(90)),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Container(
+                height: 65,
+                width: 65,
+                decoration: BoxDecoration(
+                    gradient: AppTheme().themeGradient, shape: BoxShape.circle),
+                child: const CircleAvatar(
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: Colors.white,
+                  child: Icon(
+                    Icons.calculate_rounded,
+                    size: 45,
+                  ),
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Package id : ${id}",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    "${str}",
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ],
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Container(
+                padding: EdgeInsets.all(10),
+                height: 75,
+                width: 120,
+                decoration: BoxDecoration(
+                    gradient: AppTheme().themeGradient,
+                    borderRadius: BorderRadius.circular(90)),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(time!, style: TextStyle(color: Colors.white)),
+                      Container(
+                        height: 1,
+                        color: Colors.grey.shade300,
+                      ),
+                      Text(
+                        date!,
+                        style: TextStyle(color: Colors.white),
+                      )
+                    ]),
+              )
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
