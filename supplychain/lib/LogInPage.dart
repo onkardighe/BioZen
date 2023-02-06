@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'utils/Authentication.dart';
+import 'utils/appTheme.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LogInPage extends StatefulWidget {
+  
+
   @override
   _LogInPageState createState() => _LogInPageState();
 }
 
 class _LogInPageState extends State<LogInPage> {
+  
   TextEditingController _mobileController = TextEditingController();
   TextEditingController _passController = TextEditingController();
 
@@ -102,8 +106,9 @@ class _LogInPageState extends State<LogInPage> {
                         ),
                         TextButton(
                           style: ButtonStyle(
+                            
                               backgroundColor:
-                                  MaterialStateProperty.all<Color>(Colors.grey),
+                                  MaterialStateProperty.all<Color>(Colors.blue),
                               foregroundColor: MaterialStateProperty.all<Color>(
                                   Colors.white),
                               minimumSize: MaterialStateProperty.all<Size>(
@@ -111,9 +116,8 @@ class _LogInPageState extends State<LogInPage> {
                               shape: MaterialStateProperty.all<
                                       RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      side: const BorderSide(
-                                          color: Colors.grey)))),
+                                borderRadius: BorderRadius.circular(8),
+                              ))),
                           onPressed: () {
                             if (_mobileController.value.text.isNotEmpty &&
                                 _passController.value.text.isNotEmpty) {
@@ -158,10 +162,18 @@ class _LogInPageState extends State<LogInPage> {
                         Navigator.pushNamed(context, "/SignUpPage");
                         setState(() {});
                       },
-                      child: const Text("NEW USER ? Sign up",
-                          style: TextStyle(
-                              color: Colors.blue,
-                              fontWeight: FontWeight.bold))),
+                      child: RichText(
+                        text: const TextSpan(
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                            children: [
+                              TextSpan(
+                                  text: "Don't have an account ? ",
+                                  style: TextStyle(color: Colors.grey)),
+                              TextSpan(
+                                  text: "Register",
+                                  style: TextStyle(color: Colors.blue)),
+                            ]),
+                      )),
                   Spacer()
                 ],
               )),

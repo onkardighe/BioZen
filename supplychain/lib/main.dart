@@ -6,6 +6,7 @@ import 'package:supplychain/ProfileChooserPage.dart';
 
 void main() {
   runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
     title: "Supply Chain",
     home: LogInPage(),
     routes: {

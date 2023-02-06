@@ -130,7 +130,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         TextButton(
                           style: ButtonStyle(
                               backgroundColor:
-                                  MaterialStateProperty.all<Color>(Colors.grey),
+                                  MaterialStateProperty.all<Color>(Colors.blue),
                               foregroundColor: MaterialStateProperty.all<Color>(
                                   Colors.white),
 
@@ -140,9 +140,8 @@ class _SignUpPageState extends State<SignUpPage> {
                               shape: MaterialStateProperty.all<
                                       RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      side: const BorderSide(
-                                          color: Colors.grey)))),
+                                borderRadius: BorderRadius.circular(8),
+                              ))),
                           onPressed: () {
                             _errorTextPassConfirm =
                                 _passConfirmController.value.text !=
@@ -169,7 +168,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                         const Text("or Sign up with "),
                         const SizedBox(
-                          height: 20,
+                          height: 10,
                         ),
                         FutureBuilder(
                           future: Authentication.initializeFirebase(),
@@ -197,13 +196,19 @@ class _SignUpPageState extends State<SignUpPage> {
                       onPressed: () {
                         Navigator.pushNamed(context, "/LoginPage");
                       },
-                      child: const Text("Already registered ? Log In",
-                          style: TextStyle(
-                              color: Colors.blue,
-                              fontWeight: FontWeight.bold))),
-                  const SizedBox(
-                    height: 40,
-                  ),
+                      child: RichText(
+                        text: const TextSpan(
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                            children: [
+                              TextSpan(
+                                  text: "Already registered ? ",
+                                  style: TextStyle(color: Colors.grey)),
+                              TextSpan(
+                                  text: "LOG IN",
+                                  style: TextStyle(color: Colors.blue)),
+                            ]),
+                      )),
+                  Spacer()
                 ],
               )),
             )));

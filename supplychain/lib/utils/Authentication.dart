@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:supplychain/HomePage.dart';
 import 'package:supplychain/LogInPage.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -146,7 +147,8 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
                 if (user != null) {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (context) => UserInfoScreen(
+                      // builder: (context) => UserInfoScreen(
+                      builder: (context) => HomePage(
                         user: user,
                       ),
                     ),
@@ -169,6 +171,10 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
             ),
     );
   }
+
+
+
+  // ?/////////////// ?/////////////// ?/////////////// ?/////////////// ?/////////////
 }
 
 class UserInfoScreen extends StatefulWidget {
