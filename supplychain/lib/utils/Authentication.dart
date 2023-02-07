@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:supplychain/ProfileChooserPage.dart';
+import 'package:supplychain/utils/DatabaseService.dart';
 import 'package:supplychain/HomePage.dart';
-import 'package:supplychain/LogInPage.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Authentication {
@@ -58,6 +60,8 @@ class Authentication {
             await auth.signInWithCredential(credential);
 
         user = userCredential.user;
+        saveUser(
+            user!.email!, user!.displayName!, user!.uid!); //save to firestore
       } on FirebaseAuthException catch (e) {
         if (e.code == 'account-exists-with-different-credential') {
           ScaffoldMessenger.of(context)
@@ -109,6 +113,87 @@ class Authentication {
       );
     }
   }
+
+  static saveUser(String email, name, uid) async {
+    var userSnap = FirebaseFirestore.instance.collection('users').doc(uid);
+
+    await userSnap.set({'email': email, 'name': name});
+  }
+
+  static updateUserType(String uid, type) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .update({'type': type});
+  }
+
+  static Future<User?> signUpWithEmail({
+    required BuildContext context,
+    required String email,
+    required String password,
+    String? name,
+  }) async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
+
+      await userCredential.user!.updateDisplayName(name);
+      await userCredential.user!.updatePhotoURL(
+          "https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png");
+      await FirebaseAuth.instance.currentUser!.updateEmail(email);
+      await FirebaseAuth.instance.currentUser!.updateDisplayName(name);
+      await FirebaseAuth.instance.currentUser!.updatePhotoURL(
+          "https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png");
+
+      await saveUser(email, name, userCredential.user!.uid); //save to firestore
+      return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          Authentication.customSnackBar(
+            content: 'Password Provided is too weak',
+          ),
+        );
+      } else if (e.code == 'email-already-in-use') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          Authentication.customSnackBar(
+            content: 'Email already Exists! Log In',
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  static Future<User?> signinUser(
+      {required String email,
+      required String password,
+      required,
+      required BuildContext context}) async {
+    User? user;
+    try {
+      UserCredential credential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+
+      return credential.user;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          Authentication.customSnackBar(
+            content: 'No user Found with this Email !',
+          ),
+        );
+      } else if (e.code == 'wrong-password') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          Authentication.customSnackBar(content: 'Wrong Password !'),
+        );
+      }
+    } catch (e) {
+      print("Exception in code : ${e}");
+    }
+  }
 }
 
 class GoogleSignInButton extends StatefulWidget {
@@ -147,10 +232,21 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
                 if (user != null) {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      // builder: (context) => UserInfoScreen(
-                      builder: (context) => HomePage(
-                        user: user,
-                      ),
+                      builder: (context) {
+                        var t = DatabaseService().getType(user.uid) !=
+                            null;
+                        if (t) {
+                          print("NOT found");
+                          return ProfileChooserPage(user: user);
+                        } else {
+                          print(
+                              "TYpe present ${DatabaseService().getType(user.uid)}");
+                          return HomePage(
+                            user: user,
+                            name: user.displayName,
+                          );
+                        }
+                      },
                     ),
                   );
                 } else {
@@ -169,175 +265,6 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
                     'https://cdn-icons-png.flaticon.com/64/281/281764.png'),
               ),
             ),
-    );
-  }
-
-
-
-  // ?/////////////// ?/////////////// ?/////////////// ?/////////////// ?/////////////
-}
-
-class UserInfoScreen extends StatefulWidget {
-  const UserInfoScreen({Key? key, required User user})
-      : _user = user,
-        super(key: key);
-
-  final User _user;
-
-  @override
-  _UserInfoScreenState createState() => _UserInfoScreenState();
-}
-
-class _UserInfoScreenState extends State<UserInfoScreen> {
-  late User _user;
-  bool _isSigningOut = false;
-
-  Route _routeToSignInScreen() {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => LogInPage(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        var begin = Offset(-1.0, 0.0);
-        var end = Offset.zero;
-        var curve = Curves.ease;
-
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
-    );
-  }
-
-  @override
-  void initState() {
-    _user = widget._user;
-
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.blue,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.blue,
-        title: Text("Supply Chain"),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(
-            left: 16.0,
-            right: 16.0,
-            bottom: 20.0,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(),
-              _user.photoURL != null
-                  ? ClipOval(
-                      child: Material(
-                        color: Colors.grey.withOpacity(0.3),
-                        child: Image.network(
-                          _user.photoURL!,
-                          fit: BoxFit.fitHeight,
-                        ),
-                      ),
-                    )
-                  : ClipOval(
-                      child: Material(
-                        color: Colors.grey.withOpacity(0.3),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Icon(
-                            Icons.person,
-                            size: 60,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ),
-                    ),
-              SizedBox(height: 16.0),
-              Text(
-                'Hello',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 26,
-                ),
-              ),
-              SizedBox(height: 8.0),
-              Text(
-                _user.displayName!,
-                style: TextStyle(
-                  color: Colors.yellow,
-                  fontSize: 26,
-                ),
-              ),
-              SizedBox(height: 8.0),
-              Text(
-                '( ${_user.email!} )',
-                style: TextStyle(
-                  color: Colors.orange,
-                  fontSize: 20,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              SizedBox(height: 24.0),
-              Text(
-                'You are now signed in using your Google account. To sign out of your account, click the "Sign Out" button below.',
-                style: TextStyle(
-                    color: Colors.grey.withOpacity(0.8),
-                    fontSize: 14,
-                    letterSpacing: 0.2),
-              ),
-              SizedBox(height: 16.0),
-              _isSigningOut
-                  ? CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    )
-                  : ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                          Colors.redAccent,
-                        ),
-                        shape: MaterialStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                      onPressed: () async {
-                        setState(() {
-                          _isSigningOut = true;
-                        });
-                        await Authentication.signOut(context: context);
-                        setState(() {
-                          _isSigningOut = false;
-                        });
-                        Navigator.of(context)
-                            .pushReplacement(_routeToSignInScreen());
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
-                        child: Text(
-                          'Sign Out',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            letterSpacing: 2,
-                          ),
-                        ),
-                      ),
-                    ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

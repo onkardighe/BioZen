@@ -1,14 +1,23 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/rendering.dart';
 import 'utils/appTheme.dart';
+import 'package:supplychain/utils/appDrawer.dart';
+import 'package:supplychain/utils/DatabaseService.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomePage extends StatefulWidget {
   final User _user;
-  const HomePage({Key? key, required User user})
-      : _user = user,
+  final String _userName;
+  String _userType;
+
+  HomePage({
+    Key? key,
+    required User user,
+    required name,
+    String userType = '',
+  })  : _user = user,
+        _userName = name,
+        _userType = userType,
         super(key: key);
 
   @override
@@ -20,6 +29,7 @@ class _HomePageState extends State<HomePage> {
   ScrollController _bodyScrollConroller = ScrollController();
   var initial;
   User? thisUser;
+  var userName = '', userType = '';
   var myData = [
     {
       "fName": "Onkar",
@@ -63,151 +73,166 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     thisUser = widget._user;
     super.initState();
+    getType();
 
     _bodyScrollConroller.addListener(() {
       setState(() {
-        _isAppbarVisible = _bodyScrollConroller.offset == 0;
+        _isAppbarVisible = _bodyScrollConroller.offset <= 25;
       });
     });
   }
 
+  void getType() async {
+    userType = await DatabaseService().getType(widget._user.uid) ?? "";
+    userName = await DatabaseService().getName(widget._user.uid) ?? "";
+    if (this.mounted) {
+      setState(() {});
+    }
+  }
+
   @override
-  Widget build(BuildContext Context) {
+  Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: _isAppbarVisible
-          ? AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              actions: const [
-                Padding(
-                  padding: EdgeInsets.only(right: 15),
-                  child: Icon(Icons.notifications_active),
-                )
-              ],
-              title: Text(
-                "Suppy Chain",
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-            )
-          : null,
-      body: SingleChildScrollView(
-        controller: _bodyScrollConroller,
-        child: Container(
-          child: Stack(
-            children: [
-              ClipPath(
-                clipper: CustomClipPath(),
-                child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * 0.45,
-                    alignment: Alignment.topLeft,
-                    padding: EdgeInsets.only(
-                        left: MediaQuery.of(context).size.width * 0.05,
-                        right: MediaQuery.of(context).size.width * 0.05),
-                    decoration: BoxDecoration(
-                      gradient: AppTheme().themeGradient,
-                    ),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: MediaQuery.of(context).size.width * 0.25,
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            TileIconWithName(
-                              userProfileImage: thisUser!.photoURL,
-                              childText: "",
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Text(
-                              thisUser!.displayName!,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontSize: 25),
-                            )
-                          ],
-                        ),
-                      ],
-                    )),
-              ),
-              Column(
-                children: [
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.25,
-                  ),
-                  Container(
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 10,
-                                blurStyle: BlurStyle.normal)
-                          ],
-                          borderRadius: BorderRadius.circular(35)),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(25),
-                            alignment: Alignment.centerLeft,
-                            decoration: BoxDecoration(),
-                            child: Text(
-                              "text",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          Container(
-                            height: 1,
-                            color: Colors.grey.shade300,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                TileIconWithName(
-                                  icon: Icons.dashboard_rounded,
-                                  childText: "Dashboard",
-                                  gradient: AppTheme().themeGradient,
-                                ),
-                                TileIconWithName(
-                                  icon: Icons.history_rounded,
-                                  childText: "History",
-                                  gradient: AppTheme().themeGradient,
-                                )
-                              ],
-                            ),
-                          )
-                        ],
-                      )),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  Center(
-                    child: Column(children: [
-                      for (var thisData in myData)
-                        buildCard(thisData["fName"], myData.indexOf(thisData),
-                            thisData["date"], thisData["time"])
-                    ]),
+        extendBodyBehindAppBar: true,
+        appBar: _isAppbarVisible
+            ? AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                actions: const [
+                  Padding(
+                    padding: EdgeInsets.only(right: 15),
+                    child: Icon(Icons.notifications_active),
                   )
                 ],
-              ),
-            ],
+                title: Text(
+                  "Suppy Chain",
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              )
+            : null,
+        body: SingleChildScrollView(
+          controller: _bodyScrollConroller,
+          child: Container(
+            child: Stack(
+              children: [
+                ClipPath(
+                  clipper: CustomClipPath(),
+                  child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height * 0.45,
+                      alignment: Alignment.topLeft,
+                      padding: EdgeInsets.only(
+                          left: MediaQuery.of(context).size.width * 0.05,
+                          right: MediaQuery.of(context).size.width * 0.05),
+                      decoration: BoxDecoration(
+                        gradient: AppTheme().themeGradient,
+                      ),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.width * 0.25,
+                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              TileIconWithName(
+                                userProfileImage: thisUser!.photoURL,
+                                childText: "",
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                userName,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    fontSize: 25),
+                              )
+                            ],
+                          ),
+                        ],
+                      )),
+                ),
+                Column(
+                  children: [
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.25,
+                    ),
+                    Container(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 10,
+                                  blurStyle: BlurStyle.normal)
+                            ],
+                            borderRadius: BorderRadius.circular(35)),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(25),
+                              alignment: Alignment.centerLeft,
+                              decoration: BoxDecoration(),
+                              child: Text(
+                                // "Total supplies subscribed : ${myData.length}",
+                                "Type : ${userType}",
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              height: 1,
+                              color: Colors.grey.shade300,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  TileIconWithName(
+                                    icon: Icons.dashboard_rounded,
+                                    childText: "Dashboard",
+                                    gradient: AppTheme().themeGradient,
+                                  ),
+                                  TileIconWithName(
+                                    icon: Icons.history_rounded,
+                                    childText: "History",
+                                    gradient: AppTheme().themeGradient,
+                                  )
+                                ],
+                              ),
+                            )
+                          ],
+                        )),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Center(
+                      child: Column(children: [
+                        for (var thisData in myData)
+                          buildCard(thisData["fName"], myData.indexOf(thisData),
+                              thisData["date"], thisData["time"])
+                      ]),
+                    )
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-      // ),
-    );
+        drawer: appDrawer(
+          user: thisUser!,
+          name: thisUser!.displayName ?? userName,
+        ));
   }
 
   Widget buildCard(String? str, int id, String? date, String? time) {
@@ -310,7 +335,10 @@ class TileIconWithName extends TextButton {
                     foregroundColor: Colors.white,
                     backgroundImage: userProfileImage == ""
                         ? null
-                        : NetworkImage(userProfileImage!),
+                        : userProfileImage == null
+                            ? NetworkImage(
+                                "https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png")
+                            : NetworkImage(userProfileImage!),
                     child: icon != null
                         ? Icon(
                             icon,

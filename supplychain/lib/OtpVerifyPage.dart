@@ -1,12 +1,22 @@
+import 'dart:ui';
+import 'package:firebase_auth/firebase_auth.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
+import 'package:supplychain/utils/appTheme.dart';
+import 'package:supplychain/ProfileChooserPage.dart';
 
 class OtpVerifyPage extends StatefulWidget {
+  final User _user;
+  const OtpVerifyPage({Key? key, required User user})
+      : _user = user,
+        super(key: key);
+
   @override
   _OtpVerifyPageState createState() => _OtpVerifyPageState();
 }
 
 class _OtpVerifyPageState extends State<OtpVerifyPage> {
+  User? thisUser;
   TextEditingController _otp1 = TextEditingController(),
       _otp2 = TextEditingController(),
       _otp3 = TextEditingController(),
@@ -21,9 +31,17 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
   final _numericRegex = RegExp(r'^[0-9]+$');
 
   @override
+  void initState() {
+    thisUser = widget._user;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        flexibleSpace: Container(
+            decoration: BoxDecoration(gradient: AppTheme().themeGradient)),
         centerTitle: true,
         title: const Text(
           "Supply Chain",
@@ -49,7 +67,8 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                 Text("${_mobileNumber}"),
                 TextButton(
                   onPressed: () => Navigator.pushNamed(context, "/SignUpPage"),
-                  child: Text("Change", style: TextStyle(color: Colors.blue)),
+                  child: Text("Change",
+                      style: TextStyle(color: Colors.deepPurple)),
                 ),
                 SizedBox(
                   height: 30,
@@ -70,6 +89,9 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                           ],
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 2, color: Colors.deepPurple)),
                               border: OutlineInputBorder(),
                               errorText: _errorOTP1),
                         )),
@@ -86,6 +108,9 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                           ],
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 2, color: Colors.deepPurple)),
                               border: OutlineInputBorder(),
                               errorText: _errorOTP2),
                         )),
@@ -102,6 +127,9 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                           ],
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 2, color: Colors.deepPurple)),
                               border: OutlineInputBorder(),
                               errorText: _errorOTP3),
                         )),
@@ -118,6 +146,9 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                           ],
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 2, color: Colors.deepPurple)),
                               border: OutlineInputBorder(),
                               errorText: _errorOTP4),
                         )),
@@ -127,20 +158,25 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
                 SizedBox(
                   height: 70,
                 ),
-                TextButton(
-                    style: ButtonStyle(
-                        fixedSize:
-                            MaterialStateProperty.all<Size>(Size(230, 40)),
-                        foregroundColor:
-                            MaterialStateProperty.all<Color>(Colors.white),
-                        backgroundColor:
-                            MaterialStateProperty.all<Color>(Colors.blue)),
-                    onPressed: _verify,
-                    child: const Text("Verify",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ))),
+                Container(
+                  decoration: BoxDecoration(
+                      gradient: AppTheme().themeGradient,
+                      borderRadius: BorderRadius.circular(8)),
+                  child: TextButton(
+                      style: ButtonStyle(
+                          fixedSize:
+                              MaterialStateProperty.all<Size>(Size(230, 40)),
+                          foregroundColor:
+                              MaterialStateProperty.all<Color>(Colors.white),
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.transparent)),
+                      onPressed: _verify,
+                      child: const Text("Verify",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ))),
+                ),
                 Spacer(
                   flex: 2,
                 ),
@@ -191,7 +227,10 @@ class _OtpVerifyPageState extends State<OtpVerifyPage> {
         _errorOTP2 == null &&
         _errorOTP3 == null &&
         _errorOTP4 == null) {
-      Navigator.pushNamed(context, "/ProfileChooserPage");
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: ((context) => ProfileChooserPage(
+                user: thisUser!,
+              ))));
     }
   }
 }

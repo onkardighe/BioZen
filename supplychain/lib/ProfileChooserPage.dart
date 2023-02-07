@@ -1,185 +1,124 @@
 import 'package:flutter/material.dart';
+import 'package:supplychain/utils/appTheme.dart';
+import 'package:supplychain/utils/Authentication.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:supplychain/HomePage.dart';
 
 class ProfileChooserPage extends StatefulWidget {
+  final User _user;
+  const ProfileChooserPage({Key? key, required User user})
+      : _user = user,
+        super(key: key);
+
+  @override
   _ProfileChooserPageState createState() => _ProfileChooserPageState();
 }
 
 class _ProfileChooserPageState extends State<ProfileChooserPage> {
   double _cardHeight = 220, _cardWidth = 160;
+  User? _thisUser;
+
+  @override
+  void initState() {
+    _thisUser = widget._user;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-        appBar: AppBar(
-          centerTitle: true,
-          title: const Text(
-            "Supply Chain",
-          ),
+      appBar: AppBar(
+        flexibleSpace: Container(
+            decoration: BoxDecoration(gradient: AppTheme().themeGradient)),
+        centerTitle: true,
+        title: const Text(
+          "Supply Chain",
         ),
-        body: Center(
-          child: Container(
-              child: Column(
+      ),
+      body: Center(
+        child: Container(
+          child: Column(
+            children: [
+              Spacer(),
+              Text(
+                "Are You ?",
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 30),
+              ),
+              SizedBox(
+                height: 40,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Spacer(),
-                  Text(
-                    "Are You ?",
-                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 30),
-                  ),
-                  SizedBox(
-                    height: 40,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox.fromSize(
-                        size: Size(_cardWidth, _cardHeight), // button width and height
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(90),
-                          child: Material(
-                            color: Colors.blueGrey.shade100, // button color
-                            child: InkWell(
-                              splashColor: Colors.blue, // splash color
-                              onTap: () {}, // button pressed
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: const <Widget>[
-                                  Spacer(),
-                                  Icon(
-                                    Icons.factory_rounded,
-                                    size: 80,
-                                  ),
-                                  // Spacer(),
-                                  Text(
-                                    "Supplier",
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Spacer(),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 20),
-                      SizedBox.fromSize(
-                        size: Size(_cardWidth, _cardHeight), // button width and height
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(90),
-                          child: Material(
-                            color: Colors.blueGrey.shade100, // button color
-                            child: InkWell(
-                              splashColor: Colors.blue, // splash color
-                              onTap: () {}, // button pressed
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: const <Widget>[
-                                  Spacer(),
-                                  Icon(
-                                    Icons.local_gas_station_rounded,
-                                    size: 80,
-                                  ),
-                                  // Spacer(),
-                                  Text(
-                                    "Fuel Company",
-                                    textAlign: TextAlign.center,
-                                    softWrap: true,
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Spacer()
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox.fromSize(
-                        size: Size(_cardWidth, _cardHeight), // button width and height
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(90),
-                          child: Material(
-                            color: Colors.blueGrey.shade100, // button color
-                            child: InkWell(
-                              splashColor: Colors.blue, // splash color
-                              onTap: () {}, // button pressed
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: const <Widget>[
-                                  Spacer(),
-                                  Icon(
-                                    Icons.local_shipping_rounded,
-                                    size: 80,
-                                  ),
-                                  // Spacer(),
-                                  Text(
-                                    "Transport Authority",
-                                    textAlign: TextAlign.center,
-                                    softWrap: true,
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Spacer()
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 20),
-                      SizedBox.fromSize(
-                        size: Size(_cardWidth, _cardHeight), // button width and height
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(90),
-                          child: Material(
-                            color: Colors.blueGrey.shade100, // button color
-                            child: InkWell(
-                              splashColor: Colors.blue, // splash color
-                              onTap: () {}, // button pressed
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: const <Widget>[
-                                  Spacer(),
-                                  Icon(
-                                    Icons.shield_rounded,
-                                    size: 80,
-                                  ),
-                                  // Spacer(),
-                                  Text(
-                                    "Insurance Authority",
-                                    textAlign: TextAlign.center,
-                                    softWrap: true,
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Spacer()
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                                  // Text("📦  🏭 🚚 🛡", style: TextStyle(fontSize: 60),),
-                  Spacer()
+                  profileCard(Icons.factory_rounded, "Supplier"),
+                  SizedBox(width: 20),
+                  profileCard(Icons.local_gas_station_rounded, "Fuel Company"),
                 ],
               ),
-            ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  profileCard(
+                      Icons.local_shipping_rounded, "Transport Authority"),
+                  SizedBox(width: 20),
+                  profileCard(
+                    Icons.shield_rounded,
+                    "Insurance Authority",
+                  ),
+                ],
+              ),
+              // Text("📦  🏭 🚚 🛡", style: TextStyle(fontSize: 60),),
+              Spacer()
+            ],
           ),
-        );
+        ),
+      ),
+    );
   }
 
   void _buttonPressed() {}
+
+  Widget profileCard(IconData icon, String type) {
+    return SizedBox.fromSize(
+      size: Size(_cardWidth, _cardHeight),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(90),
+        child: Material(
+          color: Colors.blueGrey.shade100,
+          child: InkWell(
+            splashColor: Colors.deepPurple, // splash color
+            onTap: () {
+              Authentication.updateUserType(_thisUser!.uid, type);
+
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => HomePage(
+                  user: _thisUser!,
+                  name: "Profile page Nmae",
+                  userType: type,
+                ),
+              ));
+            }, // button pressed
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Spacer(),
+                Icon(
+                  icon,
+                  size: 80,
+                ),
+                Text(
+                  type,
+                  textAlign: TextAlign.center,
+                  softWrap: true,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                Spacer()
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

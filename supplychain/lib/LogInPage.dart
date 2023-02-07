@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
-import 'utils/Authentication.dart';
-import 'utils/appTheme.dart';
+import 'package:supplychain/utils/Authentication.dart';
+import 'package:supplychain/utils/appTheme.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:supplychain/HomePage.dart';
 
 class LogInPage extends StatefulWidget {
-  
-
   @override
   _LogInPageState createState() => _LogInPageState();
 }
 
 class _LogInPageState extends State<LogInPage> {
-  
-  TextEditingController _mobileController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
   TextEditingController _passController = TextEditingController();
-
+  String? _errorPassText;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          flexibleSpace: Container(
+              decoration: BoxDecoration(gradient: AppTheme().themeGradient)),
           centerTitle: true,
           title: const Text(
             "Supply Chain",
@@ -34,7 +34,9 @@ class _LogInPageState extends State<LogInPage> {
               child: Center(
                   child: Column(
                 children: [
-                  const Spacer(),
+                  SizedBox(
+                    height: 30,
+                  ),
                   const Text("Log In",
                       style: TextStyle(
                           color: Colors.black87,
@@ -61,21 +63,38 @@ class _LogInPageState extends State<LogInPage> {
                         const SizedBox(
                           height: 5,
                         ),
-                        TextField(
+                        TextFormField(
                           textAlign: TextAlign.center,
-                          controller: _mobileController,
+                          controller: _emailController,
                           inputFormatters: [
-                            LengthLimitingTextInputFormatter(10),
-                            FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
+                            FilteringTextInputFormatter.allow(
+                                RegExp(r'[a-zA-Z0-9@.]'))
                           ],
-                          keyboardType: TextInputType.phone,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (input) =>
+                              isValidEmail(input!) ? null : "Invalid Email !",
+                          keyboardType: TextInputType.emailAddress,
+                          style: TextStyle(color: Colors.deepPurple),
                           decoration: const InputDecoration(
-                            label: Text("Mobile Number"),
-                            labelStyle: TextStyle(),
+                            label: Text(
+                              "Email",
+                              style: TextStyle(color: Colors.deepPurple),
+                            ),
+                            floatingLabelStyle:
+                                TextStyle(color: Colors.deepPurple),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    width: 2, color: Colors.deepPurple),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                            enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    width: 1, color: Colors.deepPurple),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
                             border: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(10))),
-                            hintStyle: TextStyle(color: Colors.black38),
                           ),
                         ),
                         const SizedBox(
@@ -84,49 +103,97 @@ class _LogInPageState extends State<LogInPage> {
                         const SizedBox(
                           height: 5,
                         ),
-                        TextField(
+                        TextFormField(
                           obscureText: true,
                           controller: _passController,
+                          onChanged: (passwordText) {
+                            _errorPassText = null;
+                          },
                           inputFormatters: [
                             LengthLimitingTextInputFormatter(15),
                           ],
                           textAlign: TextAlign.center,
-                          decoration: const InputDecoration(
-                            suffixIcon: Icon(Icons.visibility),
-                            label: Text("Password"),
+                          style: TextStyle(color: Colors.deepPurple),
+                          decoration: InputDecoration(
+                            errorText: _errorPassText,
+                            suffixIcon: Icon(
+                              Icons.visibility,
+                              color: Colors.deepPurple,
+                            ),
+                            label: Text(
+                              "Password",
+                              style: TextStyle(
+                                color: Colors.deepPurple,
+                              ),
+                            ),
                             counterText: 'Forgot Password ?',
+                            floatingLabelStyle:
+                                TextStyle(color: Colors.deepPurple),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    width: 2, color: Colors.deepPurple),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                            enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    width: 1, color: Colors.deepPurple),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
                             border: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(10))),
-                            hintStyle: TextStyle(color: Colors.black38),
                           ),
                         ),
                         const SizedBox(
                           height: 25,
                         ),
-                        TextButton(
-                          style: ButtonStyle(
-                            
-                              backgroundColor:
-                                  MaterialStateProperty.all<Color>(Colors.blue),
-                              foregroundColor: MaterialStateProperty.all<Color>(
-                                  Colors.white),
-                              minimumSize: MaterialStateProperty.all<Size>(
-                                  const Size(200, 50)),
-                              shape: MaterialStateProperty.all<
-                                      RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ))),
-                          onPressed: () {
-                            if (_mobileController.value.text.isNotEmpty &&
-                                _passController.value.text.isNotEmpty) {
-                              // log in
-                            }
-                          },
-                          child: const Text('Log In',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold)),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: AppTheme().themeGradient,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: TextButton(
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.transparent),
+                                foregroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.white),
+                                minimumSize: MaterialStateProperty.all<Size>(
+                                    const Size(200, 50)),
+                                shape: MaterialStateProperty.all<
+                                        RoundedRectangleBorder>(
+                                    RoundedRectangleBorder())),
+                            onPressed: () async {
+                              if (_emailController.value.text.isNotEmpty &&
+                                  isValidEmail(_emailController.value.text) &&
+                                  _passController.value.text.isNotEmpty) {
+                                // log in
+                                User? tempUser = await loginUser();
+                                if (tempUser != null) {
+                                  Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                      builder: (context) => HomePage(
+                                          user: tempUser!, name: tempUser.displayName),
+                                    ),
+                                  );
+                                } else {
+                                  setState(() {
+                                    _errorPassText =
+                                        "Sign up failed, Try agin !";
+                                  });
+                                }
+                              } else {
+                                setState(() {
+                                  _errorPassText = "Invalid Credentials";
+                                });
+                              }
+                            },
+                            child: const Text('Log In',
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold)),
+                          ),
                         ),
                         const SizedBox(
                           height: 50,
@@ -163,7 +230,7 @@ class _LogInPageState extends State<LogInPage> {
                         setState(() {});
                       },
                       child: RichText(
-                        text: const TextSpan(
+                        text: TextSpan(
                             style: TextStyle(fontWeight: FontWeight.bold),
                             children: [
                               TextSpan(
@@ -171,12 +238,27 @@ class _LogInPageState extends State<LogInPage> {
                                   style: TextStyle(color: Colors.grey)),
                               TextSpan(
                                   text: "Register",
-                                  style: TextStyle(color: Colors.blue)),
+                                  style: TextStyle(
+                                      color: Colors.deepPurple.shade500)),
                             ]),
                       )),
                   Spacer()
                 ],
               )),
             )));
+  }
+
+  Future<User?> loginUser() async {
+    User? user = await Authentication.signinUser(
+        email: _emailController.value.text,
+        password: _passController.value.text,
+        context: context);
+    return user;
+  }
+
+  bool isValidEmail(String str) {
+    return RegExp(
+            r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+        .hasMatch(str);
   }
 }
