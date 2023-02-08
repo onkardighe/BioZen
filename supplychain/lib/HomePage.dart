@@ -99,10 +99,18 @@ class _HomePageState extends State<HomePage> {
             ? AppBar(
                 backgroundColor: Colors.transparent,
                 elevation: 0,
-                actions: const [
+                actions: [
                   Padding(
                     padding: EdgeInsets.only(right: 15),
-                    child: Icon(Icons.notifications_active),
+                    child: Container(
+                        width: 33,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.indigo.shade400),
+                        child: Icon(
+                          Icons.notifications,
+                          size: 22,
+                        )),
                   )
                 ],
                 title: Text(
@@ -233,6 +241,7 @@ class _HomePageState extends State<HomePage> {
         drawer: appDrawer(
           user: thisUser!,
           name: thisUser!.displayName ?? userName,
+          type: userType,
         ));
   }
 
