@@ -3,12 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class DatabaseService {
   Future<String?> getType(String uid) async {
     try {
-      CollectionReference users =
-          FirebaseFirestore.instance.collection('users');
-      final snapshot = await users.doc(uid).get();
-      final data = snapshot.data() as Map<String, dynamic>;
+      var users = FirebaseFirestore.instance.collection('users');
+      var snapshot = await users.doc(uid).get();
+
+      var data = snapshot.data() as Map<String, dynamic>;
       return data['type'];
     } catch (e) {
+      print("Exception : {$e}");
       return 'Error Fetching User';
     }
   }

@@ -175,7 +175,8 @@ class _LogInPageState extends State<LogInPage> {
                                   Navigator.of(context).pushReplacement(
                                     MaterialPageRoute(
                                       builder: (context) => HomePage(
-                                          user: tempUser!, name: tempUser.displayName),
+                                          user: tempUser!,
+                                          name: tempUser.displayName),
                                     ),
                                   );
                                 } else {
@@ -226,7 +227,7 @@ class _LogInPageState extends State<LogInPage> {
                   const Spacer(),
                   TextButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, "/SignUpPage");
+                        Navigator.pushReplacementNamed(context, "/SignUpPage");
                         setState(() {});
                       },
                       child: RichText(

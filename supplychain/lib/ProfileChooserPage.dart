@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supplychain/utils/DatabaseService.dart';
 import 'package:supplychain/utils/appTheme.dart';
 import 'package:supplychain/utils/Authentication.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,11 +18,24 @@ class ProfileChooserPage extends StatefulWidget {
 class _ProfileChooserPageState extends State<ProfileChooserPage> {
   double _cardHeight = 220, _cardWidth = 160;
   User? _thisUser;
+  var userType;
 
   @override
   void initState() {
     _thisUser = widget._user;
+    getType();
+    if (userType != null) {
+      _routeToHomeScreen(userType);
+      return;
+    }
     super.initState();
+  }
+
+  void getType() async {
+    userType = await DatabaseService().getType(widget._user.uid) ?? "";
+    if (this.mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -91,13 +105,7 @@ class _ProfileChooserPageState extends State<ProfileChooserPage> {
             onTap: () {
               Authentication.updateUserType(_thisUser!.uid, type);
 
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => HomePage(
-                  user: _thisUser!,
-                  name: "Profile page Nmae",
-                  userType: type,
-                ),
-              ));
+              _routeToHomeScreen(type);
             }, // button pressed
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -120,5 +128,17 @@ class _ProfileChooserPageState extends State<ProfileChooserPage> {
         ),
       ),
     );
+  }
+
+  void _routeToHomeScreen(String type) {
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => HomePage(
+            user: _thisUser!,
+            name: "Profile page Nmae",
+            userType: type,
+          ),
+        ),
+        (Route route) => false);
   }
 }

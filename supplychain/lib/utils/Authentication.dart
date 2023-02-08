@@ -116,8 +116,11 @@ class Authentication {
 
   static saveUser(String email, name, uid) async {
     var userSnap = FirebaseFirestore.instance.collection('users').doc(uid);
+    var doc = await userSnap.get();
 
-    await userSnap.set({'email': email, 'name': name});
+    if (!doc.exists) {
+      await userSnap.set({'email': email, 'name': name});
+    }
   }
 
   static updateUserType(String uid, type) async {
@@ -233,9 +236,8 @@ class _GoogleSignInButtonState extends State<GoogleSignInButton> {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                       builder: (context) {
-                        var t = DatabaseService().getType(user.uid) !=
-                            null;
-                        if (t) {
+                        var t = DatabaseService().getType(user.uid);
+                        if (t != null) {
                           print("NOT found");
                           return ProfileChooserPage(user: user);
                         } else {

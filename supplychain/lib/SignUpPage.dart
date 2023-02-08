@@ -302,7 +302,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   const Spacer(),
                   TextButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, "/LoginPage");
+                        Navigator.pushReplacementNamed(context, "/LoginPage");
                       },
                       child: RichText(
                         text: const TextSpan(
