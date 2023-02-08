@@ -76,6 +76,7 @@ class Authentication {
           );
         }
       } catch (e) {
+        print(e);
         ScaffoldMessenger.of(context).showSnackBar(
           Authentication.customSnackBar(
             content: 'Error occurred using Google Sign-In. Try again.',

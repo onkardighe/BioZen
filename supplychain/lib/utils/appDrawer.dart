@@ -3,13 +3,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:supplychain/utils/appTheme.dart';
 import 'package:supplychain/LogInPage.dart';
 import 'package:supplychain/utils/Authentication.dart';
+import 'package:supplychain/utils/profilePage.dart';
 
 class appDrawer extends StatefulWidget {
   final User _user;
   final String _userName;
-  const appDrawer({Key? key, required User user, required String name})
+  final String? userType;
+  const appDrawer(
+      {Key? key, required User user, required String name, String? type})
       : _user = user,
         _userName = name,
+        userType = type,
         super(key: key);
 
   @override
@@ -19,12 +23,13 @@ class appDrawer extends StatefulWidget {
 class _appDrawerState extends State<appDrawer> {
   bool _isSigningOut = false;
   User? _thisUser;
-  var userName;
+  var userName, userType;
 
   @override
   void initState() {
     _thisUser = widget._user;
     userName = widget._userName;
+    userType = widget.userType;
     super.initState();
   }
 
@@ -39,22 +44,25 @@ class _appDrawerState extends State<appDrawer> {
               SizedBox(
                 height: 210,
                 child: DrawerHeader(
-                    child: UserAccountsDrawerHeader(
-                  currentAccountPicture: CircleAvatar(
-                    backgroundImage: _thisUser!.photoURL == null
-                        ? NetworkImage(
-                            "https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png")
-                        : NetworkImage(_thisUser!.photoURL!),
+                  child: UserAccountsDrawerHeader(
+                    margin: EdgeInsets.only(bottom: 0),
+                    currentAccountPicture: CircleAvatar(
+                      backgroundImage: _thisUser!.photoURL == null
+                          ? NetworkImage(
+                              "https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png")
+                          : NetworkImage(_thisUser!.photoURL!),
+                    ),
+                    accountName: Text(
+                      _thisUser!.displayName != null
+                          ? _thisUser!.displayName!
+                          : userName,
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    accountEmail: Text(_thisUser!.email ?? "Link Your Email !"),
+                    decoration: BoxDecoration(color: Colors.transparent),
                   ),
-                  accountName: Text(
-                    _thisUser!.displayName != null
-                        ? _thisUser!.displayName!
-                        : userName,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  accountEmail: Text(_thisUser!.email!),
-                  decoration: BoxDecoration(color: Colors.transparent),
-                )),
+                ),
               ),
               Container(
                 margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
@@ -66,15 +74,17 @@ class _appDrawerState extends State<appDrawer> {
                       )),
                       backgroundColor:
                           MaterialStateProperty.all(Colors.indigo.shade700)),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).push(_routeToProfile());
+                  },
                   child: const ListTile(
                     textColor: Colors.white,
                     title: Text(
-                      "Edit Profile",
+                      "Profile",
                       style: TextStyle(fontSize: 18),
                     ),
                     leading: Icon(
-                      Icons.edit_outlined,
+                      Icons.person_rounded,
                       size: 25,
                       color: Colors.white,
                     ),
@@ -177,6 +187,29 @@ class _appDrawerState extends State<appDrawer> {
       pageBuilder: (context, animation, secondaryAnimation) => LogInPage(),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         var begin = Offset(-1.0, 0.0);
+        var end = Offset.zero;
+        var curve = Curves.ease;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
+  }
+
+  Route _routeToProfile() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => ProfilePage(
+        user: _thisUser!,
+        name: userName,
+        type: userType,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        var begin = Offset(1, 0.0);
         var end = Offset.zero;
         var curve = Curves.ease;
 
