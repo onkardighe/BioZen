@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supplychain/utils/appTheme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 
 class ProfilePage extends StatefulWidget {
   final User _user;
@@ -39,20 +40,19 @@ class _ProfilePageState extends State<ProfilePage> {
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           leading: Padding(
-            padding: const EdgeInsets.only(left: 15, top: 15),
+            padding: const EdgeInsets.only(left: 10, top: 15),
             child: Container(
               width: 50,
               decoration: BoxDecoration(
-                  shape: BoxShape.circle, color: Colors.blue.shade600),
+                  shape: BoxShape.circle, color: Colors.transparent),
               child: TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
                 child: Icon(
-                  Icons.home_outlined,
+                  Icons.arrow_circle_left_rounded,
                   color: Colors.white,
-                  // size: 33,
-                  size: 23,
+                  size: 36,
                 ),
               ),
             ),
@@ -112,7 +112,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
                     child: ListTile(
                       leading: Icon(
-                        Icons.phone,
+                        Icons.phone_android_rounded,
                         color: Colors.deepPurple,
                       ),
                       // trailing: Icon(
@@ -137,7 +137,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
                     child: ListTile(
                       leading: Icon(
-                        Icons.email,
+                        Icons.email_outlined,
                         color: Colors.deepPurple,
                       ),
                       // trailing: Icon(
@@ -151,6 +151,36 @@ class _ProfilePageState extends State<ProfilePage> {
                           color: Colors.deepPurple,
                           fontFamily: 'Source Sans Pro',
                           fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Card(
+                    margin:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
+                    child: ListTile(
+                      leading: Icon(
+                        Icons.medical_information_outlined,
+                        color: Colors.deepPurple,
+                      ),
+                      trailing: InkWell(
+                          onTap: (() async {
+                            await Clipboard.setData(ClipboardData(
+                              text: _thisUser!.uid ?? "",
+                            ));
+                          }),
+                          child: Icon(Icons.copy)),
+                      // trailing: Icon(
+                      //   Icons.edit,
+                      //   size: 17,
+                      //   color: Colors.deepPurple,
+                      // ),
+                      title: Text(
+                        _thisUser!.uid ?? "User Not Found !!",
+                        style: TextStyle(
+                          color: Colors.deepPurple,
+                          fontFamily: 'Source Sans Pro',
+                          fontSize: 14,
                         ),
                       ),
                     ),

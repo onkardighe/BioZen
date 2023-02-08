@@ -18,7 +18,7 @@ class _SignUpPageState extends State<SignUpPage> {
   TextEditingController _emailController = TextEditingController();
   String? _errorTextPassNew, _errorTextPassConfirm, _errorTextEmail;
   String tempUserName = "Onkar Dighe";
-
+  bool isPasswordVisible = false, isConfirmPasswordVisible = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,7 +118,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                         TextField(
                           controller: _passController,
-                          obscureText: true,
+                          obscureText: !isPasswordVisible,
                           inputFormatters: [
                             LengthLimitingTextInputFormatter(15),
                           ],
@@ -126,9 +126,18 @@ class _SignUpPageState extends State<SignUpPage> {
                           style: TextStyle(color: Colors.deepPurple),
                           decoration: InputDecoration(
                             errorText: _errorTextPassNew,
-                            suffixIcon: const Icon(
-                              Icons.visibility,
-                              color: Colors.deepPurple,
+                            suffixIcon: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  isPasswordVisible = !isPasswordVisible;
+                                });
+                              },
+                              child: Icon(
+                                isPasswordVisible
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: Colors.deepPurple,
+                              ),
                             ),
                             label: const Text(
                               "Create new password",
@@ -154,7 +163,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                         TextField(
                           controller: _passConfirmController,
-                          obscureText: true,
+                          obscureText: !isConfirmPasswordVisible,
                           onChanged: (passConfirmed) {
                             _errorTextPassConfirm =
                                 passConfirmed != _passController.value.text
@@ -169,9 +178,19 @@ class _SignUpPageState extends State<SignUpPage> {
                           style: TextStyle(color: Colors.deepPurple),
                           decoration: InputDecoration(
                             errorText: _errorTextPassConfirm,
-                            suffixIcon: const Icon(
-                              Icons.visibility,
-                              color: Colors.deepPurple,
+                            suffixIcon: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  isConfirmPasswordVisible =
+                                      !isConfirmPasswordVisible;
+                                });
+                              },
+                              child: Icon(
+                                isConfirmPasswordVisible
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: Colors.deepPurple,
+                              ),
                             ),
                             label: const Text(
                               "Confirm password",

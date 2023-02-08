@@ -14,6 +14,7 @@ class _LogInPageState extends State<LogInPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passController = TextEditingController();
   String? _errorPassText;
+  bool isPasswordVisible = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,7 +105,7 @@ class _LogInPageState extends State<LogInPage> {
                           height: 5,
                         ),
                         TextFormField(
-                          obscureText: true,
+                          obscureText: !isPasswordVisible,
                           controller: _passController,
                           onChanged: (passwordText) {
                             _errorPassText = null;
@@ -116,9 +117,18 @@ class _LogInPageState extends State<LogInPage> {
                           style: TextStyle(color: Colors.deepPurple),
                           decoration: InputDecoration(
                             errorText: _errorPassText,
-                            suffixIcon: Icon(
-                              Icons.visibility,
-                              color: Colors.deepPurple,
+                            suffixIcon: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  isPasswordVisible = !isPasswordVisible;
+                                });
+                              },
+                              child: Icon(
+                                isPasswordVisible
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: Colors.deepPurple,
+                              ),
                             ),
                             label: Text(
                               "Password",
