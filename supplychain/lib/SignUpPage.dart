@@ -293,28 +293,28 @@ class _SignUpPageState extends State<SignUpPage> {
                         const SizedBox(
                           height: 50,
                         ),
-                        const Text("or Sign up with "),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        FutureBuilder(
-                          future: Authentication.initializeFirebase(),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasError) {
-                              print(snapshot.error);
-                              return Text(
-                                  'Error initializing Firebase ${snapshot.error}');
-                            } else if (snapshot.connectionState ==
-                                ConnectionState.done) {
-                              return GoogleSignInButton();
-                            }
-                            return const CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.orange,
-                              ),
-                            );
-                          },
-                        ),
+                        // const Text("or Sign up with "),
+                        // const SizedBox(
+                        //   height: 10,
+                        // ),
+                        // FutureBuilder(
+                        //   future: Authentication.initializeFirebase(),
+                        //   builder: (context, snapshot) {
+                        //     if (snapshot.hasError) {
+                        //       print(snapshot.error);
+                        //       return Text(
+                        //           'Error initializing Firebase ${snapshot.error}');
+                        //     } else if (snapshot.connectionState ==
+                        //         ConnectionState.done) {
+                        //       return GoogleSignInButton();
+                        //     }
+                        //     return const CircularProgressIndicator(
+                        //       valueColor: AlwaysStoppedAnimation<Color>(
+                        //         Colors.orange,
+                        //       ),
+                        //     );
+                        //   },
+                        // ),
                       ],
                     ),
                   ),

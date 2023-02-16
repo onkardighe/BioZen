@@ -35,9 +35,10 @@ class _LogInPageState extends State<LogInPage> {
               child: Center(
                   child: Column(
                 children: [
-                  SizedBox(
-                    height: 30,
-                  ),
+                  // SizedBox(
+                  //   height: 30,
+                  // ),
+                  Spacer(),
                   const Text("Log In",
                       style: TextStyle(
                           color: Colors.black87,
@@ -155,7 +156,7 @@ class _LogInPageState extends State<LogInPage> {
                           ),
                         ),
                         const SizedBox(
-                          height: 25,
+                          height: 35,
                         ),
                         Container(
                           decoration: BoxDecoration(
@@ -207,30 +208,30 @@ class _LogInPageState extends State<LogInPage> {
                           ),
                         ),
                         const SizedBox(
-                          height: 50,
+                          height: 35,
                         ),
-                        const Text("Or Log in with "),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        FutureBuilder(
-                          future: Authentication.initializeFirebase(),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasError) {
-                              print(snapshot.error);
-                              return Text(
-                                  'Error initializing Firebase ${snapshot.error}');
-                            } else if (snapshot.connectionState ==
-                                ConnectionState.done) {
-                              return GoogleSignInButton();
-                            }
-                            return const CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.orange,
-                              ),
-                            );
-                          },
-                        ),
+                        // const Text("Or Log in with "),
+                        // const SizedBox(
+                        //   height: 10,
+                        // ),
+                        // FutureBuilder(
+                        //   future: Authentication.initializeFirebase(),
+                        //   builder: (context, snapshot) {
+                        //     if (snapshot.hasError) {
+                        //       print(snapshot.error);
+                        //       return Text(
+                        //           'Error initializing Firebase ${snapshot.error}');
+                        //     } else if (snapshot.connectionState ==
+                        //         ConnectionState.done) {
+                        //       return GoogleSignInButton();
+                        //     }
+                        //     return const CircularProgressIndicator(
+                        //       valueColor: AlwaysStoppedAnimation<Color>(
+                        //         Colors.orange,
+                        //       ),
+                        //     );
+                        //   },
+                        // ),
                       ],
                     ),
                   ),
@@ -253,7 +254,9 @@ class _LogInPageState extends State<LogInPage> {
                                       color: Colors.deepPurple.shade500)),
                             ]),
                       )),
-                  Spacer()
+                  SizedBox(
+                    height: 30,
+                  )
                 ],
               )),
             )));

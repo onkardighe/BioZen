@@ -91,8 +91,6 @@ class _ProfileChooserPageState extends State<ProfileChooserPage> {
     );
   }
 
-  void _buttonPressed() {}
-
   Widget profileCard(IconData icon, String type) {
     return SizedBox.fromSize(
       size: Size(_cardWidth, _cardHeight),
@@ -135,7 +133,7 @@ class _ProfileChooserPageState extends State<ProfileChooserPage> {
         MaterialPageRoute(
           builder: (context) => HomePage(
             user: _thisUser!,
-            name: "Profile page Nmae",
+            name: _thisUser!.displayName != null ? _thisUser!.displayName : "",
             userType: type,
           ),
         ),
