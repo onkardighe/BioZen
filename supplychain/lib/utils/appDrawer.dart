@@ -53,9 +53,7 @@ class _appDrawerState extends State<appDrawer> {
                           : NetworkImage(_thisUser!.photoURL!),
                     ),
                     accountName: Text(
-                      _thisUser!.displayName != null
-                          ? _thisUser!.displayName!
-                          : userName,
+                      userName,
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),

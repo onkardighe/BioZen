@@ -16,7 +16,11 @@ class _SignUpPageState extends State<SignUpPage> {
   TextEditingController _passController = TextEditingController();
   TextEditingController _passConfirmController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
-  String? _errorTextPassNew, _errorTextPassConfirm, _errorTextEmail;
+  TextEditingController _nameController = TextEditingController();
+  String? _errorTextPassNew,
+      _errorTextPassConfirm,
+      _errorTextEmail,
+      _errorTextName;
   String tempUserName = "Onkar Dighe";
   bool isPasswordVisible = false, isConfirmPasswordVisible = false;
   @override
@@ -39,9 +43,10 @@ class _SignUpPageState extends State<SignUpPage> {
               child: Center(
                   child: Column(
                 children: [
-                  SizedBox(
-                    height: 30,
-                  ),
+                  // SizedBox(
+                  //   height: 30,
+                  // ),
+                  Spacer(),
                   const Text("Sign Up",
                       style: TextStyle(
                           color: Colors.black87,
@@ -113,8 +118,47 @@ class _SignUpPageState extends State<SignUpPage> {
                         const SizedBox(
                           height: 15,
                         ),
+                        TextFormField(
+                          controller: _nameController,
+                          textAlign: TextAlign.center,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                                RegExp(r'[a-zA-Z]'))
+                          ],
+                          onChanged: (input) {
+                            _errorTextName =
+                                input!.isEmpty ? "Enter Name !" : null;
+                          },
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          validator: (input) =>
+                              input!.isEmpty ? "Enter Name !" : null,
+                          keyboardType: TextInputType.name,
+                          style: TextStyle(color: Colors.deepPurple),
+                          decoration: InputDecoration(
+                            errorText: _errorTextName,
+                            label: const Text(
+                              "Name",
+                              style: TextStyle(color: Colors.deepPurple),
+                            ),
+                            floatingLabelStyle:
+                                TextStyle(color: Colors.deepPurple),
+                            focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    width: 2, color: Colors.deepPurple),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                            enabledBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    width: 1, color: Colors.deepPurple),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                            border: const OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                          ),
+                        ),
                         const SizedBox(
-                          height: 5,
+                          height: 15,
                         ),
                         TextField(
                           controller: _passController,
@@ -150,7 +194,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                     width: 2, color: Colors.deepPurple),
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(10))),
-                            enabledBorder: OutlineInputBorder(
+                            enabledBorder: const OutlineInputBorder(
                                 borderSide: BorderSide(
                                     width: 1, color: Colors.deepPurple),
                                 borderRadius:
@@ -256,6 +300,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                 setState(() {
                                   _errorTextEmail = "Invalid Email !";
                                 });
+                              } else if (_nameController.value.text.isEmpty) {
+                                _errorTextName = "Enter Name !";
                               } else if (_errorTextPassConfirm != null ||
                                   _passConfirmController.value.text.length <=
                                       0) {
@@ -291,30 +337,8 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                         ),
                         const SizedBox(
-                          height: 50,
+                          height: 35,
                         ),
-                        // const Text("or Sign up with "),
-                        // const SizedBox(
-                        //   height: 10,
-                        // ),
-                        // FutureBuilder(
-                        //   future: Authentication.initializeFirebase(),
-                        //   builder: (context, snapshot) {
-                        //     if (snapshot.hasError) {
-                        //       print(snapshot.error);
-                        //       return Text(
-                        //           'Error initializing Firebase ${snapshot.error}');
-                        //     } else if (snapshot.connectionState ==
-                        //         ConnectionState.done) {
-                        //       return GoogleSignInButton();
-                        //     }
-                        //     return const CircularProgressIndicator(
-                        //       valueColor: AlwaysStoppedAnimation<Color>(
-                        //         Colors.orange,
-                        //       ),
-                        //     );
-                        //   },
-                        // ),
                       ],
                     ),
                   ),
@@ -335,7 +359,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                   style: TextStyle(color: Colors.deepPurple)),
                             ]),
                       )),
-                  Spacer()
+                  SizedBox(
+                    height: 30,
+                  )
                 ],
               )),
             )));
@@ -346,7 +372,7 @@ class _SignUpPageState extends State<SignUpPage> {
         context: context,
         email: _emailController.value.text,
         password: _passConfirmController.value.text,
-        name: tempUserName);
+        name: _nameController.value.text);
 
     return user;
   }

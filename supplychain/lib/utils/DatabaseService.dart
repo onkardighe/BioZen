@@ -32,4 +32,23 @@ class DatabaseService {
         .doc(uid)
         .update({'type': type});
   }
+
+  static setMobileNumber(String uid, mobileNumber) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .update({'mobile': mobileNumber});
+  }
+
+  static getMobileNumber(String uid) async {
+    try {
+      CollectionReference users =
+          FirebaseFirestore.instance.collection('users');
+      final snapshot = await users.doc(uid).get();
+      final data = snapshot.data() as Map<String, dynamic>;
+      return data['mobile'];
+    } catch (e) {
+      return 'Error Fetching User';
+    }
+  }
 }

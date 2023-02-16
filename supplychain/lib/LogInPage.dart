@@ -11,8 +11,8 @@ class LogInPage extends StatefulWidget {
 }
 
 class _LogInPageState extends State<LogInPage> {
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passController = TextEditingController();
   String? _errorPassText;
   bool isPasswordVisible = false;
   @override
@@ -210,28 +210,6 @@ class _LogInPageState extends State<LogInPage> {
                         const SizedBox(
                           height: 35,
                         ),
-                        // const Text("Or Log in with "),
-                        // const SizedBox(
-                        //   height: 10,
-                        // ),
-                        // FutureBuilder(
-                        //   future: Authentication.initializeFirebase(),
-                        //   builder: (context, snapshot) {
-                        //     if (snapshot.hasError) {
-                        //       print(snapshot.error);
-                        //       return Text(
-                        //           'Error initializing Firebase ${snapshot.error}');
-                        //     } else if (snapshot.connectionState ==
-                        //         ConnectionState.done) {
-                        //       return GoogleSignInButton();
-                        //     }
-                        //     return const CircularProgressIndicator(
-                        //       valueColor: AlwaysStoppedAnimation<Color>(
-                        //         Colors.orange,
-                        //       ),
-                        //     );
-                        //   },
-                        // ),
                       ],
                     ),
                   ),
@@ -239,7 +217,6 @@ class _LogInPageState extends State<LogInPage> {
                   TextButton(
                       onPressed: () {
                         Navigator.pushReplacementNamed(context, "/SignUpPage");
-                        setState(() {});
                       },
                       child: RichText(
                         text: TextSpan(
@@ -263,7 +240,7 @@ class _LogInPageState extends State<LogInPage> {
   }
 
   Future<User?> loginUser() async {
-    User? user = await Authentication.signinUser(
+    User? user = await Authentication.logInUser(
         email: _emailController.value.text,
         password: _passController.value.text,
         context: context);

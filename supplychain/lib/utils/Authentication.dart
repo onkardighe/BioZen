@@ -38,56 +38,6 @@ class Authentication {
 //???//////////////////////////////////////////////???//////////////////////////////////////////////???//////////////////////////////////////////////???//////////////////////////////////////////////???//////////////////////////////////////////////???//////////////////////////////////////////////???//////////////////////////////////////////////???//////////////////////////////////////////////???//////////////////////////////////////////////???//////////////////////////////////////////////???//////////////////////////////////////////////???////////////////////////////////////////////
 //???//////////////////////////////////////////////???//////////////////////////////////////////////???//////////////////////////////////////////////???//////////////////////////////////////////////???//////////////////////////////////////////////???//////////////////////////////////////////////???//////////////////////////////////////////////???//////////////////////////////////////////////???//////////////////////////////////////////////???//////////////////////////////////////////////???//////////////////////////////////////////////???////////////////////////////////////////////
 
-  static Future<User?> signInWithGoogle({required BuildContext context}) async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    User? user;
-
-    final GoogleSignIn googleSignIn = GoogleSignIn();
-
-    final GoogleSignInAccount? googleSignInAccount =
-        await googleSignIn.signIn();
-    if (googleSignInAccount != null) {
-      final GoogleSignInAuthentication googleSignInAuthentication =
-          await googleSignInAccount.authentication;
-
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleSignInAuthentication.accessToken,
-        idToken: googleSignInAuthentication.idToken,
-      );
-
-      try {
-        final UserCredential userCredential =
-            await auth.signInWithCredential(credential);
-
-        user = userCredential.user;
-        saveUser(
-            user!.email!, user!.displayName!, user!.uid!); //save to firestore
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'account-exists-with-different-credential') {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(Authentication.customSnackBar(
-            content: 'The account already exists with a different credential.',
-          ));
-        } else if (e.code == 'invalid-credential') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            Authentication.customSnackBar(
-              content: 'Error occurred while accessing credentials. Try again.',
-            ),
-          );
-        }
-      } catch (e) {
-        print(e);
-        ScaffoldMessenger.of(context).showSnackBar(
-          Authentication.customSnackBar(
-            content: 'Error occurred using Google Sign-In. Try again.',
-          ),
-        );
-      }
-    }
-
-    return user;
-  }
-
   static SnackBar customSnackBar({required String content}) {
     return SnackBar(
       backgroundColor: Colors.black,
@@ -99,11 +49,11 @@ class Authentication {
   }
 
   static Future<void> signOut({required BuildContext context}) async {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
+    final GoogleSignIn firebaseAuth = GoogleSignIn();
 
     try {
       if (!kIsWeb) {
-        await googleSignIn.signOut();
+        await firebaseAuth.signOut();
       }
       await FirebaseAuth.instance.signOut();
     } catch (e) {
@@ -131,11 +81,17 @@ class Authentication {
         .update({'type': type});
   }
 
+  static Future<bool> isMobileLinked(String uid) async {
+    final doc =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    final data = doc.data() as Map<String, dynamic>;
+    return data.containsKey("mobile");
+  }
   static Future<User?> signUpWithEmail({
     required BuildContext context,
     required String email,
     required String password,
-    String? name,
+    required String? name,
   }) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
@@ -143,10 +99,6 @@ class Authentication {
 
       await userCredential.user!.updateDisplayName(name);
       await userCredential.user!.updatePhotoURL(
-          "https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png");
-      await FirebaseAuth.instance.currentUser!.updateEmail(email);
-      await FirebaseAuth.instance.currentUser!.updateDisplayName(name);
-      await FirebaseAuth.instance.currentUser!.updatePhotoURL(
           "https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png");
 
       await saveUser(email, name, userCredential.user!.uid); //save to firestore
@@ -171,10 +123,9 @@ class Authentication {
     }
   }
 
-  static Future<User?> signinUser(
+  static Future<User?> logInUser(
       {required String email,
       required String password,
-      required,
       required BuildContext context}) async {
     User? user;
     try {
@@ -197,77 +148,5 @@ class Authentication {
     } catch (e) {
       print("Exception in code : ${e}");
     }
-  }
-}
-
-class GoogleSignInButton extends StatefulWidget {
-  @override
-  _GoogleSignInButtonState createState() => _GoogleSignInButtonState();
-}
-
-class _GoogleSignInButtonState extends State<GoogleSignInButton> {
-  bool _isSigningIn = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: _isSigningIn
-          ? const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
-            )
-          : TextButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.white),
-                shape: MaterialStateProperty.all(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                ),
-              ),
-              onPressed: () async {
-                setState(() {
-                  _isSigningIn = true;
-                });
-
-                // TODO: Add a method call to the Google Sign-In authenticationrs
-                User? user =
-                    await Authentication.signInWithGoogle(context: context);
-                if (user != null) {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) {
-                        var t = DatabaseService().getType(user.uid);
-                        if (t != null) {
-                          print("NOT found");
-                          return ProfileChooserPage(user: user);
-                        } else {
-                          print(
-                              "TYpe present ${DatabaseService().getType(user.uid)}");
-                          return HomePage(
-                            user: user,
-                            name: user.displayName,
-                          );
-                        }
-                      },
-                    ),
-                  );
-                } else {
-                  setState(() {
-                    _isSigningIn = false;
-                  });
-                }
-
-                setState(() {
-                  _isSigningIn = false;
-                });
-              },
-              child: const CircleAvatar(
-                backgroundColor: Colors.white,
-                backgroundImage: NetworkImage(
-                    'https://cdn-icons-png.flaticon.com/64/281/281764.png'),
-              ),
-            ),
-    );
   }
 }

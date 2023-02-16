@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:supplychain/utils/Authentication.dart';
 import 'package:supplychain/utils/appTheme.dart';
+import 'package:supplychain/utils/DatabaseService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 
@@ -23,6 +25,10 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   var userName, userType;
   User? _thisUser;
+  var _mobileLinkController = TextEditingController();
+  var isMobileLinked = true;
+  var number = '';
+  var copyIcon = Icon(Icons.copy_rounded);
 
   @override
   void initState() {
@@ -30,6 +36,16 @@ class _ProfilePageState extends State<ProfilePage> {
     _thisUser = widget._user;
     userType = widget.userType;
     super.initState();
+    checkMobileLink();
+  }
+
+  void checkMobileLink() async {
+    isMobileLinked = await Authentication.isMobileLinked(_thisUser!.uid);
+    if (isMobileLinked) {
+      number = await DatabaseService.getMobileNumber(_thisUser!.uid);
+    }
+    setState(() {});
+    print(await Authentication.isMobileLinked(_thisUser!.uid));
   }
 
   @override
@@ -115,21 +131,48 @@ class _ProfilePageState extends State<ProfilePage> {
                         Icons.phone_android_rounded,
                         color: Colors.deepPurple,
                       ),
-                      // trailing: Icon(
-                      //   Icons.edit,
-                      //   size: 17,
-                      //   color: Colors.deepPurple,
-                      // ),
-                      title: Text(
-                        _thisUser!.phoneNumber == null
-                            ? "Link Mobile Number ! "
-                            : _thisUser!.phoneNumber!,
-                        style: TextStyle(
-                          color: Colors.deepPurple,
-                          fontFamily: 'Source Sans Pro',
-                          fontSize: 16,
-                        ),
-                      ),
+                      title: isMobileLinked
+                          ? Text(
+                              number,
+                              style: TextStyle(
+                                color: Colors.deepPurple,
+                              ),
+                            )
+                          : TextFormField(
+                              onEditingComplete: () => _linkMobileNumber(),
+                              keyboardType: TextInputType.phone,
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(10),
+                              ],
+                              controller: _mobileLinkController,
+                              style: TextStyle(color: Colors.deepPurple),
+                              decoration: InputDecoration(
+                                floatingLabelStyle:
+                                    TextStyle(color: Colors.white),
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.white)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.white)),
+                                label: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Link Mobile Number ! ",
+                                      style:
+                                          TextStyle(color: Colors.deepPurple),
+                                    ),
+                                    Icon(
+                                      Icons.edit,
+                                      size: 17,
+                                      color: Colors.grey,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                     ),
                   ),
                   Card(
@@ -140,11 +183,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         Icons.email_outlined,
                         color: Colors.deepPurple,
                       ),
-                      // trailing: Icon(
-                      //   Icons.edit,
-                      //   size: 17,
-                      //   color: Colors.deepPurple,
-                      // ),
                       title: Text(
                         _thisUser!.email ?? "Email Not Found !!",
                         style: TextStyle(
@@ -164,17 +202,19 @@ class _ProfilePageState extends State<ProfilePage> {
                         color: Colors.deepPurple,
                       ),
                       trailing: InkWell(
-                          onTap: (() async {
-                            await Clipboard.setData(ClipboardData(
-                              text: _thisUser!.uid ?? "",
-                            ));
-                          }),
-                          child: Icon(Icons.copy)),
-                      // trailing: Icon(
-                      //   Icons.edit,
-                      //   size: 17,
-                      //   color: Colors.deepPurple,
-                      // ),
+                        onTap: () async {
+                          await Clipboard.setData(ClipboardData(
+                            text: _thisUser!.uid ?? "",
+                          ));
+                          setState(() {
+                            copyIcon = Icon(
+                              Icons.check_rounded,
+                              color: Colors.green,
+                            );
+                          });
+                        },
+                        child: copyIcon,
+                      ),
                       title: Text(
                         _thisUser!.uid ?? "User Not Found !!",
                         style: TextStyle(
@@ -200,5 +240,19 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
     );
+  }
+
+  _linkMobileNumber() async {
+    if (_mobileLinkController.value.text.length != 10) {
+      print("Lengh not correct");
+      return;
+    }
+
+    var completeNumber = "+91" + _mobileLinkController.value.text;
+    await DatabaseService.setMobileNumber(_thisUser!.uid, completeNumber);
+    setState(() {
+      number = completeNumber;
+      isMobileLinked = true;
+    });
   }
 }
