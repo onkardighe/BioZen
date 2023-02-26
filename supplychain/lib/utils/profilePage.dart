@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:supplychain/utils/Authentication.dart';
 import 'package:supplychain/utils/appTheme.dart';
@@ -53,6 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        resizeToAvoidBottomInset: false,
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           leading: Padding(
@@ -64,6 +67,7 @@ class _ProfilePageState extends State<ProfilePage> {
               child: TextButton(
                 onPressed: () {
                   Navigator.pop(context);
+                  // Navigator.popUntil(context, (route) => route.isFirst);
                 },
                 child: Icon(
                   Icons.arrow_circle_left_rounded,
@@ -127,53 +131,39 @@ class _ProfilePageState extends State<ProfilePage> {
                     margin:
                         EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
                     child: ListTile(
-                      leading: Icon(
-                        Icons.phone_android_rounded,
-                        color: Colors.deepPurple,
-                      ),
-                      title: isMobileLinked
-                          ? Text(
-                              number,
-                              style: TextStyle(
-                                color: Colors.deepPurple,
-                              ),
-                            )
-                          : TextFormField(
-                              onEditingComplete: () => _linkMobileNumber(),
-                              keyboardType: TextInputType.phone,
-                              inputFormatters: [
-                                LengthLimitingTextInputFormatter(10),
-                              ],
-                              controller: _mobileLinkController,
-                              style: TextStyle(color: Colors.deepPurple),
-                              decoration: InputDecoration(
-                                floatingLabelStyle:
-                                    TextStyle(color: Colors.white),
-                                enabledBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.white)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.white)),
-                                label: Row(
+                        leading: Icon(
+                          Icons.phone_android_rounded,
+                          color: Colors.deepPurple,
+                        ),
+                        title: isMobileLinked
+                            ? Text(
+                                number,
+                                style: TextStyle(
+                                  color: Colors.deepPurple,
+                                ),
+                              )
+                            // : gettextForMobile()
+                            : Align(
+                                alignment: Alignment.centerLeft,
+                                child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      "Link Mobile Number ! ",
-                                      style:
-                                          TextStyle(color: Colors.deepPurple),
-                                    ),
+                                    TextButton(
+                                        onPressed: () {
+                                          showAlert();
+                                        },
+                                        child: Text("Link Mobile Number !",
+                                            style: TextStyle(
+                                              color: Colors.deepPurple,
+                                            ))),
                                     Icon(
                                       Icons.edit,
-                                      size: 17,
                                       color: Colors.grey,
                                     ),
                                   ],
                                 ),
-                              ),
-                            ),
-                    ),
+                              )),
                   ),
                   Card(
                     margin:
@@ -253,6 +243,70 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       number = completeNumber;
       isMobileLinked = true;
+      Navigator.of(context).pop();
     });
+  }
+
+  TextFormField gettextForMobile() {
+    return TextFormField(
+      onEditingComplete: () => _linkMobileNumber(),
+      keyboardType: TextInputType.phone,
+      inputFormatters: [
+        LengthLimitingTextInputFormatter(10),
+      ],
+      controller: _mobileLinkController,
+      style: TextStyle(color: Colors.deepPurple),
+      decoration: InputDecoration(
+          floatingLabelStyle: TextStyle(color: Colors.white),
+          enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.deepPurple)),
+          focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.deepPurple)),
+          label: Text(
+            "Mobile",
+            style: TextStyle(color: Colors.deepPurple),
+          )),
+    );
+  }
+
+  Future<void> showAlert() async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text(
+              "Enter Mobile Number",
+              style: TextStyle(color: Colors.deepPurple),
+            ),
+            content: gettextForMobile(),
+            actions: [
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          Colors.deepPurple.shade400)),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                    "Cancel",
+                    style: TextStyle(color: Colors.white),
+                  )),
+              SizedBox(
+                width: 15,
+              ),
+              ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(Colors.deepPurple)),
+                  onPressed: () {
+                    _linkMobileNumber();
+                  },
+                  child: const Text(
+                    "OK",
+                    style: TextStyle(color: Colors.white),
+                  )),
+            ],
+          );
+        });
   }
 }

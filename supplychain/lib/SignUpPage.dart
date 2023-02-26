@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supplychain/ProfileChooserPage.dart';
@@ -38,332 +40,338 @@ class _SignUpPageState extends State<SignUpPage> {
             onTap: () {
               FocusScope.of(context).requestFocus(FocusNode());
             },
-            child: Container(
-              color: Colors.grey.shade100,
-              child: Center(
-                  child: Column(
-                children: [
-                  // SizedBox(
-                  //   height: 30,
-                  // ),
-                  Spacer(),
-                  const Text("Sign Up",
-                      style: TextStyle(
-                          color: Colors.black87,
-                          fontSize: 35,
-                          fontWeight: FontWeight.bold)),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    decoration: BoxDecoration(
-                      boxShadow: const [
-                        BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 5,
-                            blurStyle: BlurStyle.normal)
-                      ],
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+            child: SingleChildScrollView(
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.89,
+                color: Colors.grey.shade100,
+                child: Center(
                     child: Column(
-                      children: [
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        TextFormField(
-                          textAlign: TextAlign.center,
-                          controller: _emailController,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                                RegExp(r'[a-zA-Z0-9@.]'))
-                          ],
-                          onChanged: ((email) {
-                            setState(() {
-                              _errorTextEmail = !isValidEmail(email)
-                                  ? "Invalid Email !"
-                                  : null;
-                            });
-                          }),
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: (input) =>
-                              !isValidEmail(input!) ? "Invalid Email !" : null,
-                          keyboardType: TextInputType.emailAddress,
-                          style: TextStyle(color: Colors.deepPurple),
-                          decoration: InputDecoration(
-                            errorText: _errorTextEmail,
-                            label: const Text(
-                              "Email",
-                              style: TextStyle(color: Colors.deepPurple),
-                            ),
-                            floatingLabelStyle:
-                                TextStyle(color: Colors.deepPurple),
-                            focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    width: 2, color: Colors.deepPurple),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    width: 1, color: Colors.deepPurple),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
+                  children: [
+                    Spacer(),
+                    const Text("Sign Up",
+                        style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 35,
+                            fontWeight: FontWeight.bold)),
+                    const SizedBox(
+                      height: 40,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      decoration: BoxDecoration(
+                        boxShadow: const [
+                          BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 5,
+                              blurStyle: BlurStyle.normal)
+                        ],
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Column(
+                        children: [
+                          const SizedBox(
+                            height: 5,
                           ),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        TextFormField(
-                          controller: _nameController,
-                          textAlign: TextAlign.center,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                                RegExp(r'[a-zA-Z]'))
-                          ],
-                          onChanged: (input) {
-                            _errorTextName =
-                                input!.isEmpty ? "Enter Name !" : null;
-                          },
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: (input) =>
-                              input!.isEmpty ? "Enter Name !" : null,
-                          keyboardType: TextInputType.name,
-                          style: TextStyle(color: Colors.deepPurple),
-                          decoration: InputDecoration(
-                            errorText: _errorTextName,
-                            label: const Text(
-                              "Name",
-                              style: TextStyle(color: Colors.deepPurple),
-                            ),
-                            floatingLabelStyle:
-                                TextStyle(color: Colors.deepPurple),
-                            focusedBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    width: 2, color: Colors.deepPurple),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    width: 1, color: Colors.deepPurple),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            border: const OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        TextField(
-                          controller: _passController,
-                          obscureText: !isPasswordVisible,
-                          inputFormatters: [
-                            LengthLimitingTextInputFormatter(15),
-                          ],
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.deepPurple),
-                          decoration: InputDecoration(
-                            errorText: _errorTextPassNew,
-                            suffixIcon: InkWell(
-                              onTap: () {
-                                setState(() {
-                                  isPasswordVisible = !isPasswordVisible;
-                                });
-                              },
-                              child: Icon(
-                                isPasswordVisible
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: Colors.deepPurple,
-                              ),
-                            ),
-                            label: const Text(
-                              "Create new password",
-                              style: TextStyle(color: Colors.deepPurple),
-                            ),
-                            floatingLabelStyle:
-                                TextStyle(color: Colors.deepPurple),
-                            focusedBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    width: 2, color: Colors.deepPurple),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    width: 1, color: Colors.deepPurple),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            hintStyle: const TextStyle(color: Colors.black38),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        TextField(
-                          controller: _passConfirmController,
-                          obscureText: !isConfirmPasswordVisible,
-                          onChanged: (passConfirmed) {
-                            _errorTextPassConfirm =
-                                passConfirmed != _passController.value.text
-                                    ? "Password does not match !"
+                          TextFormField(
+                            textAlign: TextAlign.center,
+                            controller: _emailController,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[a-zA-Z0-9@.]'))
+                            ],
+                            onChanged: ((email) {
+                              setState(() {
+                                _errorTextEmail = !isValidEmail(email)
+                                    ? "Invalid Email !"
                                     : null;
-                            setState(() {});
-                          },
-                          inputFormatters: [
-                            LengthLimitingTextInputFormatter(15),
-                          ],
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.deepPurple),
-                          decoration: InputDecoration(
-                            errorText: _errorTextPassConfirm,
-                            suffixIcon: InkWell(
-                              onTap: () {
-                                setState(() {
-                                  isConfirmPasswordVisible =
-                                      !isConfirmPasswordVisible;
-                                });
-                              },
-                              child: Icon(
-                                isConfirmPasswordVisible
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: Colors.deepPurple,
+                              });
+                            }),
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            validator: (input) => !isValidEmail(input!)
+                                ? "Invalid Email !"
+                                : null,
+                            keyboardType: TextInputType.emailAddress,
+                            style: TextStyle(color: Colors.deepPurple),
+                            decoration: InputDecoration(
+                              errorText: _errorTextEmail,
+                              label: const Text(
+                                "Email",
+                                style: TextStyle(color: Colors.deepPurple),
                               ),
+                              floatingLabelStyle:
+                                  TextStyle(color: Colors.deepPurple),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 2, color: Colors.deepPurple),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 1, color: Colors.deepPurple),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
                             ),
-                            label: const Text(
-                              "Confirm password",
-                              style: TextStyle(color: Colors.deepPurple),
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          TextFormField(
+                            controller: _nameController,
+                            textAlign: TextAlign.center,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[a-zA-Z ]'))
+                            ],
+                            onChanged: (input) {
+                              _errorTextName =
+                                  input.isEmpty ? "Enter Name !" : null;
+                            },
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            validator: (input) =>
+                                input!.isEmpty ? "Enter Name !" : null,
+                            keyboardType: TextInputType.name,
+                            style: TextStyle(color: Colors.deepPurple),
+                            decoration: InputDecoration(
+                              errorText: _errorTextName,
+                              label: const Text(
+                                "Name",
+                                style: TextStyle(color: Colors.deepPurple),
+                              ),
+                              floatingLabelStyle:
+                                  TextStyle(color: Colors.deepPurple),
+                              focusedBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 2, color: Colors.deepPurple),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              enabledBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 1, color: Colors.deepPurple),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              border: const OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
                             ),
-                            floatingLabelStyle:
-                                TextStyle(color: Colors.deepPurple),
-                            focusedBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    width: 2, color: Colors.deepPurple),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    width: 1, color: Colors.deepPurple),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
-                            border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 25,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: AppTheme().themeGradient,
-                            borderRadius: BorderRadius.circular(8),
+                          const SizedBox(
+                            height: 15,
                           ),
-                          child: TextButton(
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Colors.transparent),
-                                foregroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Colors.white),
+                          TextField(
+                            controller: _passController,
+                            obscureText: !isPasswordVisible,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(15),
+                            ],
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.deepPurple),
+                            decoration: InputDecoration(
+                              errorText: _errorTextPassNew,
+                              suffixIcon: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    isPasswordVisible = !isPasswordVisible;
+                                  });
+                                },
+                                child: Icon(
+                                  isPasswordVisible
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Colors.deepPurple,
+                                ),
+                              ),
+                              label: const Text(
+                                "Create new password",
+                                style: TextStyle(color: Colors.deepPurple),
+                              ),
+                              floatingLabelStyle:
+                                  TextStyle(color: Colors.deepPurple),
+                              focusedBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 2, color: Colors.deepPurple),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              enabledBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 1, color: Colors.deepPurple),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              hintStyle: const TextStyle(color: Colors.black38),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          TextField(
+                            controller: _passConfirmController,
+                            obscureText: !isConfirmPasswordVisible,
+                            onChanged: (passConfirmed) {
+                              _errorTextPassConfirm =
+                                  passConfirmed != _passController.value.text
+                                      ? "Password does not match !"
+                                      : null;
+                              setState(() {});
+                            },
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(15),
+                            ],
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.deepPurple),
+                            decoration: InputDecoration(
+                              errorText: _errorTextPassConfirm,
+                              suffixIcon: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    isConfirmPasswordVisible =
+                                        !isConfirmPasswordVisible;
+                                  });
+                                },
+                                child: Icon(
+                                  isConfirmPasswordVisible
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Colors.deepPurple,
+                                ),
+                              ),
+                              label: const Text(
+                                "Confirm password",
+                                style: TextStyle(color: Colors.deepPurple),
+                              ),
+                              floatingLabelStyle:
+                                  TextStyle(color: Colors.deepPurple),
+                              focusedBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 2, color: Colors.deepPurple),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              enabledBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 1, color: Colors.deepPurple),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 25,
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: AppTheme().themeGradient,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: TextButton(
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.transparent),
+                                  foregroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.white),
 
-                                // change width of the button
-                                minimumSize: MaterialStateProperty.all<Size>(
-                                    const Size(200, 50)),
-                                shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ))),
-                            onPressed: () async {
-                              if (_passConfirmController.value.text ==
-                                  _passController.value.text) {
-                                setState(() {
-                                  _errorTextPassConfirm = null;
-                                });
-                              } else {
-                                setState(() {
-                                  _errorTextPassConfirm =
-                                      "Password does not match !";
-                                });
-                              }
-
-                              if (_emailController.value.text.length <= 0 ||
-                                  !isValidEmail(_emailController.value.text)) {
-                                setState(() {
-                                  _errorTextEmail = "Invalid Email !";
-                                });
-                              } else if (_nameController.value.text.isEmpty) {
-                                _errorTextName = "Enter Name !";
-                              } else if (_errorTextPassConfirm != null ||
-                                  _passConfirmController.value.text.length <=
-                                      0) {
-                                setState(() {
-                                  _errorTextPassConfirm = "Invalid Password";
-                                });
-                              } else {
-                                // do sign up
-                                User? tempUser = await _SignUp();
-                                if (tempUser != null) {
-                                  Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(
-                                        // builder: (context) => HomePage(
-                                        //   user: tempUser!,
-                                        //   name: tempUserName,
-                                        // ),
-
-                                        builder: (context) =>
-                                            ProfileChooserPage(user: tempUser)),
-                                  );
+                                  // change width of the button
+                                  minimumSize: MaterialStateProperty.all<Size>(
+                                      const Size(200, 50)),
+                                  shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ))),
+                              onPressed: () async {
+                                if (_passConfirmController.value.text ==
+                                    _passController.value.text) {
+                                  setState(() {
+                                    _errorTextPassConfirm = null;
+                                  });
                                 } else {
                                   setState(() {
-                                    _errorTextEmail = "";
                                     _errorTextPassConfirm =
-                                        "Sign up failed, Try agin !";
+                                        "Password does not match !";
                                   });
                                 }
-                              }
-                            },
-                            child: const Text('Sign Up',
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold)),
+
+                                if (_emailController.value.text.length <= 0 ||
+                                    !isValidEmail(
+                                        _emailController.value.text)) {
+                                  setState(() {
+                                    _errorTextEmail = "Invalid Email !";
+                                  });
+                                } else if (_nameController.value.text.isEmpty) {
+                                  _errorTextName = "Enter Name !";
+                                } else if (_errorTextPassConfirm != null ||
+                                    _passConfirmController.value.text.length <=
+                                        0) {
+                                  setState(() {
+                                    _errorTextPassConfirm = "Invalid Password";
+                                  });
+                                } else {
+                                  // do sign up
+                                  User? tempUser = await _SignUp();
+                                  if (tempUser != null) {
+                                    Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                          // builder: (context) => HomePage(
+                                          //   user: tempUser!,
+                                          //   name: tempUserName,
+                                          // ),
+
+                                          builder: (context) =>
+                                              ProfileChooserPage(
+                                                  user: tempUser)),
+                                    );
+                                  } else {
+                                    setState(() {
+                                      _errorTextEmail = "";
+                                      _errorTextPassConfirm =
+                                          "Sign up failed, Try agin !";
+                                    });
+                                  }
+                                }
+                              },
+                              child: const Text('Sign Up',
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold)),
+                            ),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 35,
-                        ),
-                      ],
+                          const SizedBox(
+                            height: 35,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, "/LoginPage");
-                      },
-                      child: RichText(
-                        text: const TextSpan(
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                            children: [
-                              TextSpan(
-                                  text: "Already registered ? ",
-                                  style: TextStyle(color: Colors.grey)),
-                              TextSpan(
-                                  text: "Login",
-                                  style: TextStyle(color: Colors.deepPurple)),
-                            ]),
-                      )),
-                  SizedBox(
-                    height: 30,
-                  )
-                ],
-              )),
+                    const Spacer(),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(context, "/LoginPage");
+                        },
+                        child: RichText(
+                          text: const TextSpan(
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                              children: [
+                                TextSpan(
+                                    text: "Already registered ? ",
+                                    style: TextStyle(color: Colors.grey)),
+                                TextSpan(
+                                    text: "Login",
+                                    style: TextStyle(color: Colors.deepPurple)),
+                              ]),
+                        )),
+                    SizedBox(
+                      height: 30,
+                    )
+                  ],
+                )),
+              ),
             )));
   }
 
@@ -372,7 +380,7 @@ class _SignUpPageState extends State<SignUpPage> {
         context: context,
         email: _emailController.value.text,
         password: _passConfirmController.value.text,
-        name: _nameController.value.text);
+        name: _nameController.value.text.trim());
 
     return user;
   }

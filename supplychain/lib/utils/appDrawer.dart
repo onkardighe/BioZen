@@ -1,9 +1,12 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:supplychain/utils/appTheme.dart';
-import 'package:supplychain/LogInPage.dart';
+import 'package:supplychain/services/functions.dart';
 import 'package:supplychain/utils/Authentication.dart';
-import 'package:supplychain/utils/profilePage.dart';
+// import 'package:supplychain/utils/profilePage.dart';
+// import 'package:supplychain/pages/dashnoard.dart';
 
 class appDrawer extends StatefulWidget {
   final User _user;
@@ -73,7 +76,8 @@ class _appDrawerState extends State<appDrawer> {
                       backgroundColor:
                           MaterialStateProperty.all(Colors.indigo.shade700)),
                   onPressed: () {
-                    Navigator.of(context).push(_routeToProfile());
+                    Navigator.of(context)
+                        .push(routeToProfile(_thisUser!, userName, userType));
                   },
                   child: const ListTile(
                     textColor: Colors.white,
@@ -91,7 +95,7 @@ class _appDrawerState extends State<appDrawer> {
               ),
               Container(
                 margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
-                child: ElevatedButton(
+                child: TextButton(
                   style: ButtonStyle(
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
@@ -99,7 +103,9 @@ class _appDrawerState extends State<appDrawer> {
                       )),
                       backgroundColor:
                           MaterialStateProperty.all(Colors.indigo.shade700)),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).push(routeToDashboard(context));
+                  },
                   child: const ListTile(
                     textColor: Colors.white,
                     title: Text(
@@ -159,7 +165,7 @@ class _appDrawerState extends State<appDrawer> {
                       _isSigningOut = false;
                     });
                     Navigator.of(context).pushAndRemoveUntil(
-                        _routeToLogInScreen(), (Route route) => false);
+                        routeToLogInScreen(), (Route route) => false);
                   },
                   child: const ListTile(
                     textColor: Colors.white,
@@ -178,47 +184,5 @@ class _appDrawerState extends State<appDrawer> {
             ],
           ),
         ));
-  }
-
-  Route _routeToLogInScreen() {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => LogInPage(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        var begin = Offset(-1.0, 0.0);
-        var end = Offset.zero;
-        var curve = Curves.ease;
-
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
-    );
-  }
-
-  Route _routeToProfile() {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => ProfilePage(
-        user: _thisUser!,
-        name: userName,
-        type: userType,
-      ),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        var begin = Offset(1, 0.0);
-        var end = Offset.zero;
-        var curve = Curves.ease;
-
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
-      },
-    );
   }
 }

@@ -1,9 +1,9 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:firebase_core/firebase_core.dart';
+import 'package:supplychain/services/functions.dart';
 import 'utils/appTheme.dart';
+import 'utils/supply.dart';
+import 'utils/supplyController.dart';
 import 'package:supplychain/utils/appDrawer.dart';
 import 'package:supplychain/utils/DatabaseService.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
@@ -28,11 +28,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late NoteController noteController;
   bool _isAppbarVisible = true;
   ScrollController _bodyScrollConroller = ScrollController();
   var initial;
   User? thisUser;
   var userName = '', userType = '';
+
+  // late List<Supply> myData;
   var myData = [
     {
       "fName": "Onkar",
@@ -228,6 +231,8 @@ class _HomePageState extends State<HomePage> {
                                   icon: Icons.dashboard_rounded,
                                   childText: "Dashboard",
                                   gradient: AppTheme().themeGradient,
+                                  route: routeToDashboard(context),
+                                  context: context,
                                 ),
                                 TileIconWithName(
                                   icon: Icons.history_rounded,
@@ -245,12 +250,23 @@ class _HomePageState extends State<HomePage> {
                   Center(
                     child: Column(children: [
                       for (var thisData in myData)
-                        buildCard(thisData["fName"], myData.indexOf(thisData),
-                            thisData["date"], thisData["time"])
+                        buildCard(
+                            thisData['fName']! + thisData['lName']!,
+                            myData.indexOf(thisData),
+                            thisData['date'],
+                            thisData['time'])
                     ]),
                   )
                 ],
               ),
+              //       child: Column(children: [
+              //         for (var thisData in myData)
+              //           buildCard(thisData.title, myData.indexOf(thisData),
+              //               thisData.body, thisData.id)
+              //       ]),
+              //     )
+              //   ],
+              // ),
             ],
           ),
         ),
@@ -306,6 +322,7 @@ class _HomePageState extends State<HomePage> {
                   Text(
                     "${str}",
                     style: TextStyle(color: Colors.black),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -348,9 +365,19 @@ class TileIconWithName extends TextButton {
     String? userProfileImage = "",
     String? childText = "",
     LinearGradient? gradient,
+    Route? route,
+    BuildContext? context,
     super.style,
   }) : super(
-            onPressed: () {},
+            onPressed: () {
+              if (route != null && context != null) {
+                try {
+                  Navigator.of(context).push(route);
+                } catch (e) {
+                  print("Route Exception : $e");
+                }
+              }
+            },
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
