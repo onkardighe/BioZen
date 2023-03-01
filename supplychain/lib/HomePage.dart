@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import 'package:supplychain/services/functions.dart';
 import 'utils/appTheme.dart';
 import 'utils/supply.dart';
@@ -28,58 +29,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late NoteController noteController;
   bool _isAppbarVisible = true;
   ScrollController _bodyScrollConroller = ScrollController();
   var initial;
   User? thisUser;
   var userName = '', userType = '';
 
-  // late List<Supply> myData;
-  var myData = [
-    {
-      "fName": "Onkar",
-      "lName": "Dighe",
-      "time": "01:00 PM",
-      "date": "22/02/2022",
-    },
-    {
-      "fName": "Nadim",
-      "lName": "Shah",
-      "time": "01:00 PM",
-      "date": "22/02/2022",
-    },
-    {
-      "fName": "Om",
-      "lName": "Kshirsagar",
-      "time": "01:00 PM",
-      "date": "22/02/2022",
-    },
-    {
-      "fName": "DhirajKumar",
-      "lName": "Sonawane",
-      "time": "01:00 PM",
-      "date": "22/02/2022",
-    },
-    {
-      "fName": "Mohit",
-      "lName": "Ahire",
-      "time": "01:00 PM",
-      "date": "22/02/2022",
-    },
-    {
-      "fName": "Shri",
-      "lName": "subramaniam",
-      "time": "01:00 PM",
-      "date": "22/02/2022",
-    }
-  ];
-
+  late NoteController noteController;
+  late List<Supply> myData;
   @override
   void initState() {
     thisUser = widget._user;
-    super.initState();
     getDataOfUser();
+    super.initState();
 
     _bodyScrollConroller.addListener(() {
       setState(() {
@@ -98,6 +60,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    noteController = Provider.of<NoteController>(context, listen: true);
+    myData = noteController.notes;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: _isAppbarVisible
@@ -248,25 +212,25 @@ class _HomePageState extends State<HomePage> {
                     height: 15,
                   ),
                   Center(
+                    //       child: Column(children: [
+                    //         for (var thisData in myData)
+                    //           buildCard(
+                    //               thisData['fName']! + thisData['lName']!,
+                    //               myData.indexOf(thisData),
+                    //               thisData['date'],
+                    //               thisData['time'])
+                    //       ]),
+                    //     )
+                    //   ],
+                    // ),
                     child: Column(children: [
                       for (var thisData in myData)
-                        buildCard(
-                            thisData['fName']! + thisData['lName']!,
-                            myData.indexOf(thisData),
-                            thisData['date'],
-                            thisData['time'])
+                        buildCard(thisData.title, myData.indexOf(thisData),
+                            thisData.body, thisData.id)
                     ]),
                   )
                 ],
               ),
-              //       child: Column(children: [
-              //         for (var thisData in myData)
-              //           buildCard(thisData.title, myData.indexOf(thisData),
-              //               thisData.body, thisData.id)
-              //       ]),
-              //     )
-              //   ],
-              // ),
             ],
           ),
         ),

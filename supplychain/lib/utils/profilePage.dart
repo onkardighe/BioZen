@@ -133,13 +133,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: ListTile(
                         leading: Icon(
                           Icons.phone_android_rounded,
-                          color: Colors.deepPurple,
+                          color: AppTheme.primaryColor,
                         ),
                         title: isMobileLinked
                             ? Text(
                                 number,
                                 style: TextStyle(
-                                  color: Colors.deepPurple,
+                                  color: AppTheme.primaryColor,
                                 ),
                               )
                             // : gettextForMobile()
@@ -155,7 +155,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         },
                                         child: Text("Link Mobile Number !",
                                             style: TextStyle(
-                                              color: Colors.deepPurple,
+                                              color: AppTheme.primaryColor,
                                             ))),
                                     Icon(
                                       Icons.edit,
@@ -171,12 +171,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: ListTile(
                       leading: Icon(
                         Icons.email_outlined,
-                        color: Colors.deepPurple,
+                        color: AppTheme.primaryColor,
                       ),
                       title: Text(
                         _thisUser!.email ?? "Email Not Found !!",
                         style: TextStyle(
-                          color: Colors.deepPurple,
+                          color: AppTheme.primaryColor,
                           fontFamily: 'Source Sans Pro',
                           fontSize: 16,
                         ),
@@ -189,7 +189,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: ListTile(
                       leading: Icon(
                         Icons.medical_information_outlined,
-                        color: Colors.deepPurple,
+                        color: AppTheme.primaryColor,
                       ),
                       trailing: InkWell(
                         onTap: () async {
@@ -208,7 +208,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       title: Text(
                         _thisUser!.uid ?? "User Not Found !!",
                         style: TextStyle(
-                          color: Colors.deepPurple,
+                          color: AppTheme.primaryColor,
                           fontFamily: 'Source Sans Pro',
                           fontSize: 14,
                         ),
@@ -255,16 +255,16 @@ class _ProfilePageState extends State<ProfilePage> {
         LengthLimitingTextInputFormatter(10),
       ],
       controller: _mobileLinkController,
-      style: TextStyle(color: Colors.deepPurple),
+      style: TextStyle(color: AppTheme.primaryColor),
       decoration: InputDecoration(
           floatingLabelStyle: TextStyle(color: Colors.white),
           enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.deepPurple)),
+              borderSide: BorderSide(color: AppTheme.primaryColor)),
           focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.deepPurple)),
+              borderSide: BorderSide(color: AppTheme.primaryColor)),
           label: Text(
             "Mobile",
-            style: TextStyle(color: Colors.deepPurple),
+            style: TextStyle(color: AppTheme.primaryColor),
           )),
     );
   }
@@ -274,16 +274,17 @@ class _ProfilePageState extends State<ProfilePage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text(
+            title: Text(
               "Enter Mobile Number",
-              style: TextStyle(color: Colors.deepPurple),
+              style: TextStyle(color: AppTheme.primaryColor),
             ),
             content: gettextForMobile(),
             actions: [
               ElevatedButton(
                   style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.all<Color>(
-                          Colors.deepPurple.shade400)),
+                    AppTheme.primaryColor,
+                  )),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -296,13 +297,13 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               ElevatedButton(
                   style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all<Color>(Colors.deepPurple)),
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          AppTheme.primaryColor)),
                   onPressed: () {
                     _linkMobileNumber();
                   },
                   child: const Text(
-                    "OK",
+                    "Save",
                     style: TextStyle(color: Colors.white),
                   )),
             ],

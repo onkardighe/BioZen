@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supplychain/LogInPage.dart';
 import 'package:supplychain/utils/profilePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:supplychain/pages/dashnoard.dart';
+import 'package:supplychain/pages/dashboard.dart';
 import 'package:supplychain/utils/constants.dart';
 import 'package:flutter/services.dart';
 import 'package:web3dart/web3dart.dart';
@@ -108,12 +108,7 @@ Future<String> callFunction(String functionName, List<dynamic> args,
   }
 }
 
-// addData(int amount, Web3Client ethClient) async {
-Future<String> addData(String name, int amount, Web3Client ethClient) async {
-  List<dynamic> args = [name, BigInt.from(amount)];
-  var response = await callFunction("addSupply", args, ethClient, privateKey);
-  return response;
-}
+
 
 getAllSupplies(Web3Client ethClient) async {
   DeployedContract contract = await loadContract();
