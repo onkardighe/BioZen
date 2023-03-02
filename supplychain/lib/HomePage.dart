@@ -199,9 +199,19 @@ class _HomePageState extends State<HomePage> {
                                   context: context,
                                 ),
                                 TileIconWithName(
-                                  icon: Icons.history_rounded,
-                                  childText: "History",
+                                  icon: Icons.refresh_rounded,
+                                  childText: "Refresh",
                                   gradient: AppTheme().themeGradient,
+                                  context: context,
+                                  noteController: noteController,
+                                  route: PageRouteBuilder(pageBuilder:
+                                      (context, animation, secondaryAnimation) {
+                                    return HomePage(
+                                      user: thisUser!,
+                                      name: userName,
+                                      userType: userType,
+                                    );
+                                  }),
                                 )
                               ],
                             ),
@@ -226,7 +236,7 @@ class _HomePageState extends State<HomePage> {
                     child: Column(children: [
                       for (var thisData in myData)
                         buildCard(thisData.title, myData.indexOf(thisData),
-                            thisData.body, thisData.id)
+                            thisData.quantity, thisData.id)
                     ]),
                   )
                 ],
@@ -329,11 +339,17 @@ class TileIconWithName extends TextButton {
     String? userProfileImage = "",
     String? childText = "",
     LinearGradient? gradient,
+    NoteController? noteController,
     Route? route,
     BuildContext? context,
     super.style,
   }) : super(
             onPressed: () {
+              if (noteController != null) {
+                noteController.getNotes();
+                noteController.notifyListeners();
+              }
+              ;
               if (route != null && context != null) {
                 try {
                   Navigator.of(context).push(route);
@@ -359,10 +375,19 @@ class TileIconWithName extends TextButton {
                                 "https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png")
                             : NetworkImage(userProfileImage),
                     child: icon != null
-                        ? Icon(
-                            icon,
-                            size: 40,
-                          )
+                        ? icon == Icons.refresh_rounded &&
+                                noteController != null &&
+                                noteController.isLoading
+                            ? Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Icon(
+                                icon,
+                                size: 40,
+                              )
                         : const SizedBox(
                             height: 0,
                           ),

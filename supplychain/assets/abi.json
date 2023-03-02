@@ -2,13 +2,54 @@
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "_buyerAddress",
+				"type": "address"
+			}
+		],
+		"name": "addBuyer",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "_insuranceAddress",
+				"type": "address"
+			}
+		],
+		"name": "addInsurance",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "string",
 				"name": "_name",
 				"type": "string"
 			},
 			{
 				"internalType": "uint256",
-				"name": "_amount",
+				"name": "_quantity",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_temp",
 				"type": "uint256"
 			}
 		],
@@ -21,13 +62,37 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "_id",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "_transporterAddress",
+				"type": "address"
+			}
+		],
+		"name": "addTransporter",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
 				"type": "uint256"
 			}
 		],
-		"name": "deleteSupply",
-		"outputs": [],
-		"stateMutability": "nonpayable",
+		"name": "buyerList",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -48,8 +113,43 @@
 					},
 					{
 						"internalType": "uint256",
-						"name": "amount",
+						"name": "quantity",
 						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "temperature",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "owner",
+						"type": "address"
+					},
+					{
+						"internalType": "bool",
+						"name": "initiated",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isBuyerAdded",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isTransporterAdded",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isInsuranceAdded",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isCompleted",
+						"type": "bool"
 					}
 				],
 				"internalType": "struct Storage.Supply[]",
@@ -97,6 +197,25 @@
 				"type": "uint256"
 			}
 		],
+		"name": "insuranceList",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
 		"name": "supplies",
 		"outputs": [
 			{
@@ -111,8 +230,43 @@
 			},
 			{
 				"internalType": "uint256",
-				"name": "amount",
+				"name": "quantity",
 				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "temperature",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"internalType": "bool",
+				"name": "initiated",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "isBuyerAdded",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "isTransporterAdded",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "isInsuranceAdded",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "isCompleted",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -135,23 +289,19 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "_id",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "_name",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_amount",
+				"name": "",
 				"type": "uint256"
 			}
 		],
-		"name": "updateSupply",
-		"outputs": [],
-		"stateMutability": "nonpayable",
+		"name": "transporterList",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	}
 ]

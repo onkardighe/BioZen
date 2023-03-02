@@ -9,4 +9,4 @@ String privateKey =
 
 String publicKey = '0xc6657756dbd79B760Bd27298cd6eB6B040946097';
 
-String deployedContractAddress = '0x728c87816cB68245e3f2998BE0BaDC1F3356D6BA';
+String deployedContractAddress = '0x5fB37B803b1cF2Abd9F2fB97123Ed973e8F99ECB';

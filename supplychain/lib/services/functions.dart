@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supplychain/LogInPage.dart';
+import 'package:supplychain/LogInPage.dart';
 import 'package:supplychain/utils/profilePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:supplychain/pages/dashboard.dart';
@@ -107,8 +108,6 @@ Future<String> callFunction(String functionName, List<dynamic> args,
     return "Error" + e.toString();
   }
 }
-
-
 
 getAllSupplies(Web3Client ethClient) async {
   DeployedContract contract = await loadContract();

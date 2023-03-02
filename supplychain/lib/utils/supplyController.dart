@@ -24,11 +24,14 @@ class NoteController extends ChangeNotifier {
   // getestimated gas price
   late EtherAmount _gasPrice;
 
-  late ContractFunction _getSupplies;
-  late ContractFunction _notes;
   late ContractFunction _addSupply;
-  late ContractFunction _deleteNote;
-  late ContractFunction _editNote;
+  late ContractFunction _getSupply;
+  late ContractFunction _getSupplies;
+  late ContractFunction _totalSupplies;
+  late ContractFunction _addBuyer;
+  late ContractFunction _addTransporter;
+  late ContractFunction _addInsurance;
+
   late ContractEvent _noteAddedEvent;
   late ContractEvent _noteDeletedEvent;
 
@@ -62,9 +65,13 @@ class NoteController extends ChangeNotifier {
     _contractAddress = EthereumAddress.fromHex(deployedContractAddress);
     _contract = DeployedContract(
         ContractAbi.fromJson(_abiStringFile, "Storage"), _contractAddress);
-    _getSupplies = _contract.function("getSupplies");
-    _notes = _contract.function("getSupply");
     _addSupply = _contract.function("addSupply");
+    _getSupply = _contract.function("getSupply");
+    _getSupplies = _contract.function("getSupplies");
+    _totalSupplies = _contract.function("totalSupplies");
+    _addBuyer = _contract.function("addBuyer");
+    _addTransporter = _contract.function("addTransporter");
+    _addInsurance = _contract.function("addInsurance");
 
     // _noteAddedEvent = _contract.event("NoteAdded");
     // _noteDeletedEvent = _contract.event("NoteDeleted");
@@ -72,6 +79,7 @@ class NoteController extends ChangeNotifier {
   }
 
   getNotes() async {
+    isLoading = true;
     try {
       List response = await _client
           .call(contract: _contract, function: _getSupplies, params: []);
@@ -80,15 +88,22 @@ class NoteController extends ChangeNotifier {
       }
       List<dynamic> notesList = response[0];
 
-      print(notesList.toString());
+      // print(notesList.toString());
       noteCount = notesList.length;
       notes.clear();
       for (List<dynamic> note in notesList) {
         Supply n = Supply(
             id: note[0].toString(),
             title: note[1],
-            body: note[2].toString(),
-            created: DateTime(2021, 10, 10));
+            quantity: note[2].toString(),
+            temperature: note[3].toString(),
+            // owner : note[4];
+            initiated: note[5],
+            isBuyerAdded: note[6],
+            isTransporterAdded: note[7],
+            isInsuranceAdded: note[8],
+            isCompleted: note[9],
+            createdAt: DateTime.now());
         notes.add(n);
         print(note.toString());
       }
@@ -100,26 +115,8 @@ class NoteController extends ChangeNotifier {
     return notes;
   }
 
-  // addNote(Supply note) async {
-  //   isLoading = true;
-  //   notifyListeners();
-  //   await _client.sendTransaction(
-  //     _credentials,
-  //     Transaction.callContract(
-  //       contract: _contract,
-  //       function: _addNote,
-  //       parameters: [
-  //         note.title,
-  //         note.body,
-  //         BigInt.from(note.created.millisecondsSinceEpoch),
-  //       ],
-  //     ),
-  //   );
-  //   await getNotes();
-  // }
-
-  Future<String> addSupply(String name, double quantity, double temp) async {
-    List<dynamic> args = [name, BigInt.from(quantity)];
+  addSupply(String name, double quantity, double temp) async {
+    List<dynamic> args = [name, BigInt.from(quantity), BigInt.from(temp)];
     try {
       isLoading = true;
       notifyListeners();
@@ -143,13 +140,103 @@ class NoteController extends ChangeNotifier {
       print("Error : ${e.toString()}");
       isLoading = false;
       notifyListeners();
-      return e.toString();
+    }
+  }
+
+  setBuyer(String id, String buyerAddress) async {
+    isLoading = true;
+    notifyListeners();
+    List<dynamic> args = [
+      BigInt.from(int.parse(id)),
+      EthereumAddress.fromHex(buyerAddress)
+    ];
+
+    try {
+      String response = await _client.sendTransaction(
+        _credentials,
+        Transaction.callContract(
+          gasPrice: _gasPrice,
+          contract: _contract,
+          function: _addBuyer,
+          parameters: args,
+        ),
+        chainId: 5,
+      );
+
+      await getNotes();
+
+      isLoading = false;
+      notifyListeners();
+      return response;
+    } catch (e) {
+      print("Error while selecting Buyer : ${e.toString()}");
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  setTransporter(String id, String transporterAddress) async {
+    isLoading = true;
+    notifyListeners();
+    List<dynamic> args = [
+      BigInt.from(int.parse(id)),
+      EthereumAddress.fromHex(transporterAddress)
+    ];
+
+    try {
+      String response = await _client.sendTransaction(
+        _credentials,
+        Transaction.callContract(
+          gasPrice: _gasPrice,
+          contract: _contract,
+          function: _addTransporter,
+          parameters: args,
+        ),
+        chainId: 5,
+      );
+
+      await getNotes();
+
+      isLoading = false;
+      notifyListeners();
+      return response;
+    } catch (e) {
+      print("Error while selecting Transporter : ${e.toString()}");
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  setInsurance(String id, String insuranceAddress) async {
+    isLoading = true;
+    notifyListeners();
+    List<dynamic> args = [
+      BigInt.from(int.parse(id)),
+      EthereumAddress.fromHex(insuranceAddress)
+    ];
+
+    try {
+      String response = await _client.sendTransaction(
+        _credentials,
+        Transaction.callContract(
+          gasPrice: _gasPrice,
+          contract: _contract,
+          function: _addInsurance,
+          parameters: args,
+          // maxFeePerGas: EtherAmount.inWei(_gasPrice.getInWei * BigInt.from(2)),
+        ),
+        chainId: 5,
+      );
+
+      await getNotes();
+
+      isLoading = false;
+      notifyListeners();
+      return response;
+    } catch (e) {
+      print("Error while selecting Transporter : ${e.toString()}");
+      isLoading = false;
+      notifyListeners();
     }
   }
 }
-// 14859823512
-// 15719886407
-// 1000000000
-
-// 10676151141
-// 11392108090

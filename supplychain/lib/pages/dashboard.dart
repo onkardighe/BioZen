@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
@@ -20,6 +22,7 @@ class DetailsScreen extends StatefulWidget {
 
 class _DetailsScreenState extends State<DetailsScreen> {
   int _selectedTag = 0;
+  late NoteController noteController;
 
   void changeTab(int index) {
     setState(() {
@@ -29,6 +32,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    noteController = Provider.of<NoteController>(context, listen: true);
     return Container(
       decoration: BoxDecoration(gradient: AppTheme().themeGradient),
       child: AnnotatedRegion<SystemUiOverlayStyle>(
@@ -42,6 +46,34 @@ class _DetailsScreenState extends State<DetailsScreen> {
             ),
             backgroundColor: Colors.transparent,
             elevation: 0,
+            actions: [
+              Padding(
+                padding: EdgeInsets.only(right: 15),
+                child: Container(
+                    // width: 100,
+                    width: 33,
+                    height: 33,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle, color: Colors.indigo.shade400),
+                    child: noteController.isLoading
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 3,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Center(
+                            child: InkWell(
+                              onTap: () {
+                                print("refreshed");
+                                noteController.getNotes();
+                                noteController.notifyListeners();
+                              },
+                              child: Icon(Icons.refresh_rounded, size: 22),
+                            ),
+                          )),
+              )
+            ],
             title: const Text(
               "ORDERS",
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -340,18 +372,9 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
   }
 
   void addNewSupply(String title, double quantity, double temp) async {
-    String supplyAddress =
+    String? supplyAddress =
         await noteController.addSupply(title, quantity, temp);
-    if (supplyAddress == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Not added !")));
-    } else {
-      print("\n________________________________");
-      print("Added : $supplyAddress");
-      print("\n________________________________");
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Added Successfully !")));
-    }
+    checkResponse(supplyAddress, context);
     Navigator.of(context).pop();
   }
 }
@@ -528,44 +551,8 @@ class OngoingList extends StatefulWidget {
 
 class _OngoingListState extends State<OngoingList> {
   ScrollController _cardScrollController = new ScrollController();
-  var myData = [
-    {
-      "fName": "Onkar",
-      "lName": "Dighe",
-      "time": "01:00 PM",
-      "date": "22/02/2022",
-    },
-    {
-      "fName": "Nadim",
-      "lName": "Shah",
-      "time": "01:00 PM",
-      "date": "22/02/2022",
-    },
-    {
-      "fName": "Om",
-      "lName": "Kshirsagar",
-      "time": "01:00 PM",
-      "date": "22/02/2022",
-    },
-    {
-      "fName": "DhirajKumar",
-      "lName": "Sonawane",
-      "time": "01:00 PM",
-      "date": "22/02/2022",
-    },
-    {
-      "fName": "Mohit",
-      "lName": "Ahire",
-      "time": "01:00 PM",
-      "date": "22/02/2022",
-    },
-    {
-      "fName": "Shri",
-      "lName": "subramaniam",
-      "time": "01:00 PM",
-      "date": "22/02/2022",
-    }
-  ];
+  late NoteController noteController;
+  late List<Supply> myData;
 
   @override
   void initState() {
@@ -574,6 +561,8 @@ class _OngoingListState extends State<OngoingList> {
 
   @override
   Widget build(BuildContext context) {
+    noteController = Provider.of<NoteController>(context, listen: true);
+    myData = noteController.notes;
     return Expanded(
       child: Container(
         color: Colors.grey.shade200,
@@ -589,10 +578,7 @@ class _OngoingListState extends State<OngoingList> {
           itemCount: myData.length,
           itemBuilder: (_, index) {
             return packageCard(
-              title: myData[index]["fName"]!,
-              id: index,
-              date: myData[index]["date"]!,
-              time: myData[index]["time"]!,
+              supply: myData[index],
               height: MediaQuery.of(context).size.height * 0.23,
               width: MediaQuery.of(context).size.width * 0.9,
               cardController: _cardScrollController,
@@ -605,23 +591,16 @@ class _OngoingListState extends State<OngoingList> {
 }
 
 class packageCard extends StatefulWidget {
-  final int _id;
-  final String _title, _date, _time;
+  final Supply _supply;
   final double _height, _width;
   final ScrollController _cardController;
   const packageCard(
       {super.key,
-      required String title,
-      required int id,
-      required String date,
-      required String time,
+      required Supply supply,
       required double height,
       required double width,
       required ScrollController cardController})
-      : _title = title,
-        _id = id,
-        _date = date,
-        _time = time,
+      : _supply = supply,
         _height = height,
         _width = width,
         _cardController = cardController;
@@ -631,18 +610,15 @@ class packageCard extends StatefulWidget {
 }
 
 class _packageCardState extends State<packageCard> {
-  late int id;
-  late String title, date, time;
+  late Supply supply;
   late double height, width;
   late bool openedCard;
   late ScrollController cardController;
+  late NoteController noteController;
 
   @override
   void initState() {
-    id = widget._id;
-    title = widget._title;
-    date = widget._date;
-    time = widget._time;
+    supply = widget._supply;
     height = widget._height;
     width = widget._width;
     openedCard = false;
@@ -653,7 +629,7 @@ class _packageCardState extends State<packageCard> {
 
   void _scrollToCard() {
     cardController.animateTo(
-      (id) * ((widget._height) + 20) + 7,
+      (int.tryParse(supply.id)!) * ((widget._height) + 20) + 7,
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
@@ -669,6 +645,7 @@ class _packageCardState extends State<packageCard> {
 
   @override
   Widget build(BuildContext context) {
+    noteController = Provider.of<NoteController>(context, listen: true);
     return GestureDetector(
       onTap: () {
         toggleSize();
@@ -714,7 +691,7 @@ class _packageCardState extends State<packageCard> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "ID : ${id}",
+                              "ID : ${supply.id}",
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 18),
                             ),
@@ -739,7 +716,7 @@ class _packageCardState extends State<packageCard> {
                           ],
                         ),
                         Text(
-                          "${title}",
+                          "${supply.title}",
                           style: TextStyle(
                               color: Colors.black, fontWeight: FontWeight.bold),
                         ),
@@ -767,7 +744,7 @@ class _packageCardState extends State<packageCard> {
                               "Quantity : ",
                               style: TextStyle(color: Colors.grey.shade700),
                             ),
-                            Text("$id Kg",
+                            Text("${supply.quantity} Kg",
                                 style: TextStyle(color: Colors.grey.shade700))
                           ],
                         ),
@@ -781,7 +758,7 @@ class _packageCardState extends State<packageCard> {
                                     style:
                                         TextStyle(color: Colors.grey.shade700),
                                   ),
-                                  Text("$id °C",
+                                  Text("${supply.temperature} °C",
                                       style: TextStyle(
                                           color: Colors.grey.shade700))
                                 ],
@@ -860,10 +837,17 @@ class _packageCardState extends State<packageCard> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("Delivery Date : ",
+                            Text("Created at : ",
                                 style: TextStyle(color: Colors.grey.shade700)),
-                            Text("$date",
-                                style: TextStyle(color: Colors.grey.shade700))
+                            openedCard
+                                ? Text(
+                                    "${supply.createdAt.hour} : ${supply.createdAt.minute}  ${supply.createdAt.day}/${supply.createdAt.month}/${supply.createdAt.year}",
+                                    style:
+                                        TextStyle(color: Colors.grey.shade700))
+                                : Text(
+                                    "${supply.createdAt.day}/${supply.createdAt.month}/${supply.createdAt.year}",
+                                    style:
+                                        TextStyle(color: Colors.grey.shade700))
                           ],
                         ),
                         addSpacing(),
@@ -875,40 +859,54 @@ class _packageCardState extends State<packageCard> {
                           children: [
                             Icon(
                               Icons.playlist_add_circle_rounded,
-                              color: Colors.green,
+                              color: supply.isBuyerAdded
+                                  ? Colors.green
+                                  : Colors.grey,
                             ),
                             Container(
                               height: 5,
                               width: width / 6,
                               decoration: BoxDecoration(
-                                color: Colors.green,
+                                color: supply.isTransporterAdded
+                                    ? Colors.green
+                                    : Colors.grey,
                               ),
                             ),
                             Icon(
                               Icons.local_shipping_rounded,
-                              color: Colors.green,
+                              color: supply.isTransporterAdded
+                                  ? Colors.green
+                                  : Colors.grey,
                             ),
                             Container(
                               height: 5,
                               width: width / 6,
                               decoration: BoxDecoration(
-                                color: Colors.green,
+                                color: supply.isInsuranceAdded
+                                    ? Colors.green
+                                    : Colors.grey,
                               ),
                             ),
                             Icon(
                               Icons.content_paste_search_rounded,
-                              color: Colors.green,
+                              color: supply.isInsuranceAdded
+                                  ? Colors.green
+                                  : Colors.grey,
                             ),
                             Container(
                               height: 5,
                               width: width / 6,
                               decoration: BoxDecoration(
-                                color: Colors.green,
+                                color: supply.isCompleted
+                                    ? Colors.green
+                                    : Colors.grey,
                               ),
                             ),
                             Icon(
                               Icons.playlist_add_check_circle_rounded,
-                              color: Colors.green,
+                              color: supply.isCompleted
+                                  ? Colors.green
+                                  : Colors.grey,
                             ),
                           ],
                         ),
@@ -918,8 +916,29 @@ class _packageCardState extends State<packageCard> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
+                                    TextButton(
+                                        onPressed: () async {
+                                          addNewBuyer(supply.id, publicKey);
+                                        },
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStatePropertyAll<Color>(
+                                                    Colors.red)),
+                                        child: Text(
+                                          "Select Buyer",
+                                          style: TextStyle(color: Colors.white),
+                                        ))
+                                  ])
+                            : SizedBox(),
+                        openedCard
+                            ? Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
                                   TextButton(
-                                      onPressed: () {},
+                                      onPressed: () async {
+                                        addNewTransporter(supply.id, publicKey);
+                                      },
                                       style: ButtonStyle(
                                           backgroundColor:
                                               MaterialStatePropertyAll<Color>(
@@ -930,7 +949,9 @@ class _packageCardState extends State<packageCard> {
                                         style: TextStyle(color: Colors.white),
                                       )),
                                   TextButton(
-                                      onPressed: () {},
+                                      onPressed: () async {
+                                        addNewInsurance(supply.id, publicKey);
+                                      },
                                       style: ButtonStyle(
                                           backgroundColor:
                                               MaterialStatePropertyAll<Color>(
@@ -941,23 +962,6 @@ class _packageCardState extends State<packageCard> {
                                       )),
                                 ],
                               )
-                            : SizedBox(),
-                        openedCard
-                            ? Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                    TextButton(
-                                        onPressed: () {},
-                                        style: ButtonStyle(
-                                            backgroundColor:
-                                                MaterialStatePropertyAll<Color>(
-                                                    Colors.red)),
-                                        child: Text(
-                                          "Select Buyer",
-                                          style: TextStyle(color: Colors.white),
-                                        ))
-                                  ])
                             : SizedBox(),
                       ],
                     ),
@@ -971,6 +975,39 @@ class _packageCardState extends State<packageCard> {
     );
   }
 
+  void addNewBuyer(String id, String address) async {
+    String? setBuyerresponse = await noteController.setBuyer(id, address);
+
+    checkResponse(setBuyerresponse, context);
+    if (setBuyerresponse != null && !setBuyerresponse.contains('Error')) {
+      setState(() {
+        supply.isBuyerAdded = true;
+      });
+    }
+  }
+
+  void addNewTransporter(String id, String address) async {
+    String? setBuyerresponse = await noteController.setTransporter(id, address);
+
+    checkResponse(setBuyerresponse, context);
+    if (setBuyerresponse != null && !setBuyerresponse.contains('Error')) {
+      setState(() {
+        supply.isTransporterAdded = true;
+      });
+    }
+  }
+
+  void addNewInsurance(String id, String address) async {
+    String? setBuyerresponse = await noteController.setInsurance(id, address);
+
+    checkResponse(setBuyerresponse, context);
+    if (setBuyerresponse != null && !setBuyerresponse.contains('Error')) {
+      setState(() {
+        supply.isInsuranceAdded = true;
+      });
+    }
+  }
+
   Widget addSpacing() {
     if (!openedCard)
       return SizedBox(
@@ -982,5 +1019,18 @@ class _packageCardState extends State<packageCard> {
         color: Colors.grey.shade100,
       );
     }
+  }
+}
+
+checkResponse(String? response, BuildContext context) {
+  if (response == null) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text("Error ! Try Again !!")));
+  } else {
+    print("\n________________________________");
+    print("Added : $response");
+    print("\n________________________________");
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text("Added Successfully !")));
   }
 }
