@@ -2,11 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:supplychain/ProfileChooserPage.dart';
+import 'package:supplychain/pages/ProfileChooserPage.dart';
 import 'package:supplychain/utils/appTheme.dart';
-import 'package:supplychain/HomePage.dart';
-import 'package:supplychain/utils/Authentication.dart';
+import 'package:supplychain/pages/HomePage.dart';
+import 'package:supplychain/services/Authentication.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:web3dart/web3dart.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -15,16 +16,20 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   // User thisUser;
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
   TextEditingController _passController = TextEditingController();
   TextEditingController _passConfirmController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _nameController = TextEditingController();
+  TextEditingController _walletAddressController = TextEditingController();
   String? _errorTextPassNew,
       _errorTextPassConfirm,
       _errorTextEmail,
+      _errorWalletAddress,
       _errorTextName;
   String tempUserName = "Onkar Dighe";
-  bool isPasswordVisible = false, isConfirmPasswordVisible = false;
+  bool isPasswordVisible = false,
+      isConfirmPasswordVisible = false,
+      isWalletAddressVisible = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,7 +53,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     child: Column(
                   children: [
                     Spacer(),
-                    const Text("Sign Up",
+                    Text("Sign Up",
                         style: TextStyle(
                             color: Colors.black87,
                             fontSize: 35,
@@ -209,7 +214,9 @@ class _SignUpPageState extends State<SignUpPage> {
                           const SizedBox(
                             height: 15,
                           ),
+                          //
                           TextField(
+                            // Confirm password field
                             controller: _passConfirmController,
                             obscureText: !isConfirmPasswordVisible,
                             onChanged: (passConfirmed) {
@@ -262,7 +269,58 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                           ),
                           const SizedBox(
-                            height: 25,
+                            height: 15,
+                          ),
+                          TextField(
+                            // Wallet Address field
+                            controller: _walletAddressController,
+                            obscureText: !isWalletAddressVisible,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.deepPurple),
+                            onChanged: (walletAddress) {
+                              _errorWalletAddress = walletAddress.length == 42
+                                  ? null
+                                  : 'Invalid wallet Address !';
+                            },
+                            decoration: InputDecoration(
+                              errorText: _errorWalletAddress,
+                              suffixIcon: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    isWalletAddressVisible =
+                                        !isWalletAddressVisible;
+                                  });
+                                },
+                                child: Icon(
+                                  isWalletAddressVisible
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Colors.deepPurple,
+                                ),
+                              ),
+                              label: const Text(
+                                "Wallet Public address",
+                                style: TextStyle(color: Colors.deepPurple),
+                              ),
+                              floatingLabelStyle:
+                                  TextStyle(color: Colors.deepPurple),
+                              focusedBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 2, color: Colors.deepPurple),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              enabledBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 1, color: Colors.deepPurple),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 15,
                           ),
                           Container(
                             decoration: BoxDecoration(
@@ -277,8 +335,6 @@ class _SignUpPageState extends State<SignUpPage> {
                                   foregroundColor:
                                       MaterialStateProperty.all<Color>(
                                           Colors.white),
-
-                                  // change width of the button
                                   minimumSize: MaterialStateProperty.all<Size>(
                                       const Size(200, 50)),
                                   shape: MaterialStateProperty.all<
@@ -287,6 +343,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                     borderRadius: BorderRadius.circular(8),
                                   ))),
                               onPressed: () async {
+                                // check for passwords equal
                                 if (_passConfirmController.value.text ==
                                     _passController.value.text) {
                                   setState(() {
@@ -299,6 +356,21 @@ class _SignUpPageState extends State<SignUpPage> {
                                   });
                                 }
 
+                                // check for wallet Address
+                                if (_walletAddressController.value.text
+                                            .trim()
+                                            .length !=
+                                        42 ||
+                                    !RegExp('^0x[a-fA-F0-9]{40}').hasMatch(
+                                        _walletAddressController.value.text
+                                            .trim())) {
+                                  _errorWalletAddress =
+                                      'Invalid wallet Address !';
+                                } else {
+                                  _errorWalletAddress = null;
+                                }
+
+                                // check for email
                                 if (_emailController.value.text.length <= 0 ||
                                     !isValidEmail(
                                         _emailController.value.text)) {
@@ -319,11 +391,6 @@ class _SignUpPageState extends State<SignUpPage> {
                                   if (tempUser != null) {
                                     Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
-                                          // builder: (context) => HomePage(
-                                          //   user: tempUser!,
-                                          //   name: tempUserName,
-                                          // ),
-
                                           builder: (context) =>
                                               ProfileChooserPage(
                                                   user: tempUser)),
@@ -344,12 +411,12 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                           ),
                           const SizedBox(
-                            height: 35,
+                            height: 15,
                           ),
                         ],
                       ),
                     ),
-                    const Spacer(),
+                    Spacer(),
                     TextButton(
                         onPressed: () {
                           Navigator.pushReplacementNamed(context, "/LoginPage");
@@ -366,9 +433,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                     style: TextStyle(color: Colors.deepPurple)),
                               ]),
                         )),
-                    SizedBox(
-                      height: 30,
-                    )
+                    Spacer()
                   ],
                 )),
               ),
@@ -380,7 +445,8 @@ class _SignUpPageState extends State<SignUpPage> {
         context: context,
         email: _emailController.value.text,
         password: _passConfirmController.value.text,
-        name: _nameController.value.text.trim());
+        name: _nameController.value.text.trim(),
+        publicWalletAddress: _walletAddressController.value.text.trim());
 
     return user;
   }

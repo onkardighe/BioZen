@@ -1,8 +1,11 @@
+import 'package:web3dart/credentials.dart';
+
 class Supply {
   final String id;
   final String title;
   final String quantity;
   final String temperature;
+  final EthereumAddress supplierAddress;
   final DateTime createdAt;
 
   final bool initiated;
@@ -16,6 +19,7 @@ class Supply {
     required this.title,
     required this.quantity,
     required this.temperature,
+    required this.supplierAddress,
     required this.createdAt,
     required this.initiated,
     required this.isBuyerAdded,

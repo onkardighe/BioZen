@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:supplychain/utils/appTheme.dart';
 import 'package:supplychain/services/functions.dart';
-import 'package:supplychain/utils/Authentication.dart';
+import 'package:supplychain/services/Authentication.dart';
+import 'package:supplychain/utils/constants.dart';
 // import 'package:supplychain/utils/profilePage.dart';
 // import 'package:supplychain/pages/dashnoard.dart';
 
@@ -60,7 +61,7 @@ class _appDrawerState extends State<appDrawer> {
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    accountEmail: Text(_thisUser!.email ?? "Link Your Email !"),
+                    accountEmail: Text(email),
                     decoration: BoxDecoration(color: Colors.transparent),
                   ),
                 ),

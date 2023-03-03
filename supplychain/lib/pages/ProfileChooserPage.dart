@@ -1,11 +1,11 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:supplychain/utils/DatabaseService.dart';
+import 'package:supplychain/services/DatabaseService.dart';
 import 'package:supplychain/utils/appTheme.dart';
-import 'package:supplychain/utils/Authentication.dart';
+import 'package:supplychain/services/Authentication.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:supplychain/HomePage.dart';
+import 'package:supplychain/pages/HomePage.dart';
 
 class ProfileChooserPage extends StatefulWidget {
   final User _user;
@@ -34,7 +34,8 @@ class _ProfileChooserPageState extends State<ProfileChooserPage> {
   }
 
   void getType() async {
-    userType = await DatabaseService().getType(widget._user.uid) ?? "";
+    userType =
+        await DatabaseService().fetchDataOfUser(widget._user.uid, 'type') ?? "";
     if (this.mounted) {
       setState(() {});
     }

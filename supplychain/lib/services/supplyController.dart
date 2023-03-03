@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
+import 'package:supplychain/services/functions.dart';
 import 'package:supplychain/utils/supply.dart';
 import 'package:supplychain/utils/constants.dart';
 import 'package:web3dart/web3dart.dart';
@@ -8,12 +9,11 @@ import 'package:web_socket_channel/io.dart';
 
 class NoteController extends ChangeNotifier {
   List<Supply> notes = [];
+  List<Supply> userSupply = [];
   bool isLoading = true;
   late int noteCount;
   final String _rpcUrl = goreli_url;
   final String _wsUrl = ws_url;
-
-  final String _privateKey = privateKey;
 
   late Web3Client _client;
   late String _abiStringFile;
@@ -27,6 +27,7 @@ class NoteController extends ChangeNotifier {
   late ContractFunction _addSupply;
   late ContractFunction _getSupply;
   late ContractFunction _getSupplies;
+  late ContractFunction _getUserSupplies;
   late ContractFunction _totalSupplies;
   late ContractFunction _addBuyer;
   late ContractFunction _addTransporter;
@@ -46,11 +47,15 @@ class NoteController extends ChangeNotifier {
     await getAbi();
     await getCreadentials();
     await getDeployedContract();
+    _updateGasPrice();
+
+    // var _basePrice   = await _client.get
+  }
+
+  void _updateGasPrice() async {
     _gasPrice = await _client
         .getBlockInformation()
         .then((value) => value.baseFeePerGas!);
-
-    // var _basePrice   = await _client.get
   }
 
   Future<void> getAbi() async {
@@ -66,8 +71,10 @@ class NoteController extends ChangeNotifier {
     _contract = DeployedContract(
         ContractAbi.fromJson(_abiStringFile, "Storage"), _contractAddress);
     _addSupply = _contract.function("addSupply");
+
     _getSupply = _contract.function("getSupply");
     _getSupplies = _contract.function("getSupplies");
+    _getUserSupplies = _contract.function("getSuppliesOfUser");
     _totalSupplies = _contract.function("totalSupplies");
     _addBuyer = _contract.function("addBuyer");
     _addTransporter = _contract.function("addTransporter");
@@ -76,6 +83,7 @@ class NoteController extends ChangeNotifier {
     // _noteAddedEvent = _contract.event("NoteAdded");
     // _noteDeletedEvent = _contract.event("NoteDeleted");
     await getNotes();
+    await getSuppliesOfUser();
   }
 
   getNotes() async {
@@ -93,17 +101,18 @@ class NoteController extends ChangeNotifier {
       notes.clear();
       for (List<dynamic> note in notesList) {
         Supply n = Supply(
-            id: note[0].toString(),
-            title: note[1],
-            quantity: note[2].toString(),
-            temperature: note[3].toString(),
-            // owner : note[4];
-            initiated: note[5],
-            isBuyerAdded: note[6],
-            isTransporterAdded: note[7],
-            isInsuranceAdded: note[8],
-            isCompleted: note[9],
-            createdAt: DateTime.now());
+          id: note[0].toString(),
+          title: note[1],
+          quantity: note[2].toString(),
+          temperature: note[3].toString(),
+          supplierAddress: note[4],
+          createdAt: DateTime.parse(note[5]),
+          initiated: note[6],
+          isBuyerAdded: note[7],
+          isTransporterAdded: note[8],
+          isInsuranceAdded: note[9],
+          isCompleted: note[10],
+        );
         notes.add(n);
         print(note.toString());
       }
@@ -115,8 +124,74 @@ class NoteController extends ChangeNotifier {
     return notes;
   }
 
+  getSupplyByID(BigInt id) async {
+    isLoading = true;
+    try {
+      List response = await _client
+          .call(contract: _contract, function: _getSupply, params: [id]);
+      if (response.length == 0) {
+        return;
+      }
+      List<dynamic> supply = response[0];
+      Supply n = Supply(
+        id: supply[0].toString(),
+        title: supply[1],
+        quantity: supply[2].toString(),
+        temperature: supply[3].toString(),
+        supplierAddress: supply[4],
+        createdAt: DateTime.parse(supply[5]),
+        initiated: supply[6],
+        isBuyerAdded: supply[7],
+        isTransporterAdded: supply[8],
+        isInsuranceAdded: supply[9],
+        isCompleted: supply[10],
+      );
+      userSupply.add(n);
+    } catch (e) {
+      print(e);
+    }
+    isLoading = false;
+    notifyListeners();
+  }
+
+  getSuppliesOfUser() async {
+    isLoading = true;
+    try {
+      List response = await _client.call(
+          contract: _contract,
+          function: _getUserSupplies,
+          params: [EthereumAddress.fromHex(publicKey)]);
+
+      if (response.length == 0) {
+        return;
+      }
+      var userSupplyIDList = response[0];
+      // print("ID list : " + userSupplyIDList.toString());
+
+      userSupply.clear();
+      for (var supplyID in userSupplyIDList) {
+        await getSupplyByID(supplyID);
+      }
+    } catch (e) {
+      print(e);
+    }
+    isLoading = false;
+    notifyListeners();
+    // return notes;
+  }
+
   addSupply(String name, double quantity, double temp) async {
-    List<dynamic> args = [name, BigInt.from(quantity), BigInt.from(temp)];
+    String currentStamp = DateTime.now().toString();
+    await getCreadentials();
+    _updateGasPrice();
+    publicKey = _credentials.address.toString();
+    List<dynamic> args = [
+      name,
+      BigInt.from(quantity),
+      BigInt.from(temp),
+      EthereumAddress.fromHex(publicKey),
+      currentStamp
+    ];
     try {
       isLoading = true;
       notifyListeners();
@@ -132,6 +207,7 @@ class NoteController extends ChangeNotifier {
       );
 
       await getNotes();
+      await getSuppliesOfUser();
 
       isLoading = false;
       notifyListeners();
@@ -164,6 +240,7 @@ class NoteController extends ChangeNotifier {
       );
 
       await getNotes();
+      await getSuppliesOfUser();
 
       isLoading = false;
       notifyListeners();
@@ -196,6 +273,7 @@ class NoteController extends ChangeNotifier {
       );
 
       await getNotes();
+      await getSuppliesOfUser();
 
       isLoading = false;
       notifyListeners();
@@ -229,6 +307,7 @@ class NoteController extends ChangeNotifier {
       );
 
       await getNotes();
+      await getSuppliesOfUser();
 
       isLoading = false;
       notifyListeners();
@@ -240,3 +319,5 @@ class NoteController extends ChangeNotifier {
     }
   }
 }
+
+// 08:18:02:03:2023

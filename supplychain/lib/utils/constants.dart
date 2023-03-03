@@ -9,4 +9,9 @@ String privateKey =
 
 String publicKey = '0xc6657756dbd79B760Bd27298cd6eB6B040946097';
 
-String deployedContractAddress = '0x5fB37B803b1cF2Abd9F2fB97123Ed973e8F99ECB';
+String deployedContractAddress = '0xf0cE6395B1369cd471408Bd7eFCB7ebbbc2e764b';
+
+bool privateKeyLinked = false;
+
+String? mobileNumber = null;
+late String email = "";

@@ -3,9 +3,9 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:supplychain/ProfileChooserPage.dart';
-import 'package:supplychain/utils/DatabaseService.dart';
-import 'package:supplychain/HomePage.dart';
+import 'package:supplychain/pages/ProfileChooserPage.dart';
+import 'package:supplychain/services/DatabaseService.dart';
+import 'package:supplychain/pages/HomePage.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Authentication {
@@ -65,12 +65,26 @@ class Authentication {
     }
   }
 
-  static saveUser(String email, name, uid) async {
+  static saveUserMapWithAddress(String uid, publicWalletAddress) async {
+    var userSnapByAddress = FirebaseFirestore.instance
+        .collection('usersByAddress')
+        .doc(publicWalletAddress);
+    var docByAddrress = await userSnapByAddress.get();
+
+    if (docByAddrress.exists) {
+      await userSnapByAddress.update({'uid': uid});
+    } else {
+      await userSnapByAddress.set({'uid': uid});
+    }
+  }
+
+  static saveUser(String email, name, uid, publicWalletAddress) async {
     var userSnap = FirebaseFirestore.instance.collection('users').doc(uid);
     var doc = await userSnap.get();
 
     if (!doc.exists) {
-      await userSnap.set({'email': email, 'name': name});
+      await userSnap.set(
+          {'email': email, 'name': name, 'publicAddress': publicWalletAddress});
     }
   }
 
@@ -87,12 +101,20 @@ class Authentication {
     final data = doc.data() as Map<String, dynamic>;
     return data.containsKey("mobile");
   }
-  static Future<User?> signUpWithEmail({
-    required BuildContext context,
-    required String email,
-    required String password,
-    required String? name,
-  }) async {
+
+  static Future<bool> isPrivateKeyAdded(String uid) async {
+    final doc =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    final data = doc.data() as Map<String, dynamic>;
+    return data.containsKey("privateAddress");
+  }
+
+  static Future<User?> signUpWithEmail(
+      {required BuildContext context,
+      required String email,
+      required String password,
+      required String? name,
+      required String publicWalletAddress}) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
@@ -101,7 +123,10 @@ class Authentication {
       await userCredential.user!.updatePhotoURL(
           "https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png");
 
-      await saveUser(email, name, userCredential.user!.uid); //save to firestore
+      String uid = userCredential.user!.uid;
+      await saveUser(email, name, uid, publicWalletAddress);
+      await saveUserMapWithAddress(uid, publicWalletAddress);
+      //save to firestore
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {

@@ -3,11 +3,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
+import 'package:supplychain/utils/AlertBoxForError.dart';
 import '../utils/supply.dart';
 import 'package:provider/provider.dart';
 import 'package:supplychain/utils/appTheme.dart';
 import 'package:supplychain/utils/constants.dart';
-import 'package:supplychain/utils/supplyController.dart';
+import 'package:supplychain/services/supplyController.dart';
+import 'package:supplychain/services/DatabaseService.dart';
 import 'package:web3dart/web3dart.dart';
 import '../services/functions.dart';
 
@@ -23,6 +25,12 @@ class DetailsScreen extends StatefulWidget {
 class _DetailsScreenState extends State<DetailsScreen> {
   int _selectedTag = 0;
   late NoteController noteController;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   void changeTab(int index) {
     setState(() {
@@ -67,7 +75,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               onTap: () {
                                 print("refreshed");
                                 noteController.getNotes();
+                                noteController.getSuppliesOfUser();
                                 noteController.notifyListeners();
+                                setState(() {});
                               },
                               child: Icon(Icons.refresh_rounded, size: 22),
                             ),
@@ -85,33 +95,39 @@ class _DetailsScreenState extends State<DetailsScreen> {
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    children: [
-                      CustomTabView(
-                        index: _selectedTag,
-                        changeTab: changeTab,
-                      ),
-                    ],
-                  ),
-                  _selectedTag == 0 ? const OngoingList() : const Description(),
-                ],
-              ),
+              child: privateKeyLinked
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          children: [
+                            CustomTabView(
+                              index: _selectedTag,
+                              changeTab: changeTab,
+                            ),
+                          ],
+                        ),
+                        _selectedTag == 0
+                            ? const OngoingList()
+                            : const Description(),
+                      ],
+                    )
+                  : AlertBoxForPrivateKeyErrorWithoutRoute(),
             ),
           ),
-          bottomSheet: BottomSheet(
-            onClosing: () {},
-            backgroundColor: Colors.transparent,
-            enableDrag: false,
-            builder: (context) {
-              return const SizedBox(
-                height: 60,
-                child: EnrollBottomSheet(),
-              );
-            },
-          ),
+          bottomSheet: privateKeyLinked
+              ? BottomSheet(
+                  onClosing: () {},
+                  backgroundColor: Colors.transparent,
+                  enableDrag: false,
+                  builder: (context) {
+                    return const SizedBox(
+                      height: 60,
+                      child: EnrollBottomSheet(),
+                    );
+                  },
+                )
+              : SizedBox(),
         ),
       ),
     );
@@ -226,7 +242,7 @@ class EnrollBottomSheet extends StatefulWidget {
 class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
   late NoteController noteController;
   late List<Supply> myData;
-  String email = "onkardigheofficial@gmail.com";
+  // String email = "onkardigheofficial@gmail.com";
   late List<Supply> supplyList;
 
   @override
@@ -237,11 +253,11 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
   @override
   Widget build(BuildContext context) {
     noteController = Provider.of<NoteController>(context, listen: true);
-    supplyList = noteController.notes;
+    supplyList = noteController.userSupply;
     return Container(
       decoration: BoxDecoration(gradient: AppTheme().themeGradient),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           TextButton(
               onPressed: () {
@@ -268,9 +284,40 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
                   ),
                 ],
               )),
+          TextButton(
+              onPressed: () {
+                TestFunction();
+              },
+              style: ButtonStyle(
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)))),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Icon(
+                    Icons.post_add_sharp,
+                    size: 25,
+                    color: Colors.white,
+                  ),
+                  Text(
+                    "Check",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13),
+                  ),
+                ],
+              )),
         ],
       ),
     );
+  }
+
+  void TestFunction() async {
+    print("Clicked");
+    await noteController.getSuppliesOfUser();
+    noteController.notifyListeners();
   }
 
   Future<void> showAlert() async {
@@ -552,7 +599,7 @@ class OngoingList extends StatefulWidget {
 class _OngoingListState extends State<OngoingList> {
   ScrollController _cardScrollController = new ScrollController();
   late NoteController noteController;
-  late List<Supply> myData;
+  late List<Supply> supplyList;
 
   @override
   void initState() {
@@ -562,7 +609,7 @@ class _OngoingListState extends State<OngoingList> {
   @override
   Widget build(BuildContext context) {
     noteController = Provider.of<NoteController>(context, listen: true);
-    myData = noteController.notes;
+    supplyList = noteController.userSupply;
     return Expanded(
       child: Container(
         color: Colors.grey.shade200,
@@ -575,10 +622,10 @@ class _OngoingListState extends State<OngoingList> {
           },
           padding: const EdgeInsets.only(top: 20, bottom: 40),
           shrinkWrap: true,
-          itemCount: myData.length,
+          itemCount: supplyList.length,
           itemBuilder: (_, index) {
             return packageCard(
-              supply: myData[index],
+              supply: supplyList[index],
               height: MediaQuery.of(context).size.height * 0.23,
               width: MediaQuery.of(context).size.width * 0.9,
               cardController: _cardScrollController,
@@ -615,6 +662,7 @@ class _packageCardState extends State<packageCard> {
   late bool openedCard;
   late ScrollController cardController;
   late NoteController noteController;
+  late String? supplierName;
 
   @override
   void initState() {
@@ -623,6 +671,7 @@ class _packageCardState extends State<packageCard> {
     width = widget._width;
     openedCard = false;
     cardController = widget._cardController;
+    fetchSupplyData();
 
     super.initState();
   }
@@ -633,6 +682,11 @@ class _packageCardState extends State<packageCard> {
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
+  }
+
+  void fetchSupplyData() async {
+    supplierName = await DatabaseService()
+        .getNameByAddress(supply.supplierAddress.hexEip55);
   }
 
   void toggleSize() {
@@ -786,7 +840,7 @@ class _packageCardState extends State<packageCard> {
                                   Text("From : ",
                                       style: TextStyle(
                                           color: Colors.grey.shade700)),
-                                  Text("Supplier",
+                                  Text(supplierName ?? "Supplier",
                                       style: TextStyle(
                                           color: Colors.grey.shade700))
                                 ],

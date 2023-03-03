@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:supplychain/utils/Authentication.dart';
+import 'package:supplychain/services/Authentication.dart';
 import 'package:supplychain/utils/appTheme.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:supplychain/HomePage.dart';
+import 'package:supplychain/pages/HomePage.dart';
 
 class LogInPage extends StatefulWidget {
   @override

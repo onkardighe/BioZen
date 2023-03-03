@@ -51,6 +51,16 @@
 				"internalType": "uint256",
 				"name": "_temp",
 				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "supplierAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "_createdAt",
+				"type": "string"
 			}
 		],
 		"name": "addSupply",
@@ -127,6 +137,11 @@
 						"type": "address"
 					},
 					{
+						"internalType": "string",
+						"name": "createdAt",
+						"type": "string"
+					},
+					{
 						"internalType": "bool",
 						"name": "initiated",
 						"type": "bool"
@@ -163,6 +178,25 @@
 	{
 		"inputs": [
 			{
+				"internalType": "address",
+				"name": "userAddress",
+				"type": "address"
+			}
+		],
+		"name": "getSuppliesOfUser",
+		"outputs": [
+			{
+				"internalType": "uint256[]",
+				"name": "",
+				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "uint256",
 				"name": "_id",
 				"type": "uint256"
@@ -171,19 +205,66 @@
 		"name": "getSupply",
 		"outputs": [
 			{
-				"internalType": "uint256",
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "quantity",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "temperature",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "owner",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "createdAt",
+						"type": "string"
+					},
+					{
+						"internalType": "bool",
+						"name": "initiated",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isBuyerAdded",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isTransporterAdded",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isInsuranceAdded",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "isCompleted",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct Storage.Supply",
 				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
+				"type": "tuple"
 			}
 		],
 		"stateMutability": "view",
@@ -203,6 +284,30 @@
 				"internalType": "address",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "subscriptionSupplyList",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -244,6 +349,11 @@
 				"type": "address"
 			},
 			{
+				"internalType": "string",
+				"name": "createdAt",
+				"type": "string"
+			},
+			{
 				"internalType": "bool",
 				"name": "initiated",
 				"type": "bool"
@@ -275,6 +385,25 @@
 	{
 		"inputs": [],
 		"name": "totalSupplies",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "add",
+				"type": "address"
+			}
+		],
+		"name": "totalUsers",
 		"outputs": [
 			{
 				"internalType": "uint256",
