@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseService {
-  Future<String?> fetchDataOfUser(String uid, field) async
-  {
+  Future<String?> fetchDataOfUser(String uid, field) async {
     try {
       var users = FirebaseFirestore.instance.collection('users');
       var snapshot = await users.doc(uid).get();
@@ -74,5 +73,25 @@ class DatabaseService {
         .collection('users')
         .doc(uid)
         .update({'privateAddress': privateAddress});
+  }
+
+  static Future<List?> getUsersByType(String type) async {
+    try {
+      var users = FirebaseFirestore.instance.collection('users');
+      var userList = await users.where('type', isEqualTo: type).get();
+      // var fuelCompanyList =
+      //     await users.where('type', isEqualTo: 'Fuel Company').get();
+
+      var list = [];
+      var data = userList.docs.forEach((element) {
+        var user = element.data();
+        list.add(user);
+      });
+
+      return list;
+    } catch (e) {
+      print("Exception : {$e}");
+      return null;
+    }
   }
 }

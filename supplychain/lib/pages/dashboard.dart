@@ -284,40 +284,34 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
                   ),
                 ],
               )),
-          TextButton(
-              onPressed: () {
-                TestFunction();
-              },
-              style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)))),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Icon(
-                    Icons.post_add_sharp,
-                    size: 25,
-                    color: Colors.white,
-                  ),
-                  Text(
-                    "Check",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13),
-                  ),
-                ],
-              )),
+          // TextButton(
+          //     onPressed: () {
+          //       displayAllTransporters(context);
+          //     },
+          //     style: ButtonStyle(
+          //         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          //             RoundedRectangleBorder(
+          //                 borderRadius: BorderRadius.circular(20)))),
+          //     child: Column(
+          //       mainAxisAlignment: MainAxisAlignment.spaceAround,
+          //       children: [
+          //         Icon(
+          //           Icons.post_add_sharp,
+          //           size: 25,
+          //           color: Colors.white,
+          //         ),
+          //         Text(
+          //           "Get Suppliers",
+          //           style: TextStyle(
+          //               color: Colors.white,
+          //               fontWeight: FontWeight.bold,
+          //               fontSize: 13),
+          //         ),
+          //       ],
+          //     )),
         ],
       ),
     );
-  }
-
-  void TestFunction() async {
-    print("Clicked");
-    await noteController.getSuppliesOfUser();
-    noteController.notifyListeners();
   }
 
   Future<void> showAlert() async {
@@ -972,7 +966,8 @@ class _packageCardState extends State<packageCard> {
                                 children: [
                                     TextButton(
                                         onPressed: () async {
-                                          addNewBuyer(supply.id, publicKey);
+                                          displayAllSuppliers(context);
+                                          // addNewBuyer(supply.id, publicKey);
                                         },
                                         style: ButtonStyle(
                                             backgroundColor:
@@ -991,7 +986,13 @@ class _packageCardState extends State<packageCard> {
                                 children: [
                                   TextButton(
                                       onPressed: () async {
-                                        addNewTransporter(supply.id, publicKey);
+                                        var transporter =
+                                            await displayAllTransporters(
+                                                context);
+                                        if (transporter != null) {
+                                          addNewTransporter(supply.id,
+                                              transporter['publicAddress']);
+                                        }
                                       },
                                       style: ButtonStyle(
                                           backgroundColor:
@@ -1004,7 +1005,12 @@ class _packageCardState extends State<packageCard> {
                                       )),
                                   TextButton(
                                       onPressed: () async {
-                                        addNewInsurance(supply.id, publicKey);
+                                        var insurer =
+                                            await displayAllInsurers(context);
+                                        if (insurer != null) {
+                                          addNewInsurance(supply.id,
+                                              insurer['publicAddress']);
+                                        }
                                       },
                                       style: ButtonStyle(
                                           backgroundColor:

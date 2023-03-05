@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:supplychain/pages/LogInPage.dart';
-import 'package:supplychain/pages/LogInPage.dart';
 import 'package:supplychain/pages/profilePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:supplychain/pages/dashboard.dart';
+import 'package:supplychain/pages/userListCard.dart';
 import 'package:supplychain/utils/constants.dart';
-import 'package:supplychain/utils/appTheme.dart';
-import 'package:supplychain/utils/AlertBoxForError.dart';
+import 'package:supplychain/services/DatabaseService.dart';
+
 import 'package:flutter/services.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -136,3 +136,34 @@ Future<int> getTotalSupplies(Web3Client ethClient) async {
   return ans;
 }
 
+displayAllSuppliers(BuildContext context) async {
+  List? suppliers = await DatabaseService.getUsersByType('Supplier');
+  if (suppliers == null) {
+    print("no users found");
+  } else {
+    var response = await UserListCard.createUserListCard(context, suppliers);
+    return response;
+  }
+}
+
+displayAllTransporters(BuildContext context) async {
+  List? transporters =
+      await DatabaseService.getUsersByType('Transport Authority');
+  if (transporters == null) {
+    print("no users found");
+  } else {
+    var response = await UserListCard.createUserListCard(context, transporters);
+    return response;
+  }
+}
+
+displayAllInsurers(BuildContext context) async {
+  List? transporters =
+      await DatabaseService.getUsersByType('Insurance Authority');
+  if (transporters == null) {
+    print("no users found");
+  } else {
+    var response = await UserListCard.createUserListCard(context, transporters);
+    return response;
+  }
+}
