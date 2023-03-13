@@ -3,12 +3,28 @@ import 'package:supplychain/pages/LogInPage.dart';
 import 'package:supplychain/pages/profilePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:supplychain/pages/dashboard.dart';
-import 'package:supplychain/pages/userListCard.dart';
+import 'package:supplychain/pages/ListCards.dart';
+import 'package:supplychain/services/supplyController.dart';
 import 'package:supplychain/utils/constants.dart';
+import 'package:supplychain/utils/AlertBoxes.dart';
 import 'package:supplychain/services/DatabaseService.dart';
 
 import 'package:flutter/services.dart';
 import 'package:web3dart/web3dart.dart';
+
+checkResponse(String? response, BuildContext context,
+    SupplyController supplyController) async {
+  print("Response : $response");
+  if (response == null) {
+    showRawAlert(context, "Error ! Try Again !!");
+  } else {
+    print("\n________________________________");
+    print("Added : $response");
+    print("\n________________________________");
+    showRawAlert(context, "Added Successfully !");
+    await supplyController.getSuppliesOfUser();
+  }
+}
 
 Route routeToDashboard(BuildContext context) {
   return PageRouteBuilder(
@@ -136,12 +152,13 @@ Future<int> getTotalSupplies(Web3Client ethClient) async {
   return ans;
 }
 
-displayAllSuppliers(BuildContext context) async {
-  List? suppliers = await DatabaseService.getUsersByType('Supplier');
-  if (suppliers == null) {
-    print("no users found");
+displayAllBidders(BuildContext context, String supplyId) async {
+  var bidders = await DatabaseService.getBidders(supplyId);
+  if (bidders == null) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Error fetching bidders for Supply ID : ${supplyId}")));
   } else {
-    var response = await UserListCard.createUserListCard(context, suppliers);
+    var response = await ListCard.bidderListCard(context, bidders, "Bidder");
     return response;
   }
 }
@@ -152,7 +169,8 @@ displayAllTransporters(BuildContext context) async {
   if (transporters == null) {
     print("no users found");
   } else {
-    var response = await UserListCard.createUserListCard(context, transporters);
+    var response =
+        await ListCard.userListCard(context, transporters, "Transporter");
     return response;
   }
 }
@@ -163,7 +181,21 @@ displayAllInsurers(BuildContext context) async {
   if (transporters == null) {
     print("no users found");
   } else {
-    var response = await UserListCard.createUserListCard(context, transporters);
+    var response =
+        await ListCard.userListCard(context, transporters, "Insurer");
+    return response;
+  }
+}
+
+displayAllOpenSupplies(BuildContext context) async {
+  List? transporters =
+      await DatabaseService.getUsersByType('Insurance Authority');
+  if (transporters == null) {
+    print("no users found");
+  } else {
+    var response = await ListCard.supplyListCard(context, "Select Supply");
+
+    // await ListCard.userListCard(context, transporters, "Insurer");
     return response;
   }
 }

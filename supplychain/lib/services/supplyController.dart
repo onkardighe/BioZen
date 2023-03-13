@@ -7,7 +7,7 @@ import 'package:supplychain/utils/constants.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:web_socket_channel/io.dart';
 
-class NoteController extends ChangeNotifier {
+class SupplyController extends ChangeNotifier {
   List<Supply> notes = [];
   List<Supply> userSupply = [];
   bool isLoading = true;
@@ -36,7 +36,7 @@ class NoteController extends ChangeNotifier {
   late ContractEvent _noteAddedEvent;
   late ContractEvent _noteDeletedEvent;
 
-  NoteController() {
+  SupplyController() {
     init();
   }
 
@@ -48,8 +48,6 @@ class NoteController extends ChangeNotifier {
     await getCreadentials();
     await getDeployedContract();
     _updateGasPrice();
-
-    // var _basePrice   = await _client.get
   }
 
   void _updateGasPrice() async {
@@ -166,10 +164,15 @@ class NoteController extends ChangeNotifier {
         return;
       }
       var userSupplyIDList = response[0];
-      // print("ID list : " + userSupplyIDList.toString());
 
       userSupply.clear();
-      for (var supplyID in userSupplyIDList) {
+
+      var uniqueSupplies = Set<dynamic>();
+      userSupplyIDList.forEach((supply) {
+        uniqueSupplies.add(supply);
+      });
+
+      for (var supplyID in uniqueSupplies) {
         await getSupplyByID(supplyID);
       }
     } catch (e) {
@@ -177,7 +180,6 @@ class NoteController extends ChangeNotifier {
     }
     isLoading = false;
     notifyListeners();
-    // return notes;
   }
 
   addSupply(String name, double quantity, double temp) async {
@@ -222,6 +224,7 @@ class NoteController extends ChangeNotifier {
   setBuyer(String id, String buyerAddress) async {
     isLoading = true;
     notifyListeners();
+    _updateGasPrice();
     List<dynamic> args = [
       BigInt.from(int.parse(id)),
       EthereumAddress.fromHex(buyerAddress)
@@ -238,10 +241,6 @@ class NoteController extends ChangeNotifier {
         ),
         chainId: 5,
       );
-
-      await getNotes();
-      await getSuppliesOfUser();
-
       isLoading = false;
       notifyListeners();
       return response;
@@ -255,6 +254,7 @@ class NoteController extends ChangeNotifier {
   setTransporter(String id, String transporterAddress) async {
     isLoading = true;
     notifyListeners();
+    _updateGasPrice();
     List<dynamic> args = [
       BigInt.from(int.parse(id)),
       EthereumAddress.fromHex(transporterAddress)
@@ -272,9 +272,6 @@ class NoteController extends ChangeNotifier {
         chainId: 5,
       );
 
-      await getNotes();
-      await getSuppliesOfUser();
-
       isLoading = false;
       notifyListeners();
       return response;
@@ -288,6 +285,7 @@ class NoteController extends ChangeNotifier {
   setInsurance(String id, String insuranceAddress) async {
     isLoading = true;
     notifyListeners();
+    _updateGasPrice();
     List<dynamic> args = [
       BigInt.from(int.parse(id)),
       EthereumAddress.fromHex(insuranceAddress)
@@ -301,23 +299,15 @@ class NoteController extends ChangeNotifier {
           contract: _contract,
           function: _addInsurance,
           parameters: args,
-          // maxFeePerGas: EtherAmount.inWei(_gasPrice.getInWei * BigInt.from(2)),
         ),
         chainId: 5,
       );
 
-      await getNotes();
-      await getSuppliesOfUser();
-
-      isLoading = false;
-      notifyListeners();
       return response;
     } catch (e) {
       print("Error while selecting Transporter : ${e.toString()}");
-      isLoading = false;
-      notifyListeners();
     }
+    isLoading = false;
+    notifyListeners();
   }
 }
-
-// 08:18:02:03:2023

@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:supplychain/services/functions.dart';
 import 'package:supplychain/utils/constants.dart';
-import 'package:supplychain/utils/AlertBoxForError.dart';
+import 'package:supplychain/utils/AlertBoxes.dart';
 import '../utils/appTheme.dart';
 import '../utils/supply.dart';
 import '../services/supplyController.dart';
@@ -37,7 +37,7 @@ class _HomePageState extends State<HomePage> {
   User? thisUser;
   var userName = '', userType = '';
 
-  late NoteController noteController;
+  late SupplyController supplyController;
   late List<Supply> myData;
   @override
   void initState() {
@@ -71,8 +71,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    noteController = Provider.of<NoteController>(context, listen: true);
-    myData = noteController.notes;
+    supplyController = Provider.of<SupplyController>(context, listen: true);
+    myData = supplyController.notes;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -227,7 +227,7 @@ class _HomePageState extends State<HomePage> {
                                         childText: "Refresh",
                                         gradient: AppTheme().themeGradient,
                                         context: context,
-                                        noteController: noteController,
+                                        supplyController: supplyController,
                                         route: PageRouteBuilder(pageBuilder:
                                             (context, animation,
                                                 secondaryAnimation) {
@@ -367,16 +367,16 @@ class TileIconWithName extends TextButton {
     String? userProfileImage = "",
     String? childText = "",
     LinearGradient? gradient,
-    NoteController? noteController,
+    SupplyController? supplyController,
     Route? route,
     BuildContext? context,
     super.style,
   }) : super(
             onPressed: () {
-              if (noteController != null) {
-                noteController.getNotes();
-                noteController.getSuppliesOfUser();
-                noteController.notifyListeners();
+              if (supplyController != null) {
+                supplyController.getNotes();
+                supplyController.getSuppliesOfUser();
+                supplyController.notifyListeners();
               }
               ;
               if (route != null && context != null) {
@@ -405,8 +405,8 @@ class TileIconWithName extends TextButton {
                             : NetworkImage(userProfileImage),
                     child: icon != null
                         ? icon == Icons.refresh_rounded &&
-                                noteController != null &&
-                                noteController.isLoading
+                                supplyController != null &&
+                                supplyController.isLoading
                             ? Center(
                                 child: CircularProgressIndicator(
                                   strokeWidth: 3,

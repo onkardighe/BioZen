@@ -10,7 +10,6 @@ import 'package:supplychain/services/Authentication.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Authentication.initializeFirebase();
-  User thisUser;
 
   runApp(const myApp());
 }
@@ -28,7 +27,7 @@ class _myAppState extends State<myApp> {
     
 
     return ChangeNotifierProvider(
-      create: (_) => NoteController(),
+      create: (_) => SupplyController(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: "Supply Chain",

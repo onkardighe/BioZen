@@ -2,15 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart';
-import 'package:supplychain/utils/AlertBoxForError.dart';
+import 'package:supplychain/utils/AlertBoxes.dart';
 import '../utils/supply.dart';
 import 'package:provider/provider.dart';
 import 'package:supplychain/utils/appTheme.dart';
 import 'package:supplychain/utils/constants.dart';
 import 'package:supplychain/services/supplyController.dart';
 import 'package:supplychain/services/DatabaseService.dart';
-import 'package:web3dart/web3dart.dart';
 import '../services/functions.dart';
 
 class DetailsScreen extends StatefulWidget {
@@ -24,13 +22,7 @@ class DetailsScreen extends StatefulWidget {
 
 class _DetailsScreenState extends State<DetailsScreen> {
   int _selectedTag = 0;
-  late NoteController noteController;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
+  late SupplyController supplyController;
 
   void changeTab(int index) {
     setState(() {
@@ -40,7 +32,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    noteController = Provider.of<NoteController>(context, listen: true);
+    supplyController = Provider.of<SupplyController>(context, listen: true);
     return Container(
       decoration: BoxDecoration(gradient: AppTheme().themeGradient),
       child: AnnotatedRegion<SystemUiOverlayStyle>(
@@ -63,7 +55,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     height: 33,
                     decoration: BoxDecoration(
                         shape: BoxShape.circle, color: Colors.indigo.shade400),
-                    child: noteController.isLoading
+                    child: supplyController.isLoading
                         ? Center(
                             child: CircularProgressIndicator(
                               strokeWidth: 3,
@@ -74,9 +66,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             child: InkWell(
                               onTap: () {
                                 print("refreshed");
-                                noteController.getNotes();
-                                noteController.getSuppliesOfUser();
-                                noteController.notifyListeners();
+                                supplyController.getNotes();
+                                supplyController.getSuppliesOfUser();
+                                supplyController.notifyListeners();
                                 setState(() {});
                               },
                               child: Icon(Icons.refresh_rounded, size: 22),
@@ -85,7 +77,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
               )
             ],
             title: const Text(
-              "ORDERS",
+              "DASHBOARD",
               style: TextStyle(fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
@@ -240,7 +232,7 @@ class EnrollBottomSheet extends StatefulWidget {
 }
 
 class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
-  late NoteController noteController;
+  late SupplyController supplyController;
   late List<Supply> myData;
   // String email = "onkardigheofficial@gmail.com";
   late List<Supply> supplyList;
@@ -252,8 +244,8 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    noteController = Provider.of<NoteController>(context, listen: true);
-    supplyList = noteController.userSupply;
+    supplyController = Provider.of<SupplyController>(context, listen: true);
+    supplyList = supplyController.userSupply;
     return Container(
       decoration: BoxDecoration(gradient: AppTheme().themeGradient),
       child: Row(
@@ -284,31 +276,35 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
                   ),
                 ],
               )),
-          // TextButton(
-          //     onPressed: () {
-          //       displayAllTransporters(context);
-          //     },
-          //     style: ButtonStyle(
-          //         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-          //             RoundedRectangleBorder(
-          //                 borderRadius: BorderRadius.circular(20)))),
-          //     child: Column(
-          //       mainAxisAlignment: MainAxisAlignment.spaceAround,
-          //       children: [
-          //         Icon(
-          //           Icons.post_add_sharp,
-          //           size: 25,
-          //           color: Colors.white,
-          //         ),
-          //         Text(
-          //           "Get Suppliers",
-          //           style: TextStyle(
-          //               color: Colors.white,
-          //               fontWeight: FontWeight.bold,
-          //               fontSize: 13),
-          //         ),
-          //       ],
-          //     )),
+          TextButton(
+              onPressed: () async {
+                var transporter = await displayAllOpenSupplies(context);
+                // if (transporter != null) {
+                //   addNewTransporter(supply.id,
+                //       transporter['publicAddress']);
+                // }
+              },
+              style: ButtonStyle(
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)))),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Icon(
+                    Icons.post_add_sharp,
+                    size: 25,
+                    color: Colors.white,
+                  ),
+                  Text(
+                    "Buy Supply",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13),
+                  ),
+                ],
+              )),
         ],
       ),
     );
@@ -381,7 +377,7 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
                 SizedBox(
                   width: 15,
                 ),
-                noteController.isLoading
+                supplyController.isLoading
                     ? Center(
                         child: CircularProgressIndicator(),
                       )
@@ -393,7 +389,6 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
                           if (_titleController.value.text.isEmpty ||
                               _temperatureController.value.text.isEmpty ||
                               _quantityController.value.text.isEmpty) {
-                            print("Invalid !");
                             return;
                           }
                           addNewSupply(
@@ -414,8 +409,8 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
 
   void addNewSupply(String title, double quantity, double temp) async {
     String? supplyAddress =
-        await noteController.addSupply(title, quantity, temp);
-    checkResponse(supplyAddress, context);
+        await supplyController.addSupply(title, quantity, temp);
+    checkResponse(supplyAddress, context, supplyController);
     Navigator.of(context).pop();
   }
 }
@@ -592,7 +587,7 @@ class OngoingList extends StatefulWidget {
 
 class _OngoingListState extends State<OngoingList> {
   ScrollController _cardScrollController = new ScrollController();
-  late NoteController noteController;
+  late SupplyController supplyController;
   late List<Supply> supplyList;
 
   @override
@@ -602,8 +597,8 @@ class _OngoingListState extends State<OngoingList> {
 
   @override
   Widget build(BuildContext context) {
-    noteController = Provider.of<NoteController>(context, listen: true);
-    supplyList = noteController.userSupply;
+    supplyController = Provider.of<SupplyController>(context, listen: true);
+    supplyList = supplyController.userSupply;
     return Expanded(
       child: Container(
         color: Colors.grey.shade200,
@@ -655,8 +650,9 @@ class _packageCardState extends State<packageCard> {
   late double height, width;
   late bool openedCard;
   late ScrollController cardController;
-  late NoteController noteController;
+  late SupplyController supplyController;
   late String? supplierName;
+  late String? buyerName = "Fuel Company";
 
   @override
   void initState() {
@@ -670,17 +666,22 @@ class _packageCardState extends State<packageCard> {
     super.initState();
   }
 
-  void _scrollToCard() {
-    cardController.animateTo(
-      (int.tryParse(supply.id)!) * ((widget._height) + 20) + 7,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-    );
-  }
+  // void _scrollToCard() {
+
+  // cardController.animateTo(
+  //   (int.tryParse(supply.id)!) * ((widget._height) + 20) + 7,
+  //   duration: const Duration(milliseconds: 500),
+  //   curve: Curves.easeInOut,
+  // );
+  // }
 
   void fetchSupplyData() async {
     supplierName = await DatabaseService()
         .getNameByAddress(supply.supplierAddress.hexEip55);
+    if(supply.isBuyerAdded)
+    {
+      // buyerName = await supplyController.
+    }
   }
 
   void toggleSize() {
@@ -688,12 +689,12 @@ class _packageCardState extends State<packageCard> {
       height = openedCard ? height / 3 : height * 3;
       openedCard = !openedCard;
     });
-    _scrollToCard();
+    // _scrollToCard();
   }
 
   @override
   Widget build(BuildContext context) {
-    noteController = Provider.of<NoteController>(context, listen: true);
+    supplyController = Provider.of<SupplyController>(context, listen: true);
     return GestureDetector(
       onTap: () {
         toggleSize();
@@ -848,7 +849,7 @@ class _packageCardState extends State<packageCard> {
                                   Text("To : ",
                                       style: TextStyle(
                                           color: Colors.grey.shade700)),
-                                  Text("Fuel Company",
+                                  Text(buyerName!,
                                       style: TextStyle(
                                           color: Colors.grey.shade700))
                                 ],
@@ -964,19 +965,26 @@ class _packageCardState extends State<packageCard> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                    TextButton(
-                                        onPressed: () async {
-                                          displayAllSuppliers(context);
-                                          // addNewBuyer(supply.id, publicKey);
-                                        },
-                                        style: ButtonStyle(
-                                            backgroundColor:
-                                                MaterialStatePropertyAll<Color>(
-                                                    Colors.red)),
-                                        child: Text(
-                                          "Select Buyer",
-                                          style: TextStyle(color: Colors.white),
-                                        ))
+                                    supply.isBuyerAdded
+                                        ? SizedBox()
+                                        : TextButton(
+                                            onPressed: () async {
+                                              var bidder =
+                                                  await displayAllBidders(
+                                                      context, supply.id);
+                                              if (bidder != null) {
+                                                addNewBuyer(supply.id, bidder);
+                                              }
+                                            },
+                                            style: ButtonStyle(
+                                                backgroundColor:
+                                                    MaterialStatePropertyAll<
+                                                        Color>(Colors.red)),
+                                            child: Text(
+                                              "Select Buyer",
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ))
                                   ])
                             : SizedBox(),
                         openedCard
@@ -984,42 +992,49 @@ class _packageCardState extends State<packageCard> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  TextButton(
-                                      onPressed: () async {
-                                        var transporter =
-                                            await displayAllTransporters(
-                                                context);
-                                        if (transporter != null) {
-                                          addNewTransporter(supply.id,
-                                              transporter['publicAddress']);
-                                        }
-                                      },
-                                      style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStatePropertyAll<Color>(
-                                                  Colors.red)),
-                                      child: Text(
-                                        "Select Transporter",
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(color: Colors.white),
-                                      )),
-                                  TextButton(
-                                      onPressed: () async {
-                                        var insurer =
-                                            await displayAllInsurers(context);
-                                        if (insurer != null) {
-                                          addNewInsurance(supply.id,
-                                              insurer['publicAddress']);
-                                        }
-                                      },
-                                      style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStatePropertyAll<Color>(
-                                                  Colors.red)),
-                                      child: Text(
-                                        "Select Insurance",
-                                        style: TextStyle(color: Colors.white),
-                                      )),
+                                  supply.isTransporterAdded
+                                      ? SizedBox()
+                                      : TextButton(
+                                          onPressed: () async {
+                                            var transporter =
+                                                await displayAllTransporters(
+                                                    context);
+                                            if (transporter != null) {
+                                              addNewTransporter(supply.id,
+                                                  transporter['publicAddress']);
+                                            }
+                                          },
+                                          style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStatePropertyAll<
+                                                      Color>(Colors.red)),
+                                          child: Text(
+                                            "Select Transporter",
+                                            overflow: TextOverflow.ellipsis,
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          )),
+                                  supply.isInsuranceAdded
+                                      ? SizedBox()
+                                      : TextButton(
+                                          onPressed: () async {
+                                            var insurer =
+                                                await displayAllInsurers(
+                                                    context);
+                                            if (insurer != null) {
+                                              addNewInsurance(supply.id,
+                                                  insurer['publicAddress']);
+                                            }
+                                          },
+                                          style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStatePropertyAll<
+                                                      Color>(Colors.red)),
+                                          child: Text(
+                                            "Select Insurance",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          )),
                                 ],
                               )
                             : SizedBox(),
@@ -1036,35 +1051,26 @@ class _packageCardState extends State<packageCard> {
   }
 
   void addNewBuyer(String id, String address) async {
-    String? setBuyerresponse = await noteController.setBuyer(id, address);
+    String? setBuyerresponse = await supplyController.setBuyer(id, address);
 
-    checkResponse(setBuyerresponse, context);
-    if (setBuyerresponse != null && !setBuyerresponse.contains('Error')) {
-      setState(() {
-        supply.isBuyerAdded = true;
-      });
+    if (mounted) {
+      await checkResponse(setBuyerresponse, context, supplyController);
     }
   }
 
   void addNewTransporter(String id, String address) async {
-    String? setBuyerresponse = await noteController.setTransporter(id, address);
+    String? setTransporterresponse =
+        await supplyController.setTransporter(id, address);
 
-    checkResponse(setBuyerresponse, context);
-    if (setBuyerresponse != null && !setBuyerresponse.contains('Error')) {
-      setState(() {
-        supply.isTransporterAdded = true;
-      });
+    if (mounted) {
+      await checkResponse(setTransporterresponse, context, supplyController);
     }
   }
 
   void addNewInsurance(String id, String address) async {
-    String? setBuyerresponse = await noteController.setInsurance(id, address);
-
-    checkResponse(setBuyerresponse, context);
-    if (setBuyerresponse != null && !setBuyerresponse.contains('Error')) {
-      setState(() {
-        supply.isInsuranceAdded = true;
-      });
+    String? setBuyerresponse = await supplyController.setInsurance(id, address);
+    if (mounted) {
+      await checkResponse(setBuyerresponse, context, supplyController);
     }
   }
 
@@ -1079,18 +1085,5 @@ class _packageCardState extends State<packageCard> {
         color: Colors.grey.shade100,
       );
     }
-  }
-}
-
-checkResponse(String? response, BuildContext context) {
-  if (response == null) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text("Error ! Try Again !!")));
-  } else {
-    print("\n________________________________");
-    print("Added : $response");
-    print("\n________________________________");
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text("Added Successfully !")));
   }
 }

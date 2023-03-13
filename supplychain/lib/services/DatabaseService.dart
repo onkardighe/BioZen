@@ -79,11 +79,9 @@ class DatabaseService {
     try {
       var users = FirebaseFirestore.instance.collection('users');
       var userList = await users.where('type', isEqualTo: type).get();
-      // var fuelCompanyList =
-      //     await users.where('type', isEqualTo: 'Fuel Company').get();
 
       var list = [];
-      var data = userList.docs.forEach((element) {
+      userList.docs.forEach((element) {
         var user = element.data();
         list.add(user);
       });
@@ -93,5 +91,46 @@ class DatabaseService {
       print("Exception : {$e}");
       return null;
     }
+  }
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////  BIDDING PROCESS ///////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  static void makeBid(String supplyId, String address, int price) async {
+    var dbSnap =
+        await FirebaseFirestore.instance.collection('bids').doc(supplyId);
+    var doc = await dbSnap.get();
+
+    if (doc.exists) {
+      await dbSnap.update({address: price});
+    } else {
+      await dbSnap.set({address: price});
+    }
+  }
+
+  static Future<bool> isBidderPresent(
+      String supplyId, String bidderAddress) async {
+    var dbSnap =
+        await FirebaseFirestore.instance.collection('bids').doc(supplyId);
+    var doc = await dbSnap.get();
+
+    if (doc.exists) {
+      var docList = doc.data() as Map<String, dynamic>;
+      return docList.containsKey(bidderAddress);
+    } else {
+      return false;
+    }
+  }
+
+  static Future<Map> getBidders(String supplyId) async {
+    var biddedSupplies =
+        await FirebaseFirestore.instance.collection('bids').doc(supplyId);
+    var doc = await biddedSupplies.get();
+
+    if (doc.exists) {
+      var docList = doc.data() as Map<String, dynamic>;
+      return docList;
+    }
+    return Map<String, dynamic>();
   }
 }
