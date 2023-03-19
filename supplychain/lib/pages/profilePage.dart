@@ -220,7 +220,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     title: Text(
                       publicWalletAddress != null &&
-                              publicWalletAddress!.trim().length != 0
+                              publicWalletAddress!.trim().isNotEmpty
                           ? "${publicWalletAddress!.substring(0, 8)}*************${publicWalletAddress!.substring(publicWalletAddress!.length - 5, publicWalletAddress!.length)} "
                           : "User Not Found !!",
                       style: TextStyle(
@@ -245,7 +245,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       title: isPrivateAddressLinked
                           ? Text(
                               publicWalletAddress != null &&
-                                      publicWalletAddress!.trim().length != 0
+                                      publicWalletAddress!.trim().isNotEmpty
                                   ? privateWalletAddress.length <= 8
                                       ? privateWalletAddress
                                       : "${privateWalletAddress.substring(0, 8)}*************${privateWalletAddress.substring(privateWalletAddress.length - 5, privateWalletAddress.length)} "

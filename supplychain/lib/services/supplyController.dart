@@ -127,7 +127,7 @@ class SupplyController extends ChangeNotifier {
     try {
       List response = await _client
           .call(contract: _contract, function: _getSupply, params: [id]);
-      if (response.length == 0) {
+      if (response.isEmpty) {
         return;
       }
       List<dynamic> supply = response[0];
@@ -160,14 +160,14 @@ class SupplyController extends ChangeNotifier {
           function: _getUserSupplies,
           params: [EthereumAddress.fromHex(publicKey)]);
 
-      if (response.length == 0) {
+      if (response.isEmpty) {
         return;
       }
       var userSupplyIDList = response[0];
 
       userSupply.clear();
 
-      var uniqueSupplies = Set<dynamic>();
+      var uniqueSupplies = <dynamic>{};
       userSupplyIDList.forEach((supply) {
         uniqueSupplies.add(supply);
       });

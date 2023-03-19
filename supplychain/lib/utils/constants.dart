@@ -19,7 +19,7 @@ bool privateKeyLinked = false;
 late User user;
 late String userType = '';
 String? mobileNumber = null;
-late String email = "";
+String email = "";
 
 // ---------------- Names of Users --------------------//
 String fuelCompany = "Fuel Company";

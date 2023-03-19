@@ -81,10 +81,10 @@ class DatabaseService {
       var userList = await users.where('type', isEqualTo: type).get();
 
       var list = [];
-      userList.docs.forEach((element) {
+      for (var element in userList.docs) {
         var user = element.data();
         list.add(user);
-      });
+      }
 
       return list;
     } catch (e) {
@@ -97,8 +97,7 @@ class DatabaseService {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   static void makeBid(String supplyId, String address, int price) async {
-    var dbSnap =
-        await FirebaseFirestore.instance.collection('bids').doc(supplyId);
+    var dbSnap = FirebaseFirestore.instance.collection('bids').doc(supplyId);
     var doc = await dbSnap.get();
 
     if (doc.exists) {
@@ -110,8 +109,7 @@ class DatabaseService {
 
   static Future<bool> isBidderPresent(
       String supplyId, String bidderAddress) async {
-    var dbSnap =
-        await FirebaseFirestore.instance.collection('bids').doc(supplyId);
+    var dbSnap = FirebaseFirestore.instance.collection('bids').doc(supplyId);
     var doc = await dbSnap.get();
 
     if (doc.exists) {
@@ -124,7 +122,7 @@ class DatabaseService {
 
   static Future<Map> getBidders(String supplyId) async {
     var biddedSupplies =
-        await FirebaseFirestore.instance.collection('bids').doc(supplyId);
+        FirebaseFirestore.instance.collection('bids').doc(supplyId);
     var doc = await biddedSupplies.get();
 
     if (doc.exists) {

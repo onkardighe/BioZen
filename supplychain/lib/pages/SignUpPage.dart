@@ -4,11 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supplychain/pages/ProfileChooserPage.dart';
 import 'package:supplychain/utils/appTheme.dart';
-import 'package:supplychain/pages/HomePage.dart';
 import 'package:supplychain/services/Authentication.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:supplychain/utils/constants.dart';
-import 'package:web3dart/web3dart.dart';
 
 class SignUpPage extends StatefulWidget {
   @override

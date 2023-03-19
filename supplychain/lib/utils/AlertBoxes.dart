@@ -304,8 +304,7 @@ class _AlertBoxForPrivateKeyErrorState
                       backgroundColor: MaterialStateProperty.all<Color>(
                           AppTheme.primaryColor)),
                   onPressed: () {
-                    Navigator.of(context)
-                        .push(routeToProfile());
+                    Navigator.of(context).push(routeToProfile());
                   },
                   child: const Text(
                     "Go to Profile Page",
@@ -368,7 +367,7 @@ Future<void> showRawAlert(BuildContext context, String? titleText) async {
         return AlertDialog(
           title: titleText != null
               ? Text(
-                  "$titleText",
+                  titleText,
                   style: TextStyle(color: AppTheme.primaryColor),
                 )
               : SizedBox(),

@@ -1,6 +1,7 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:supplychain/pages/HomePage.dart';
 import 'package:supplychain/services/DatabaseService.dart';
 import 'package:supplychain/services/supplyController.dart';
 import 'package:supplychain/utils/AlertBoxes.dart';
@@ -324,7 +325,7 @@ class _UserListCard extends State<UserListCard> {
   }
 
   _fetchList() {
-    users.forEach((element) {
+    for (var element in users) {
       userCards.add(GestureDetector(
         onTap: () {
           setState(() {
@@ -368,7 +369,7 @@ class _UserListCard extends State<UserListCard> {
           ),
         ),
       ));
-    });
+    }
   }
 
   @override

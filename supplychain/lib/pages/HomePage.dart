@@ -1,11 +1,11 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:supplychain/services/functions.dart';
 import 'package:supplychain/utils/constants.dart';
 import 'package:supplychain/utils/AlertBoxes.dart';
 import '../utils/appTheme.dart';
-import '../utils/supply.dart';
 import '../services/supplyController.dart';
 import 'package:supplychain/utils/Drawer.dart';
 import 'package:supplychain/services/DatabaseService.dart';
@@ -14,13 +14,12 @@ class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  State<HomePage>  createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
   bool _isAppbarVisible = true;
   ScrollController _bodyScrollConroller = ScrollController();
-  var initial;
   var userName = '';
   late var userSpecificButtonText = '';
   int subscribedSupplies = 0;
@@ -334,7 +333,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
       ),
-      drawer: appDrawer(
+      drawer: AppDrawer(
         type: userType,
       ),
       bottomSheet: privateKeyLinked

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supplychain/pages/LogInPage.dart';
 import 'package:supplychain/pages/profilePage.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:supplychain/pages/dashboard.dart';
 import 'package:supplychain/pages/ListCards.dart';
 import 'package:supplychain/services/supplyController.dart';

@@ -1,25 +1,20 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:supplychain/utils/appTheme.dart';
 import 'package:supplychain/services/functions.dart';
 import 'package:supplychain/services/Authentication.dart';
 import 'package:supplychain/utils/constants.dart';
-// import 'package:supplychain/utils/profilePage.dart';
-// import 'package:supplychain/pages/dashnoard.dart';
 
-class appDrawer extends StatefulWidget {
+class AppDrawer extends StatefulWidget {
   final String? userType;
-  const appDrawer({Key? key, String? type})
+  const AppDrawer({Key? key, String? type})
       : userType = type,
         super(key: key);
 
   @override
-  _appDrawerState createState() => _appDrawerState();
+  State<AppDrawer>  createState() => _AppDrawerState();
 }
 
-class _appDrawerState extends State<appDrawer> {
+class _AppDrawerState extends State<AppDrawer> {
   bool _isSigningOut = false;
   var userType;
 

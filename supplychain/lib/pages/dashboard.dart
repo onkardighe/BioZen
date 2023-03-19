@@ -1,6 +1,5 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supplychain/pages/HomePage.dart';
@@ -848,11 +847,11 @@ class _packageCardState extends State<packageCard> {
   }
 
   Widget addSpacing() {
-    if (!openedCard)
+    if (!openedCard) {
       return SizedBox(
         height: 0,
       );
-    else {
+    } else {
       return Container(
         height: 2,
         color: Colors.grey.shade100,
