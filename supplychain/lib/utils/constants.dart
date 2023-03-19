@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+
 String goreli_url =
     'https://eth-goerli.g.alchemy.com/v2/UEaVuX0SQSuYOZ0JyVYBfRRfqRN4vfWU';
 
@@ -13,5 +15,14 @@ String deployedContractAddress = '0xf0cE6395B1369cd471408Bd7eFCB7ebbbc2e764b';
 
 bool privateKeyLinked = false;
 
+// ---------------- User Data --------------------//
+late User user;
+late String userType = '';
 String? mobileNumber = null;
 late String email = "";
+
+// ---------------- Names of Users --------------------//
+String fuelCompany = "Fuel Company";
+String supplier = "Supplier";
+String transportAuthority = "Transport Authority";
+String insuranceAuthority = "Insurance Authority";

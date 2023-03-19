@@ -10,14 +10,9 @@ import 'package:supplychain/utils/constants.dart';
 // import 'package:supplychain/pages/dashnoard.dart';
 
 class appDrawer extends StatefulWidget {
-  final User _user;
-  final String _userName;
   final String? userType;
-  const appDrawer(
-      {Key? key, required User user, required String name, String? type})
-      : _user = user,
-        _userName = name,
-        userType = type,
+  const appDrawer({Key? key, String? type})
+      : userType = type,
         super(key: key);
 
   @override
@@ -26,13 +21,10 @@ class appDrawer extends StatefulWidget {
 
 class _appDrawerState extends State<appDrawer> {
   bool _isSigningOut = false;
-  User? _thisUser;
-  var userName, userType;
+  var userType;
 
   @override
   void initState() {
-    _thisUser = widget._user;
-    userName = widget._userName;
     userType = widget.userType;
     super.initState();
   }
@@ -51,13 +43,13 @@ class _appDrawerState extends State<appDrawer> {
                   child: UserAccountsDrawerHeader(
                     margin: EdgeInsets.only(bottom: 0),
                     currentAccountPicture: CircleAvatar(
-                      backgroundImage: _thisUser!.photoURL == null
+                      backgroundImage: user.photoURL == null
                           ? NetworkImage(
                               "https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png")
-                          : NetworkImage(_thisUser!.photoURL!),
+                          : NetworkImage(user.photoURL!),
                     ),
                     accountName: Text(
-                      userName,
+                      user.displayName!,
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
@@ -75,10 +67,9 @@ class _appDrawerState extends State<appDrawer> {
                         borderRadius: BorderRadius.circular(90),
                       )),
                       backgroundColor:
-                          MaterialStateProperty.all(Colors.indigo.shade700)),
+                          MaterialStateProperty.all(AppTheme.primaryDark)),
                   onPressed: () {
-                    Navigator.of(context)
-                        .push(routeToProfile(_thisUser!, userName, userType));
+                    Navigator.of(context).push(routeToProfile());
                   },
                   child: const ListTile(
                     textColor: Colors.white,
@@ -96,14 +87,14 @@ class _appDrawerState extends State<appDrawer> {
               ),
               Container(
                 margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
-                child: TextButton(
+                child: ElevatedButton(
                   style: ButtonStyle(
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(90),
                       )),
                       backgroundColor:
-                          MaterialStateProperty.all(Colors.indigo.shade700)),
+                          MaterialStateProperty.all(AppTheme.primaryDark)),
                   onPressed: () {
                     Navigator.of(context).push(routeToDashboard(context));
                   },
@@ -130,7 +121,7 @@ class _appDrawerState extends State<appDrawer> {
                         borderRadius: BorderRadius.circular(90),
                       )),
                       backgroundColor:
-                          MaterialStateProperty.all(Colors.indigo.shade700)),
+                          MaterialStateProperty.all(AppTheme.primaryDark)),
                   onPressed: () {},
                   child: const ListTile(
                     textColor: Colors.white,
@@ -155,8 +146,8 @@ class _appDrawerState extends State<appDrawer> {
                           RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(90),
                       )),
-                      backgroundColor: MaterialStateProperty.all(
-                          Colors.deepPurple.shade400)),
+                      backgroundColor:
+                          MaterialStateProperty.all(AppTheme.secondaryDark)),
                   onPressed: () async {
                     setState(() {
                       _isSigningOut = true;

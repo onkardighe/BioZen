@@ -8,7 +8,7 @@ import 'package:web3dart/web3dart.dart';
 import 'package:web_socket_channel/io.dart';
 
 class SupplyController extends ChangeNotifier {
-  List<Supply> notes = [];
+  List<Supply> allSupplies = [];
   List<Supply> userSupply = [];
   bool isLoading = true;
   late int noteCount;
@@ -50,7 +50,7 @@ class SupplyController extends ChangeNotifier {
     _updateGasPrice();
   }
 
-  void _updateGasPrice() async {
+  _updateGasPrice() async {
     _gasPrice = await _client
         .getBlockInformation()
         .then((value) => value.baseFeePerGas!);
@@ -94,9 +94,9 @@ class SupplyController extends ChangeNotifier {
       }
       List<dynamic> notesList = response[0];
 
-      // print(notesList.toString());
       noteCount = notesList.length;
-      notes.clear();
+      allSupplies.clear();
+
       for (List<dynamic> note in notesList) {
         Supply n = Supply(
           id: note[0].toString(),
@@ -111,7 +111,7 @@ class SupplyController extends ChangeNotifier {
           isInsuranceAdded: note[9],
           isCompleted: note[10],
         );
-        notes.add(n);
+        allSupplies.add(n);
         print(note.toString());
       }
     } catch (e) {
@@ -119,7 +119,7 @@ class SupplyController extends ChangeNotifier {
     }
     isLoading = false;
     notifyListeners();
-    return notes;
+    return allSupplies;
   }
 
   getSupplyByID(BigInt id) async {
@@ -131,7 +131,7 @@ class SupplyController extends ChangeNotifier {
         return;
       }
       List<dynamic> supply = response[0];
-      Supply n = Supply(
+      Supply newSypply = Supply(
         id: supply[0].toString(),
         title: supply[1],
         quantity: supply[2].toString(),
@@ -144,7 +144,7 @@ class SupplyController extends ChangeNotifier {
         isInsuranceAdded: supply[9],
         isCompleted: supply[10],
       );
-      userSupply.add(n);
+      return newSypply;
     } catch (e) {
       print(e);
     }
@@ -173,7 +173,8 @@ class SupplyController extends ChangeNotifier {
       });
 
       for (var supplyID in uniqueSupplies) {
-        await getSupplyByID(supplyID);
+        var newSupply = await getSupplyByID(supplyID);
+        userSupply.add(newSupply);
       }
     } catch (e) {
       print(e);
@@ -185,7 +186,7 @@ class SupplyController extends ChangeNotifier {
   addSupply(String name, double quantity, double temp) async {
     String currentStamp = DateTime.now().toString();
     await getCreadentials();
-    _updateGasPrice();
+    await _updateGasPrice();
     publicKey = _credentials.address.toString();
     List<dynamic> args = [
       name,
@@ -207,9 +208,6 @@ class SupplyController extends ChangeNotifier {
         ),
         chainId: 5,
       );
-
-      await getNotes();
-      await getSuppliesOfUser();
 
       isLoading = false;
       notifyListeners();

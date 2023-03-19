@@ -39,7 +39,7 @@ class ListCard {
         context: context,
         builder: (context) {
           return SupplyListCard(
-            // suppliers: users,
+            context: context,
             title: title,
           );
         });
@@ -48,35 +48,76 @@ class ListCard {
 
 class SupplyListCard extends StatefulWidget {
   final String? _title;
-  const SupplyListCard({super.key, required String? title}) : _title = title;
+  final BuildContext _context;
+  const SupplyListCard(
+      {super.key, required BuildContext context, required String? title})
+      : _title = title,
+        _context = context;
 
   @override
   State<SupplyListCard> createState() => _SupplyListCardState();
 }
 
 class _SupplyListCardState extends State<SupplyListCard> {
-  late String? title;
+  late String title;
+  late BuildContext context;
   bool isFirstTime = true;
   late SupplyController supplyController;
   late List<Supply> buySupplyList = [];
   late List<String> addedBidsList = [];
+  late TextStyle titleTextStyle;
+  late TextStyle nameTextStyle;
+  late TextStyle boldTextStyle;
+  late TextStyle mainTextStyle;
+  String fontName = 'roboto';
 
   @override
   void initState() {
-    title = widget._title;
+    title = widget._title!;
+    context = widget._context;
+    initFontStyle();
     super.initState();
+  }
+
+  void initFontStyle() {
+    titleTextStyle = TextStyle(
+        fontFamily: fontName,
+        color: Colors.grey.shade700,
+        fontWeight: FontWeight.bold,
+        fontSize: 18,
+        decoration: TextDecoration.none);
+    nameTextStyle = TextStyle(
+        color: AppTheme.primaryColor,
+        fontFamily: fontName,
+        fontWeight: FontWeight.bold,
+        fontSize: 17,
+        decoration: TextDecoration.none);
+    boldTextStyle = TextStyle(
+        color: Colors.grey.shade800,
+        fontFamily: fontName,
+        fontSize: 15,
+        fontWeight: FontWeight.bold,
+        decoration: TextDecoration.none);
+    mainTextStyle = TextStyle(
+        fontFamily: fontName,
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+        color: Colors.grey.shade700,
+        decoration: TextDecoration.none);
   }
 
   void getSuppliesReadyToBuy() async {
     buySupplyList.clear();
     addedBidsList.clear();
-    for (var supply in supplyController.notes) {
+    for (var supply in supplyController.allSupplies) {
       if (!supply.isBuyerAdded) {
         buySupplyList.add(supply);
         await isAlreadyBidded(supply.id);
       }
     }
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   isAlreadyBidded(String id) async {
@@ -108,11 +149,8 @@ class _SupplyListCardState extends State<SupplyListCard> {
             children: [
               Spacer(),
               Text(
-                "Select biofuel to buy",
-                style: TextStyle(
-                    color: Colors.grey.shade700,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18),
+                title,
+                style: titleTextStyle,
               ),
               Spacer(),
               GestureDetector(
@@ -176,11 +214,8 @@ class _SupplyListCardState extends State<SupplyListCard> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "ID : " + supply.id,
-                                    style: TextStyle(
-                                        color: AppTheme.primaryColor,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 17),
+                                    "ID : ${supply.id}",
+                                    style: nameTextStyle,
                                   ),
                                   Icon(
                                     Icons.info_outline_rounded,
@@ -193,9 +228,7 @@ class _SupplyListCardState extends State<SupplyListCard> {
                                 children: [
                                   Text(
                                     supply.title,
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold),
+                                    style: boldTextStyle,
                                   ),
                                 ],
                               ),
@@ -205,25 +238,20 @@ class _SupplyListCardState extends State<SupplyListCard> {
                                 children: [
                                   Text(
                                     "Quantity : ",
-                                    style:
-                                        TextStyle(color: Colors.grey.shade700),
+                                    style: mainTextStyle,
                                   ),
                                   Text("${supply.quantity} Kg",
-                                      style: TextStyle(
-                                          color: Colors.grey.shade700))
+                                      style: mainTextStyle)
                                 ],
                               ),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("Created at : ",
-                                      style: TextStyle(
-                                          color: Colors.grey.shade700)),
+                                  Text("Created at : ", style: mainTextStyle),
                                   Text(
                                       "${supply.createdAt.hour}:${supply.createdAt.minute}  ${supply.createdAt.day}/${supply.createdAt.month}/${supply.createdAt.year}",
-                                      style: TextStyle(
-                                          color: Colors.grey.shade700))
+                                      style: mainTextStyle)
                                 ],
                               ),
                               addedBidsList.contains(supply.id)
@@ -237,8 +265,6 @@ class _SupplyListCardState extends State<SupplyListCard> {
                                           onPressed: (() {
                                             AlertToAddBidAmount(
                                                 context, supply);
-                                            // DatabaseService.makeBid(
-                                            //     supply.id, publicKey, 250);
                                           }),
                                           style: ButtonStyle(
                                               backgroundColor:

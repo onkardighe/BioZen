@@ -1,7 +1,9 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:supplychain/pages/HomePage.dart';
 import 'package:supplychain/utils/AlertBoxes.dart';
 import '../utils/supply.dart';
 import 'package:provider/provider.dart';
@@ -11,19 +13,16 @@ import 'package:supplychain/services/supplyController.dart';
 import 'package:supplychain/services/DatabaseService.dart';
 import '../services/functions.dart';
 
-class DetailsScreen extends StatefulWidget {
-  const DetailsScreen({
-    Key? key,
-  }) : super(key: key);
+class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({Key? key}) : super(key: key);
 
   @override
-  _DetailsScreenState createState() => _DetailsScreenState();
+  State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DetailsScreenState extends State<DetailsScreen> {
+class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedTag = 0;
   late SupplyController supplyController;
-
   void changeTab(int index) {
     setState(() {
       _selectedTag = index;
@@ -40,10 +39,13 @@ class _DetailsScreenState extends State<DetailsScreen> {
         child: Scaffold(
           appBar: AppBar(
             leading: IconButton(
-              icon: Icon(Icons.arrow_circle_left_rounded,
-                  color: Colors.white, size: 36),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
+                icon: Icon(Icons.arrow_circle_left_rounded,
+                    color: Colors.white, size: 36),
+                onPressed: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => HomePage()),
+                      (Route<dynamic> route) => false);
+                }),
             backgroundColor: Colors.transparent,
             elevation: 0,
             actions: [
@@ -54,7 +56,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     width: 33,
                     height: 33,
                     decoration: BoxDecoration(
-                        shape: BoxShape.circle, color: Colors.indigo.shade400),
+                        shape: BoxShape.circle, color: AppTheme.primaryColor),
                     child: supplyController.isLoading
                         ? Center(
                             child: CircularProgressIndicator(
@@ -99,9 +101,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             ),
                           ],
                         ),
-                        _selectedTag == 0
-                            ? const OngoingList()
-                            : const Description(),
+                        _selectedTag == 0 ? OngoingList() : const Description(),
                       ],
                     )
                   : AlertBoxForPrivateKeyErrorWithoutRoute(),
@@ -228,7 +228,7 @@ class EnrollBottomSheet extends StatefulWidget {
   const EnrollBottomSheet({Key? key}) : super(key: key);
 
   @override
-  _EnrollBottomSheetState createState() => _EnrollBottomSheetState();
+  State<EnrollBottomSheet> createState() => _EnrollBottomSheetState();
 }
 
 class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
@@ -253,7 +253,7 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
         children: [
           TextButton(
               onPressed: () {
-                showAlert();
+                AlertBoxes.showAlertForCreateSupply(context, supplyController);
               },
               style: ButtonStyle(
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -278,11 +278,7 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
               )),
           TextButton(
               onPressed: () async {
-                var transporter = await displayAllOpenSupplies(context);
-                // if (transporter != null) {
-                //   addNewTransporter(supply.id,
-                //       transporter['publicAddress']);
-                // }
+                await displayAllOpenSupplies(context);
               },
               style: ButtonStyle(
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -305,233 +301,6 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
                   ),
                 ],
               )),
-        ],
-      ),
-    );
-  }
-
-  Future<void> showAlert() async {
-    TextEditingController _titleController = TextEditingController();
-    TextEditingController _quantityController = TextEditingController();
-    TextEditingController _temperatureController = TextEditingController();
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return GestureDetector(
-            onTap: () {
-              FocusScope.of(context).requestFocus(FocusNode());
-            },
-            child: AlertDialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle, color: AppTheme.primaryColor),
-                    child: Icon(
-                      Icons.post_add_rounded,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        "Owner",
-                        style: TextStyle(
-                            color: Colors.grey.shade600, fontSize: 14),
-                      ),
-                      Text(
-                        email.substring(0, 3) +
-                            "***" +
-                            email.substring(email.indexOf('@'), email.length),
-                        overflow: TextOverflow.clip,
-                        style: TextStyle(
-                            color: Colors.grey.shade500, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              content: InputNewSupply(
-                  titleController: _titleController,
-                  quantityController: _quantityController,
-                  temperatureController: _temperatureController),
-              actions: [
-                ElevatedButton(
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                      Colors.grey.shade700,
-                    )),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text(
-                      "Cancel",
-                      style: TextStyle(color: Colors.white),
-                    )),
-                SizedBox(
-                  width: 15,
-                ),
-                supplyController.isLoading
-                    ? Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : ElevatedButton(
-                        style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                                AppTheme.primaryColor)),
-                        onPressed: () {
-                          if (_titleController.value.text.isEmpty ||
-                              _temperatureController.value.text.isEmpty ||
-                              _quantityController.value.text.isEmpty) {
-                            return;
-                          }
-                          addNewSupply(
-                              _titleController.value.text.trim(),
-                              double.tryParse(_quantityController.value.text)!,
-                              double.tryParse(
-                                  _temperatureController.value.text)!);
-                        },
-                        child: const Text(
-                          "Add Supply",
-                          style: TextStyle(color: Colors.white),
-                        )),
-              ],
-            ),
-          );
-        });
-  }
-
-  void addNewSupply(String title, double quantity, double temp) async {
-    String? supplyAddress =
-        await supplyController.addSupply(title, quantity, temp);
-    checkResponse(supplyAddress, context, supplyController);
-    Navigator.of(context).pop();
-  }
-}
-
-class InputNewSupply extends StatefulWidget {
-  final TextEditingController _titleController;
-  final TextEditingController _quantityController;
-  final TextEditingController _temperatureController;
-  const InputNewSupply(
-      {super.key,
-      required TextEditingController titleController,
-      required TextEditingController quantityController,
-      required TextEditingController temperatureController})
-      : _titleController = titleController,
-        _quantityController = quantityController,
-        _temperatureController = temperatureController;
-
-  @override
-  State<InputNewSupply> createState() => _InputNewSupplyState();
-}
-
-class _InputNewSupplyState extends State<InputNewSupply> {
-  late TextEditingController _titleController;
-  late TextEditingController _quantityController;
-  late TextEditingController _temperatureController;
-
-  @override
-  void initState() {
-    _titleController = widget._titleController;
-    _quantityController = widget._quantityController;
-    _temperatureController = widget._temperatureController;
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 230,
-      // color: Colors.red,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _titleController,
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9@. ]'))
-              ],
-              style: TextStyle(color: AppTheme.primaryColor),
-              decoration: InputDecoration(
-                  label: Text(
-                    "Title",
-                  ),
-                  labelStyle: TextStyle(color: Colors.grey.shade600),
-                  floatingLabelStyle: TextStyle(color: AppTheme.primaryColor),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: AppTheme.primaryColor, width: 2)),
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: AppTheme.primaryColor))),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _quantityController,
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
-              ],
-              keyboardType: TextInputType.numberWithOptions(),
-              style: TextStyle(color: AppTheme.primaryColor),
-              decoration: InputDecoration(
-                  suffix: Text(
-                    "Kg",
-                    style: TextStyle(color: AppTheme.primaryColor),
-                  ),
-                  label: Text(
-                    "Quantity",
-                  ),
-                  labelStyle: TextStyle(color: Colors.grey.shade600),
-                  floatingLabelStyle: TextStyle(color: AppTheme.primaryColor),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: AppTheme.primaryColor, width: 2)),
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: AppTheme.primaryColor))),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _temperatureController,
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
-              ],
-              keyboardType: TextInputType.numberWithOptions(),
-              style: TextStyle(color: AppTheme.primaryColor),
-              decoration: InputDecoration(
-                  suffix: Text(
-                    "°C",
-                    style: TextStyle(color: AppTheme.primaryColor),
-                  ),
-                  label: Text(
-                    "Temperature",
-                  ),
-                  labelStyle: TextStyle(color: Colors.grey.shade600),
-                  floatingLabelStyle: TextStyle(color: AppTheme.primaryColor),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: AppTheme.primaryColor, width: 2)),
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey)),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: AppTheme.primaryColor))),
-            ),
-          )
         ],
       ),
     );
@@ -653,6 +422,7 @@ class _packageCardState extends State<packageCard> {
   late SupplyController supplyController;
   late String? supplierName;
   late String? buyerName = "Fuel Company";
+  late String userType;
 
   @override
   void initState() {
@@ -661,7 +431,7 @@ class _packageCardState extends State<packageCard> {
     width = widget._width;
     openedCard = false;
     cardController = widget._cardController;
-    fetchSupplyData();
+    fetchData();
 
     super.initState();
   }
@@ -674,13 +444,14 @@ class _packageCardState extends State<packageCard> {
   //   curve: Curves.easeInOut,
   // );
   // }
-
-  void fetchSupplyData() async {
+  void fetchData() async {
     supplierName = await DatabaseService()
         .getNameByAddress(supply.supplierAddress.hexEip55);
-    if(supply.isBuyerAdded)
-    {
-      // buyerName = await supplyController.
+    await DatabaseService()
+        .fetchDataOfUser(user.uid, 'type')
+        .then((userTypeResponse) => {userType = userTypeResponse!});
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -749,14 +520,14 @@ class _packageCardState extends State<packageCard> {
                                     height: 35,
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle,
-                                        color: Colors.deepPurple.shade50),
+                                        color: AppTheme.secondaryColor),
                                     child: TextButton(
                                       onPressed: () {
                                         toggleSize();
                                       },
                                       child: Icon(
                                         Icons.close_rounded,
-                                        color: Colors.deepPurple,
+                                        color: Colors.white,
                                         size: 20,
                                       ),
                                     ),
@@ -992,7 +763,8 @@ class _packageCardState extends State<packageCard> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  supply.isTransporterAdded
+                                  !supply.isBuyerAdded ||
+                                          supply.isTransporterAdded
                                       ? SizedBox()
                                       : TextButton(
                                           onPressed: () async {
@@ -1014,7 +786,8 @@ class _packageCardState extends State<packageCard> {
                                             style:
                                                 TextStyle(color: Colors.white),
                                           )),
-                                  supply.isInsuranceAdded
+                                  !supply.isBuyerAdded ||
+                                          supply.isInsuranceAdded
                                       ? SizedBox()
                                       : TextButton(
                                           onPressed: () async {

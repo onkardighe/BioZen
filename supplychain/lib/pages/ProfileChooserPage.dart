@@ -6,6 +6,7 @@ import 'package:supplychain/utils/appTheme.dart';
 import 'package:supplychain/services/Authentication.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:supplychain/pages/HomePage.dart';
+import 'package:supplychain/utils/constants.dart';
 
 class ProfileChooserPage extends StatefulWidget {
   final User _user;
@@ -67,25 +68,23 @@ class _ProfileChooserPageState extends State<ProfileChooserPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  profileCard(Icons.factory_rounded, "Supplier"),
+                  profileCard(Icons.factory_rounded, supplier),
                   SizedBox(width: 20),
-                  profileCard(Icons.local_gas_station_rounded, "Fuel Company"),
+                  profileCard(Icons.local_gas_station_rounded, fuelCompany),
                 ],
               ),
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  profileCard(
-                      Icons.local_shipping_rounded, "Transport Authority"),
+                  profileCard(Icons.local_shipping_rounded, transportAuthority),
                   SizedBox(width: 20),
                   profileCard(
                     Icons.shield_rounded,
-                    "Insurance Authority",
+                    insuranceAuthority,
                   ),
                 ],
               ),
-              // Text("📦  🏭 🚚 🛡", style: TextStyle(fontSize: 60),),
               Spacer()
             ],
           ),
@@ -102,7 +101,7 @@ class _ProfileChooserPageState extends State<ProfileChooserPage> {
         child: Material(
           color: Colors.blueGrey.shade100,
           child: InkWell(
-            splashColor: Colors.deepPurple, // splash color
+            splashColor: AppTheme.primaryColor, // splash color
             onTap: () {
               Authentication.updateUserType(_thisUser!.uid, type);
 
@@ -135,9 +134,6 @@ class _ProfileChooserPageState extends State<ProfileChooserPage> {
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (context) => HomePage(
-            user: _thisUser!,
-            name: _thisUser!.displayName != null ? _thisUser!.displayName : "",
-            userType: type,
           ),
         ),
         (Route route) => false);

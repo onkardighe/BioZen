@@ -4,6 +4,7 @@ import 'package:supplychain/utils/appTheme.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:supplychain/pages/HomePage.dart';
+import 'package:supplychain/utils/constants.dart';
 
 class LogInPage extends StatefulWidget {
   @override
@@ -80,22 +81,25 @@ class _LogInPageState extends State<LogInPage> {
                                     ? null
                                     : "Invalid Email !",
                                 keyboardType: TextInputType.emailAddress,
-                                style: TextStyle(color: Colors.deepPurple),
-                                decoration: const InputDecoration(
+                                style: TextStyle(color: AppTheme.primaryColor),
+                                decoration: InputDecoration(
                                   label: Text(
                                     "Email",
-                                    style: TextStyle(color: Colors.deepPurple),
+                                    style:
+                                        TextStyle(color: AppTheme.primaryColor),
                                   ),
                                   floatingLabelStyle:
-                                      TextStyle(color: Colors.deepPurple),
+                                      TextStyle(color: AppTheme.primaryColor),
                                   focusedBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                          width: 2, color: Colors.deepPurple),
+                                          width: 2,
+                                          color: AppTheme.primaryColor),
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(10))),
                                   enabledBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                          width: 1, color: Colors.deepPurple),
+                                          width: 1,
+                                          color: AppTheme.primaryColor),
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(10))),
                                   border: OutlineInputBorder(
@@ -119,7 +123,7 @@ class _LogInPageState extends State<LogInPage> {
                                   LengthLimitingTextInputFormatter(15),
                                 ],
                                 textAlign: TextAlign.center,
-                                style: TextStyle(color: Colors.deepPurple),
+                                style: TextStyle(color: AppTheme.primaryColor),
                                 decoration: InputDecoration(
                                   errorText: _errorPassText,
                                   suffixIcon: InkWell(
@@ -132,26 +136,28 @@ class _LogInPageState extends State<LogInPage> {
                                       isPasswordVisible
                                           ? Icons.visibility_off
                                           : Icons.visibility,
-                                      color: Colors.deepPurple,
+                                      color: AppTheme.primaryColor,
                                     ),
                                   ),
                                   label: Text(
                                     "Password",
                                     style: TextStyle(
-                                      color: Colors.deepPurple,
+                                      color: AppTheme.primaryColor,
                                     ),
                                   ),
                                   counterText: 'Forgot Password ?',
                                   floatingLabelStyle:
-                                      TextStyle(color: Colors.deepPurple),
+                                      TextStyle(color: AppTheme.primaryColor),
                                   focusedBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                          width: 2, color: Colors.deepPurple),
+                                          width: 2,
+                                          color: AppTheme.primaryColor),
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(10))),
                                   enabledBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
-                                          width: 1, color: Colors.deepPurple),
+                                          width: 1,
+                                          color: AppTheme.primaryColor),
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(10))),
                                   border: OutlineInputBorder(
@@ -190,11 +196,10 @@ class _LogInPageState extends State<LogInPage> {
                                       // log in
                                       User? tempUser = await loginUser();
                                       if (tempUser != null) {
+                                        user = tempUser;
                                         Navigator.of(context).pushReplacement(
                                           MaterialPageRoute(
-                                            builder: (context) => HomePage(
-                                                user: tempUser,
-                                                name: tempUser.displayName),
+                                            builder: (context) => HomePage(),
                                           ),
                                         );
                                       } else {
@@ -239,7 +244,7 @@ class _LogInPageState extends State<LogInPage> {
                                     TextSpan(
                                         text: "Register",
                                         style: TextStyle(
-                                            color: Colors.deepPurple.shade500)),
+                                            color: AppTheme.primaryColor)),
                                   ]),
                             )),
                       ],

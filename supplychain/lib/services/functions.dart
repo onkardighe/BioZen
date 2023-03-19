@@ -28,7 +28,7 @@ checkResponse(String? response, BuildContext context,
 
 Route routeToDashboard(BuildContext context) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => DetailsScreen(),
+    pageBuilder: (context, animation, secondaryAnimation) => DashboardScreen(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1, 0.0);
       var end = Offset.zero;
@@ -44,13 +44,9 @@ Route routeToDashboard(BuildContext context) {
   );
 }
 
-Route routeToProfile(User user, String name, String type) {
+Route routeToProfile() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => ProfilePage(
-      user: user,
-      name: name,
-      type: type,
-    ),
+    pageBuilder: (context, animation, secondaryAnimation) => ProfilePage(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1, 0.0);
       var end = Offset.zero;
@@ -188,14 +184,6 @@ displayAllInsurers(BuildContext context) async {
 }
 
 displayAllOpenSupplies(BuildContext context) async {
-  List? transporters =
-      await DatabaseService.getUsersByType('Insurance Authority');
-  if (transporters == null) {
-    print("no users found");
-  } else {
-    var response = await ListCard.supplyListCard(context, "Select Supply");
+  await ListCard.supplyListCard(context, "Select biofuel to buy");
 
-    // await ListCard.userListCard(context, transporters, "Insurer");
-    return response;
-  }
 }

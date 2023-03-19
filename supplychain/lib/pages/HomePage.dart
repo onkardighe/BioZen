@@ -7,24 +7,11 @@ import 'package:supplychain/utils/AlertBoxes.dart';
 import '../utils/appTheme.dart';
 import '../utils/supply.dart';
 import '../services/supplyController.dart';
-import 'package:supplychain/utils/appDrawer.dart';
+import 'package:supplychain/utils/Drawer.dart';
 import 'package:supplychain/services/DatabaseService.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomePage extends StatefulWidget {
-  final User _user;
-  final String _userName;
-  String _userType;
-
-  HomePage({
-    Key? key,
-    required User user,
-    required name,
-    String userType = '',
-  })  : _user = user,
-        _userName = name,
-        _userType = userType,
-        super(key: key);
+  HomePage({Key? key}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -34,15 +21,17 @@ class _HomePageState extends State<HomePage> {
   bool _isAppbarVisible = true;
   ScrollController _bodyScrollConroller = ScrollController();
   var initial;
-  User? thisUser;
-  var userName = '', userType = '';
+  var userName = '';
+  late var userSpecificButtonText = '';
+  int subscribedSupplies = 0;
+  late Route dashboardRoute;
 
   late SupplyController supplyController;
-  late List<Supply> myData;
+  // late List<Supply> allSupplies;
   @override
   void initState() {
-    getDataOfUser();
-    thisUser = widget._user;
+    getDataOfUser(user.uid);
+    dashboardRoute = routeToDashboard(context);
     super.initState();
     _bodyScrollConroller.addListener(() {
       setState(() {
@@ -51,12 +40,18 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void getDataOfUser() async {
-    userType = await DatabaseService().fetchDataOfUser(widget._user.uid, 'type') ?? "";
-    email = await DatabaseService().fetchDataOfUser(widget._user.uid, 'email') ?? "";
-    userName = await DatabaseService().fetchDataOfUser(widget._user.uid, 'name') ?? "";
-    publicKey = await DatabaseService().fetchDataOfUser(widget._user.uid, 'publicAddress') ?? publicKey;
-    String key = await DatabaseService().fetchDataOfUser(widget._user.uid, 'privateAddress') ?? "";
+  void getDataOfUser(String uid) async {
+    await DatabaseService().fetchDataOfUser(uid, 'type').then((res) {
+          userType = res ?? "";
+          getButtonText();
+        }) ??
+        "";
+    email = await DatabaseService().fetchDataOfUser(uid, 'email') ?? "";
+    userName = await DatabaseService().fetchDataOfUser(uid, 'name') ?? "";
+    publicKey = await DatabaseService().fetchDataOfUser(uid, 'publicAddress') ??
+        publicKey;
+    String key =
+        await DatabaseService().fetchDataOfUser(uid, 'privateAddress') ?? "";
     if (!key.contains("Error") && key.length == 66) {
       setState(() {
         privateKey = key;
@@ -64,15 +59,24 @@ class _HomePageState extends State<HomePage> {
       });
     }
 
-    if (this.mounted) {
-      setState(() {});
-    }
+    setState(() {});
+  }
+
+  getButtonText() async {
+    setState(() {
+      userSpecificButtonText =
+          userType == supplier ? 'Create Supply' : 'Explore Biofuels';
+    });
+  }
+
+  int getSubScribedSupplies() {
+    return supplyController.userSupply.length;
   }
 
   @override
   Widget build(BuildContext context) {
     supplyController = Provider.of<SupplyController>(context, listen: true);
-    myData = supplyController.notes;
+    subscribedSupplies = supplyController.userSupply.length;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -85,15 +89,28 @@ class _HomePageState extends State<HomePage> {
                     ? Padding(
                         padding: EdgeInsets.only(right: 15),
                         child: Container(
-                            width: 33,
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.indigo.shade400),
-                            child: Icon(
-                              Icons.notifications,
-                              size: 22,
-                            )),
-                      )
+                          width: 33,
+                          height: 33,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppTheme.primaryColor),
+                          child: supplyController.isLoading
+                              ? Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 3,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Container(
+                                  width: 33,
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: AppTheme.primaryColor),
+                                  child: Icon(
+                                    Icons.notifications,
+                                    size: 22,
+                                  )),
+                        ))
                     : SizedBox()
               ],
               title: Text(
@@ -108,12 +125,13 @@ class _HomePageState extends State<HomePage> {
         controller: _bodyScrollConroller,
         child: !privateKeyLinked
             ? AlertBoxForPrivateKeyError(
-                user: thisUser!,
+                user: user,
                 name: userName,
                 type: userType,
               )
             : Container(
                 child: Stack(
+                  alignment: Alignment.topCenter,
                   children: [
                     ClipPath(
                       clipper: CustomClipPath(),
@@ -137,7 +155,7 @@ class _HomePageState extends State<HomePage> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   TileIconWithName(
-                                    userProfileImage: thisUser!.photoURL,
+                                    userProfileImage: user.photoURL,
                                     childText: "",
                                   ),
                                   SizedBox(
@@ -155,14 +173,14 @@ class _HomePageState extends State<HomePage> {
                                             fontSize: 25),
                                       ),
                                       SizedBox(
-                                        height: 5,
+                                        height: 2,
                                       ),
                                       Text(
                                         userType,
                                         style: TextStyle(
-                                          color: Colors.deepPurple.shade100,
+                                          color: AppTheme.secondaryColor,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 15,
+                                          fontSize: 16,
                                         ),
                                       )
                                     ],
@@ -173,10 +191,12 @@ class _HomePageState extends State<HomePage> {
                           )),
                     ),
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         SizedBox(
                           height: MediaQuery.of(context).size.height * 0.25,
                         ),
+                        // Container containing dashboard & refresh button
                         Container(
                             width: MediaQuery.of(context).size.width * 0.9,
                             decoration: BoxDecoration(
@@ -189,24 +209,9 @@ class _HomePageState extends State<HomePage> {
                                 ],
                                 borderRadius: BorderRadius.circular(35)),
                             child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Container(
-                                  padding: EdgeInsets.all(25),
-                                  alignment: Alignment.centerLeft,
-                                  decoration: BoxDecoration(),
-                                  child: Text(
-                                    "Total supplies subscribed : ${myData.length}",
-                                    // "Type : ${userType}",
-                                    style: TextStyle(
-                                      color: Colors.grey.shade600,
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  height: 1,
-                                  color: Colors.grey.shade300,
-                                ),
                                 Padding(
                                   padding: const EdgeInsets.all(20),
                                   child: Row(
@@ -219,7 +224,7 @@ class _HomePageState extends State<HomePage> {
                                         icon: Icons.dashboard_rounded,
                                         childText: "Dashboard",
                                         gradient: AppTheme().themeGradient,
-                                        route: routeToDashboard(context),
+                                        route: dashboardRoute,
                                         context: context,
                                       ),
                                       TileIconWithName(
@@ -228,44 +233,100 @@ class _HomePageState extends State<HomePage> {
                                         gradient: AppTheme().themeGradient,
                                         context: context,
                                         supplyController: supplyController,
-                                        route: PageRouteBuilder(pageBuilder:
-                                            (context, animation,
-                                                secondaryAnimation) {
-                                          return HomePage(
-                                            user: thisUser!,
-                                            name: userName,
-                                            userType: userType,
-                                          );
-                                        }),
+                                        // route: PageRouteBuilder(pageBuilder:
+                                        //     (context, animation,
+                                        //         secondaryAnimation) {
+                                        //   return HomePage(
+                                        //     user: thisUser!,
+                                        //     name: userName,
+                                        //     // userType: userType,
+                                        //   );
+                                        // }),
                                       )
                                     ],
                                   ),
-                                )
+                                ),
+                                Container(
+                                  height: 1,
+                                  color: Colors.grey.shade300,
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 25, vertical: 15),
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      color: AppTheme.secondaryDark,
+                                      borderRadius: BorderRadius.only(
+                                          bottomLeft: Radius.circular(35),
+                                          bottomRight: Radius.circular(35))),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        "${subscribedSupplies} Subscribed supplies",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          fontSize: 17,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 3,
+                                      ),
+                                      Text(
+                                        "Checkout Dashboard for details",
+                                        style: TextStyle(
+                                          color: AppTheme.secondaryColor,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ],
                             )),
                         SizedBox(
-                          height: 15,
+                          height: 20,
                         ),
-                        Center(
-                          //       child: Column(children: [
-                          //         for (var thisData in myData)
-                          //           buildCard(
-                          //               thisData['fName']! + thisData['lName']!,
-                          //               myData.indexOf(thisData),
-                          //               thisData['date'],
-                          //               thisData['time'])
-                          //       ]),
-                          //     )
-                          //   ],
-                          // ),
-                          child: Column(children: [
-                            for (var thisData in myData)
-                              buildCard(
-                                  thisData.title,
-                                  myData.indexOf(thisData),
-                                  thisData.quantity,
-                                  thisData.id)
-                          ]),
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Stack(
+                                children: [
+                                  Image.asset(
+                                    'assets/fuel.png',
+                                    scale: 3.5,
+                                  ),
+                                  Container(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.38,
+                                    padding: EdgeInsets.only(
+                                        top:
+                                            MediaQuery.of(context).size.height *
+                                                0.21,
+                                        left:
+                                            MediaQuery.of(context).size.height *
+                                                0.18),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                            "Biofuel hunt is now".toUpperCase(),
+                                            style: TextStyle(fontSize: 19)),
+                                        Text(
+                                          "made easy".toUpperCase(),
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w900),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
                         )
                       ],
                     ),
@@ -274,88 +335,57 @@ class _HomePageState extends State<HomePage> {
               ),
       ),
       drawer: appDrawer(
-        user: thisUser!,
-        name: userName,
         type: userType,
       ),
-    );
-  }
-
-  Widget buildCard(String? str, int id, String? date, String? time) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Container(
-          margin: EdgeInsets.all(10),
-          // padding: EdgeInsets.all(5),
-          width: MediaQuery.of(context).size.width * 0.9,
-          height: 85,
-          decoration: BoxDecoration(boxShadow: [
-            BoxShadow(
-                color: Colors.black26,
-                blurRadius: 10,
-                blurStyle: BlurStyle.normal)
-          ], color: Colors.white, borderRadius: BorderRadius.circular(90)),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Container(
-                height: 65,
-                width: 65,
-                decoration: BoxDecoration(
-                    gradient: AppTheme().themeGradient, shape: BoxShape.circle),
-                child: const CircleAvatar(
-                  backgroundColor: Colors.transparent,
-                  foregroundColor: Colors.white,
-                  child: Icon(
-                    Icons.calculate_rounded,
-                    size: 45,
-                  ),
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Package id : ${id}",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "${str}",
-                    style: TextStyle(color: Colors.black),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Container(
-                padding: EdgeInsets.all(10),
-                height: 75,
-                width: 120,
+      bottomSheet: privateKeyLinked
+          ? GestureDetector(
+              onTap: () async {
+                if (userType == supplier) {
+                  AlertBoxes.showAlertForCreateSupply(
+                      context, supplyController);
+                } else if (userType == fuelCompany) {
+                  await displayAllOpenSupplies(context);
+                }
+              },
+              child: Container(
+                margin: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width * 0.3, bottom: 20),
+                padding: EdgeInsets.symmetric(horizontal: 25),
+                height: MediaQuery.of(context).size.height * 0.075,
                 decoration: BoxDecoration(
                     gradient: AppTheme().themeGradient,
-                    borderRadius: BorderRadius.circular(90)),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    boxShadow: [
+                      BoxShadow(
+                          color: AppTheme.shadowColor,
+                          blurRadius: 8,
+                          spreadRadius: 1,
+                          blurStyle: BlurStyle.normal)
+                    ],
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(90),
+                        bottomLeft: Radius.circular(90))),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(time!, style: TextStyle(color: Colors.white)),
-                      Container(
-                        height: 1,
-                        color: Colors.grey.shade300,
-                      ),
                       Text(
-                        date!,
-                        style: TextStyle(color: Colors.white),
-                      )
+                        userSpecificButtonText,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      Icon(
+                        Icons.keyboard_double_arrow_right_rounded,
+                        size: 35,
+                        color: Colors.white,
+                      ),
+                      SizedBox(
+                        width: 0,
+                      ),
                     ]),
-              )
-            ],
-          ),
-        ),
-      ],
+              ),
+            )
+          : SizedBox(),
     );
   }
 }
@@ -378,7 +408,6 @@ class TileIconWithName extends TextButton {
                 supplyController.getSuppliesOfUser();
                 supplyController.notifyListeners();
               }
-              ;
               if (route != null && context != null) {
                 try {
                   Navigator.of(context).push(route);

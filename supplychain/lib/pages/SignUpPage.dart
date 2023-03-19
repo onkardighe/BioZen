@@ -7,6 +7,7 @@ import 'package:supplychain/utils/appTheme.dart';
 import 'package:supplychain/pages/HomePage.dart';
 import 'package:supplychain/services/Authentication.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:supplychain/utils/constants.dart';
 import 'package:web3dart/web3dart.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -99,23 +100,23 @@ class _SignUpPageState extends State<SignUpPage> {
                                 ? "Invalid Email !"
                                 : null,
                             keyboardType: TextInputType.emailAddress,
-                            style: TextStyle(color: Colors.deepPurple),
+                            style: TextStyle(color: AppTheme.primaryColor),
                             decoration: InputDecoration(
                               errorText: _errorTextEmail,
-                              label: const Text(
+                              label: Text(
                                 "Email",
-                                style: TextStyle(color: Colors.deepPurple),
+                                style: TextStyle(color: AppTheme.primaryColor),
                               ),
                               floatingLabelStyle:
-                                  TextStyle(color: Colors.deepPurple),
+                                  TextStyle(color: AppTheme.primaryColor),
                               focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      width: 2, color: Colors.deepPurple),
+                                      width: 2, color: AppTheme.primaryColor),
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10))),
                               enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      width: 1, color: Colors.deepPurple),
+                                      width: 1, color: AppTheme.primaryColor),
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10))),
                               border: OutlineInputBorder(
@@ -130,6 +131,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             controller: _nameController,
                             textAlign: TextAlign.center,
                             inputFormatters: [
+                              LengthLimitingTextInputFormatter(16),
                               FilteringTextInputFormatter.allow(
                                   RegExp(r'[a-zA-Z ]'))
                             ],
@@ -142,26 +144,26 @@ class _SignUpPageState extends State<SignUpPage> {
                             validator: (input) =>
                                 input!.isEmpty ? "Enter Name !" : null,
                             keyboardType: TextInputType.name,
-                            style: TextStyle(color: Colors.deepPurple),
+                            style: TextStyle(color: AppTheme.primaryColor),
                             decoration: InputDecoration(
                               errorText: _errorTextName,
-                              label: const Text(
+                              label: Text(
                                 "Name",
-                                style: TextStyle(color: Colors.deepPurple),
+                                style: TextStyle(color: AppTheme.primaryColor),
                               ),
                               floatingLabelStyle:
-                                  TextStyle(color: Colors.deepPurple),
-                              focusedBorder: const OutlineInputBorder(
+                                  TextStyle(color: AppTheme.primaryColor),
+                              focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      width: 2, color: Colors.deepPurple),
+                                      width: 2, color: AppTheme.primaryColor),
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10))),
-                              enabledBorder: const OutlineInputBorder(
+                              enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      width: 1, color: Colors.deepPurple),
+                                      width: 1, color: AppTheme.primaryColor),
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10))),
-                              border: const OutlineInputBorder(
+                              border: OutlineInputBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10))),
                             ),
@@ -176,7 +178,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               LengthLimitingTextInputFormatter(15),
                             ],
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.deepPurple),
+                            style: TextStyle(color: AppTheme.primaryColor),
                             decoration: InputDecoration(
                               errorText: _errorTextPassNew,
                               suffixIcon: InkWell(
@@ -189,23 +191,23 @@ class _SignUpPageState extends State<SignUpPage> {
                                   isPasswordVisible
                                       ? Icons.visibility_off
                                       : Icons.visibility,
-                                  color: Colors.deepPurple,
+                                  color: AppTheme.primaryColor,
                                 ),
                               ),
-                              label: const Text(
+                              label: Text(
                                 "Create new password",
-                                style: TextStyle(color: Colors.deepPurple),
+                                style: TextStyle(color: AppTheme.primaryColor),
                               ),
                               floatingLabelStyle:
-                                  TextStyle(color: Colors.deepPurple),
-                              focusedBorder: const OutlineInputBorder(
+                                  TextStyle(color: AppTheme.primaryColor),
+                              focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      width: 2, color: Colors.deepPurple),
+                                      width: 2, color: AppTheme.primaryColor),
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10))),
-                              enabledBorder: const OutlineInputBorder(
+                              enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      width: 1, color: Colors.deepPurple),
+                                      width: 1, color: AppTheme.primaryColor),
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10))),
                               hintStyle: const TextStyle(color: Colors.black38),
@@ -230,7 +232,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               LengthLimitingTextInputFormatter(15),
                             ],
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.deepPurple),
+                            style: TextStyle(color: AppTheme.primaryColor),
                             decoration: InputDecoration(
                               errorText: _errorTextPassConfirm,
                               suffixIcon: InkWell(
@@ -244,23 +246,23 @@ class _SignUpPageState extends State<SignUpPage> {
                                   isConfirmPasswordVisible
                                       ? Icons.visibility_off
                                       : Icons.visibility,
-                                  color: Colors.deepPurple,
+                                  color: AppTheme.primaryColor,
                                 ),
                               ),
-                              label: const Text(
+                              label: Text(
                                 "Confirm password",
-                                style: TextStyle(color: Colors.deepPurple),
+                                style: TextStyle(color: AppTheme.primaryColor),
                               ),
                               floatingLabelStyle:
-                                  TextStyle(color: Colors.deepPurple),
-                              focusedBorder: const OutlineInputBorder(
+                                  TextStyle(color: AppTheme.primaryColor),
+                              focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      width: 2, color: Colors.deepPurple),
+                                      width: 2, color: AppTheme.primaryColor),
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10))),
-                              enabledBorder: const OutlineInputBorder(
+                              enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      width: 1, color: Colors.deepPurple),
+                                      width: 1, color: AppTheme.primaryColor),
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10))),
                               border: OutlineInputBorder(
@@ -276,7 +278,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             controller: _walletAddressController,
                             obscureText: !isWalletAddressVisible,
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.deepPurple),
+                            style: TextStyle(color: AppTheme.primaryColor),
                             onChanged: (walletAddress) {
                               _errorWalletAddress = walletAddress.length == 42
                                   ? null
@@ -295,23 +297,23 @@ class _SignUpPageState extends State<SignUpPage> {
                                   isWalletAddressVisible
                                       ? Icons.visibility_off
                                       : Icons.visibility,
-                                  color: Colors.deepPurple,
+                                  color: AppTheme.primaryColor,
                                 ),
                               ),
-                              label: const Text(
+                              label: Text(
                                 "Wallet Public address",
-                                style: TextStyle(color: Colors.deepPurple),
+                                style: TextStyle(color: AppTheme.primaryColor),
                               ),
                               floatingLabelStyle:
-                                  TextStyle(color: Colors.deepPurple),
-                              focusedBorder: const OutlineInputBorder(
+                                  TextStyle(color: AppTheme.primaryColor),
+                              focusedBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      width: 2, color: Colors.deepPurple),
+                                      width: 2, color: AppTheme.primaryColor),
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10))),
-                              enabledBorder: const OutlineInputBorder(
+                              enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      width: 1, color: Colors.deepPurple),
+                                      width: 1, color: AppTheme.primaryColor),
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10))),
                               border: OutlineInputBorder(
@@ -389,6 +391,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                   // do sign up
                                   User? tempUser = await _SignUp();
                                   if (tempUser != null) {
+                                    user = tempUser;
                                     Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
                                           builder: (context) =>
@@ -422,7 +425,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           Navigator.pushReplacementNamed(context, "/LoginPage");
                         },
                         child: RichText(
-                          text: const TextSpan(
+                          text: TextSpan(
                               style: TextStyle(fontWeight: FontWeight.bold),
                               children: [
                                 TextSpan(
@@ -430,7 +433,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                     style: TextStyle(color: Colors.grey)),
                                 TextSpan(
                                     text: "Login",
-                                    style: TextStyle(color: Colors.deepPurple)),
+                                    style: TextStyle(
+                                        color: AppTheme.primaryColor)),
                               ]),
                         )),
                     Spacer()
