@@ -26,6 +26,7 @@ class AlertBoxes {
           );
         },
         pageBuilder: (BuildContext context, animation, secondaryAnimation) {
+          bool loading = false;
           return GestureDetector(
             onTap: () {
               FocusScope.of(context).requestFocus(FocusNode());
@@ -86,7 +87,7 @@ class AlertBoxes {
                 SizedBox(
                   width: 15,
                 ),
-                supplyController.isLoading
+                supplyController.isLoading || loading
                     ? Center(
                         child: CircularProgressIndicator(),
                       )

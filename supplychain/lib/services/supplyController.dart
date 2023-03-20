@@ -29,9 +29,14 @@ class SupplyController extends ChangeNotifier {
   late ContractFunction _getSupplies;
   late ContractFunction _getUserSupplies;
   late ContractFunction _totalSupplies;
+
   late ContractFunction _addBuyer;
   late ContractFunction _addTransporter;
   late ContractFunction _addInsurance;
+
+  late ContractFunction _getBuyerFunction;
+  late ContractFunction _getTransporterFunction;
+  late ContractFunction _getInsuranceFunction;
 
   late ContractEvent _noteAddedEvent;
   late ContractEvent _noteDeletedEvent;
@@ -74,9 +79,14 @@ class SupplyController extends ChangeNotifier {
     _getSupplies = _contract.function("getSupplies");
     _getUserSupplies = _contract.function("getSuppliesOfUser");
     _totalSupplies = _contract.function("totalSupplies");
+
     _addBuyer = _contract.function("addBuyer");
     _addTransporter = _contract.function("addTransporter");
     _addInsurance = _contract.function("addInsurance");
+
+    _getBuyerFunction = _contract.function("getBuyer");
+    _getTransporterFunction = _contract.function("getTransporter");
+    _getInsuranceFunction = _contract.function("getInsurance");
 
     // _noteAddedEvent = _contract.event("NoteAdded");
     // _noteDeletedEvent = _contract.event("NoteDeleted");
@@ -304,6 +314,41 @@ class SupplyController extends ChangeNotifier {
       return response;
     } catch (e) {
       print("Error while selecting Transporter : ${e.toString()}");
+    }
+    isLoading = false;
+    notifyListeners();
+  }
+
+  getSubscribers(BigInt id, String userType) async {
+    isLoading = true;
+
+    ContractFunction contractFunction;
+    if (userType == fuelCompany) {
+      contractFunction = _getBuyerFunction;
+    } else if (userType == insuranceAuthority) {
+      contractFunction = _getInsuranceFunction;
+    } else if (userType == transportAuthority) {
+      contractFunction = _getTransporterFunction;
+    } else {
+      contractFunction = _getBuyerFunction;
+    }
+
+    try {
+      var response = await _client
+          .call(contract: _contract, function: contractFunction, params: [id]);
+      if (response.isEmpty) {
+        isLoading = false;
+        return;
+      }
+      isLoading = false;
+      return response[0];
+    } catch (e) {
+      isLoading = false;
+      var res = e.toString();
+      if (res.contains("$userType is NOT added !!")) {
+        print(res);
+        return "Not selected";
+      }
     }
     isLoading = false;
     notifyListeners();

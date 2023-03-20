@@ -56,11 +56,11 @@ class DatabaseService {
 
   static getUidByPublicAddress(String sAddress) async {
     try {
-      CollectionReference usersByAddress =
-          FirebaseFirestore.instance.collection("usersByAddress");
+      var addressDoc =
+          FirebaseFirestore.instance.collection("usersByAddress").doc(sAddress);
 
-      var ss = await usersByAddress.doc(sAddress).get();
-      final data = ss.data() as Map<String, dynamic>;
+      var res = await addressDoc.get();
+      final data = res.data() as Map<String, dynamic>;
       return data['uid'];
     } catch (e) {
       print("Error ${e.toString()}");

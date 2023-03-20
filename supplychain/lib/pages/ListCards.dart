@@ -189,115 +189,126 @@ class _SupplyListCardState extends State<SupplyListCard> {
           Container(
             padding: EdgeInsets.only(top: 10),
             height: MediaQuery.of(context).size.height * 0.66,
-            child: ListView.builder(
-                itemCount: buySupplyList.length,
-                itemBuilder: (context, index) {
-                  Supply supply = buySupplyList[index];
-
-                  return Container(
-                    height: MediaQuery.of(context).size.height * .25,
-                    margin: EdgeInsets.only(bottom: 20),
-                    padding: EdgeInsets.only(right: 15),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Row(
-                      children: [
-                        Container(
-                            //container for green border
-                            width: 5,
-                            height: MediaQuery.of(context).size.height * .25,
-                            decoration: BoxDecoration(
-                                color: AppTheme.primaryColor,
-                                borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(90),
-                                    bottomLeft: Radius.circular(90)))),
-                        Container(
-                          padding: EdgeInsets.only(left: 15, top: 10),
-                          width: MediaQuery.of(context).size.width * 0.82,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "ID : ${supply.id}",
-                                    style: nameTextStyle,
-                                  ),
-                                  Icon(
-                                    Icons.info_outline_rounded,
-                                    color: AppTheme.primaryColor,
-                                  )
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    supply.title,
-                                    style: boldTextStyle,
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Quantity : ",
-                                    style: mainTextStyle,
-                                  ),
-                                  Text("${supply.quantity} Kg",
-                                      style: mainTextStyle)
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Created at : ", style: mainTextStyle),
-                                  Text(
-                                      "${supply.createdAt.hour}:${supply.createdAt.minute}  ${supply.createdAt.day}/${supply.createdAt.month}/${supply.createdAt.year}",
-                                      style: mainTextStyle)
-                                ],
-                              ),
-                              addedBidsList.contains(supply.id)
-                                  ? Container(
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                          gradient: AppTheme().themeGradient,
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
-                                      child: TextButton(
-                                          onPressed: (() {
-                                            AlertToAddBidAmount(
-                                                context, supply);
-                                          }),
-                                          style: ButtonStyle(
-                                              backgroundColor:
-                                                  MaterialStateProperty.all<
-                                                          Color>(
-                                                      Colors.transparent)),
-                                          child: Text(
-                                            "Make a Bid",
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          )),
-                                    )
-                                  : Icon(
-                                      Icons.check_circle_outline_rounded,
-                                      color: Colors.green,
-                                      size: 30,
-                                    )
-                            ],
-                          ),
-                        ),
-                      ],
+            child: buySupplyList.isEmpty
+                ? Center(
+                    child: Text(
+                      "No Ongoing Supplies found !!",
+                      style: boldTextStyle,
                     ),
-                  );
-                }),
+                  )
+                : ListView.builder(
+                    itemCount: buySupplyList.length,
+                    itemBuilder: (context, index) {
+                      Supply supply = buySupplyList[index];
+
+                      return Container(
+                        height: MediaQuery.of(context).size.height * .25,
+                        margin: EdgeInsets.only(bottom: 20),
+                        padding: EdgeInsets.only(right: 15),
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Row(
+                          children: [
+                            Container(
+                                //container for green border
+                                width: 5,
+                                height:
+                                    MediaQuery.of(context).size.height * .25,
+                                decoration: BoxDecoration(
+                                    color: AppTheme.primaryColor,
+                                    borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(90),
+                                        bottomLeft: Radius.circular(90)))),
+                            Container(
+                              padding: EdgeInsets.only(left: 15, top: 10),
+                              width: MediaQuery.of(context).size.width * 0.82,
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "ID : ${supply.id}",
+                                        style: nameTextStyle,
+                                      ),
+                                      Icon(
+                                        Icons.info_outline_rounded,
+                                        color: AppTheme.primaryColor,
+                                      )
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        supply.title,
+                                        style: boldTextStyle,
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Quantity : ",
+                                        style: mainTextStyle,
+                                      ),
+                                      Text("${supply.quantity} Kg",
+                                          style: mainTextStyle)
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("Created at : ",
+                                          style: mainTextStyle),
+                                      Text(
+                                          "${supply.createdAt.hour}:${supply.createdAt.minute}  ${supply.createdAt.day}/${supply.createdAt.month}/${supply.createdAt.year}",
+                                          style: mainTextStyle)
+                                    ],
+                                  ),
+                                  addedBidsList.contains(supply.id)
+                                      ? Container(
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                              gradient:
+                                                  AppTheme().themeGradient,
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                          child: TextButton(
+                                              onPressed: (() {
+                                                AlertToAddBidAmount(
+                                                    context, supply);
+                                              }),
+                                              style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStateProperty.all<
+                                                              Color>(
+                                                          Colors.transparent)),
+                                              child: Text(
+                                                "Make a Bid",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              )),
+                                        )
+                                      : Icon(
+                                          Icons.check_circle_outline_rounded,
+                                          color: Colors.green,
+                                          size: 30,
+                                        )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
           ),
         ],
       ),

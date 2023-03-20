@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors, curly_braces_in_flow_control_structures
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supplychain/utils/AlertBoxes.dart';
@@ -96,13 +94,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: privateKeyLinked
                     ? GestureDetector(
                         onPanUpdate: (details) {
-                          if (details.delta.dx > 0) {
+                          if (details.delta.dx > 5) {
                             if (_selectedTag == 1) {
                               setState(() {
                                 _selectedTag = 0;
                               });
                             }
-                          } else {
+                          } else if (details.delta.dx < 5) {
                             if (_selectedTag == 0) {
                               setState(() {
                                 _selectedTag = 1;
@@ -181,25 +179,27 @@ class _CompletedListState extends State<CompletedList> {
     return Expanded(
       child: Container(
         color: Colors.grey.shade200,
-        child: ListView.separated(
-          controller: _cardScrollController,
-          separatorBuilder: (_, __) {
-            return const SizedBox(
-              height: 20,
-            );
-          },
-          padding: const EdgeInsets.only(top: 20, bottom: 40),
-          shrinkWrap: true,
-          itemCount: completedSupplyList.length,
-          itemBuilder: (_, index) {
-            return packageCard(
-              supply: completedSupplyList[index],
-              height: MediaQuery.of(context).size.height * 0.23,
-              width: MediaQuery.of(context).size.width * 0.9,
-              cardController: _cardScrollController,
-            );
-          },
-        ),
+        child: completedSupplyList.isEmpty
+            ? Center(child: Text("No Completed Supplies found !!"))
+            : ListView.separated(
+                controller: _cardScrollController,
+                separatorBuilder: (_, __) {
+                  return const SizedBox(
+                    height: 20,
+                  );
+                },
+                padding: const EdgeInsets.only(top: 20, bottom: 40),
+                shrinkWrap: true,
+                itemCount: completedSupplyList.length,
+                itemBuilder: (_, index) {
+                  return packageCard(
+                    supply: completedSupplyList[index],
+                    height: MediaQuery.of(context).size.height * 0.23,
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    cardController: _cardScrollController,
+                  );
+                },
+              ),
       ),
     );
   }
@@ -310,58 +310,63 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
     return Container(
       decoration: BoxDecoration(gradient: AppTheme().themeGradient),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          TextButton(
-              onPressed: () {
-                AlertBoxes.showAlertForCreateSupply(context, supplyController);
-              },
-              style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)))),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Icon(
-                    Icons.post_add_sharp,
-                    size: 25,
-                    color: Colors.white,
-                  ),
-                  Text(
-                    "Add Supply",
-                    style: TextStyle(
+          userType != supplier
+              ? SizedBox()
+              : TextButton(
+                  onPressed: () {
+                    AlertBoxes.showAlertForCreateSupply(
+                        context, supplyController);
+                  },
+                  style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)))),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Icon(
+                        Icons.post_add_sharp,
+                        size: 25,
                         color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13),
-                  ),
-                ],
-              )),
-          TextButton(
-              onPressed: () async {
-                await displayAllOpenSupplies(context);
-              },
-              style: ButtonStyle(
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)))),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Icon(
-                    Icons.post_add_sharp,
-                    size: 25,
-                    color: Colors.white,
-                  ),
-                  Text(
-                    "Buy Supply",
-                    style: TextStyle(
+                      ),
+                      Text(
+                        "Add Supply",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13),
+                      ),
+                    ],
+                  )),
+          userType != fuelCompany
+              ? SizedBox()
+              : TextButton(
+                  onPressed: () async {
+                    await displayAllOpenSupplies(context);
+                  },
+                  style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)))),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Icon(
+                        Icons.post_add_sharp,
+                        size: 25,
                         color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13),
-                  ),
-                ],
-              )),
+                      ),
+                      Text(
+                        "Buy Supply",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13),
+                      ),
+                    ],
+                  )),
         ],
       ),
     );
@@ -432,44 +437,48 @@ class _OngoingListState extends State<OngoingList> {
     return Expanded(
       child: Container(
         color: Colors.grey.shade200,
-        child: ListView.separated(
-          controller: _cardScrollController,
-          separatorBuilder: (_, __) {
-            return const SizedBox(
-              height: 20,
-            );
-          },
-          padding: const EdgeInsets.only(top: 20, bottom: 40),
-          shrinkWrap: true,
-          itemCount: supplyList.length,
-          itemBuilder: (_, index) {
-            return packageCard(
-              supply: supplyList[index],
-              height: MediaQuery.of(context).size.height * 0.23,
-              width: MediaQuery.of(context).size.width * 0.9,
-              cardController: _cardScrollController,
-            );
-          },
-        ),
+        child: supplyList.isEmpty
+            ? Center(child: Text("No Ongoing Supplies found !!"))
+            : ListView.separated(
+                controller: _cardScrollController,
+                separatorBuilder: (_, __) {
+                  return const SizedBox(
+                    height: 20,
+                  );
+                },
+                padding: const EdgeInsets.only(top: 20, bottom: 40),
+                shrinkWrap: true,
+                itemCount: supplyList.length,
+                itemBuilder: (_, index) {
+                  return packageCard(
+                    supply: supplyList[index],
+                    height: MediaQuery.of(context).size.height * 0.23,
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    cardController: _cardScrollController,
+                  );
+                },
+              ),
       ),
     );
   }
 }
 
 class packageCard extends StatefulWidget {
-  final Supply _supply;
-  final double _height, _width;
-  final ScrollController _cardController;
-  const packageCard(
+  late Supply _supply;
+  late double _height, _width;
+  late ScrollController _cardController;
+
+  packageCard(
       {super.key,
       required Supply supply,
       required double height,
       required double width,
-      required ScrollController cardController})
-      : _supply = supply,
-        _height = height,
-        _width = width,
-        _cardController = cardController;
+      required ScrollController cardController}) {
+    _supply = supply;
+    _height = height;
+    _width = width;
+    _cardController = cardController;
+  }
 
   @override
   State<packageCard> createState() => _packageCardState();
@@ -481,8 +490,10 @@ class _packageCardState extends State<packageCard> {
   late bool openedCard;
   late ScrollController cardController;
   late SupplyController supplyController;
-  late String? supplierName;
-  late String? buyerName = "Fuel Company";
+  late String? supplierName = "Not selected",
+      buyerName = "Not selected",
+      transporterName = "Not selected",
+      insuranceName = "Not selected";
   late String userType;
 
   @override
@@ -492,25 +503,63 @@ class _packageCardState extends State<packageCard> {
     width = widget._width;
     openedCard = false;
     cardController = widget._cardController;
-    fetchData();
+    fetchSupplyData();
 
     super.initState();
   }
 
-  // void _scrollToCard() {
-
-  // cardController.animateTo(
-  //   (int.tryParse(supply.id)!) * ((widget._height) + 20) + 7,
-  //   duration: const Duration(milliseconds: 500),
-  //   curve: Curves.easeInOut,
-  // );
-  // }
-  void fetchData() async {
+  void fetchSupplyData() async {
     supplierName = await DatabaseService()
         .getNameByAddress(supply.supplierAddress.hexEip55);
     await DatabaseService()
         .fetchDataOfUser(user.uid, 'type')
         .then((userTypeResponse) => {userType = userTypeResponse!});
+
+    //getBuyer
+    if (supply.isBuyerAdded) {
+      await supplyController
+          .getSubscribers(BigInt.parse(supply.id), fuelCompany)
+          .then((responseAddress) async {
+        buyerName =
+            await DatabaseService().getNameByAddress(responseAddress.hexEip55);
+        if (mounted) {
+          setState(() {});
+        }
+      });
+    }
+
+    //getTransporter
+    if (supply.isTransporterAdded) {
+      await supplyController
+          .getSubscribers(BigInt.parse(supply.id), transportAuthority)
+          .then((responseAddress) async {
+        if (responseAddress == null) {
+          return;
+        }
+        transporterName =
+            await DatabaseService().getNameByAddress(responseAddress.hexEip55);
+        if (mounted) {
+          setState(() {});
+        }
+      });
+    }
+
+    //getInsurance
+    if (supply.isInsuranceAdded) {
+      await supplyController
+          .getSubscribers(BigInt.parse(supply.id), insuranceAuthority)
+          .then((responseAddress) async {
+        if (responseAddress == null) {
+          return;
+        }
+        insuranceName =
+            await DatabaseService().getNameByAddress(responseAddress.hexEip55);
+        if (mounted) {
+          setState(() {});
+        }
+      });
+    }
+
     if (mounted) {
       setState(() {});
     }
@@ -521,7 +570,6 @@ class _packageCardState extends State<packageCard> {
       height = openedCard ? height / 3 : height * 3;
       openedCard = !openedCard;
     });
-    // _scrollToCard();
   }
 
   @override
@@ -681,7 +729,10 @@ class _packageCardState extends State<packageCard> {
                                   Text("To : ",
                                       style: TextStyle(
                                           color: Colors.grey.shade700)),
-                                  Text(buyerName!,
+                                  Text(
+                                      supply.isBuyerAdded && buyerName != null
+                                          ? buyerName!
+                                          : "Not selected",
                                       style: TextStyle(
                                           color: Colors.grey.shade700))
                                 ],
@@ -695,7 +746,11 @@ class _packageCardState extends State<packageCard> {
                                   Text("Transporter : ",
                                       style: TextStyle(
                                           color: Colors.grey.shade700)),
-                                  Text("Onkar Dighe",
+                                  Text(
+                                      supply.isTransporterAdded &&
+                                              transporterName != null
+                                          ? transporterName!
+                                          : "Not selected",
                                       style: TextStyle(
                                           color: Colors.grey.shade700))
                                 ],
@@ -709,7 +764,11 @@ class _packageCardState extends State<packageCard> {
                                   Text("Insurence : ",
                                       style: TextStyle(
                                           color: Colors.grey.shade700)),
-                                  Text("LIC ",
+                                  Text(
+                                      supply.isInsuranceAdded &&
+                                              insuranceName != null
+                                          ? insuranceName!
+                                          : "Not selected",
                                       style: TextStyle(
                                           color: Colors.grey.shade700))
                                 ],
@@ -799,24 +858,27 @@ class _packageCardState extends State<packageCard> {
                                 children: [
                                     supply.isBuyerAdded
                                         ? SizedBox()
-                                        : TextButton(
-                                            onPressed: () async {
-                                              var bidder =
-                                                  await displayAllBidders(
-                                                      context, supply.id);
-                                              if (bidder != null) {
-                                                addNewBuyer(supply.id, bidder);
-                                              }
-                                            },
-                                            style: ButtonStyle(
-                                                backgroundColor:
-                                                    MaterialStatePropertyAll<
-                                                        Color>(Colors.red)),
-                                            child: Text(
-                                              "Select Buyer",
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ))
+                                        : userType != supplier
+                                            ? SizedBox()
+                                            : TextButton(
+                                                onPressed: () async {
+                                                  var bidder =
+                                                      await displayAllBidders(
+                                                          context, supply.id);
+                                                  if (bidder != null) {
+                                                    addNewBuyer(
+                                                        supply.id, bidder);
+                                                  }
+                                                },
+                                                style: ButtonStyle(
+                                                    backgroundColor:
+                                                        MaterialStatePropertyAll<
+                                                            Color>(Colors.red)),
+                                                child: Text(
+                                                  "Select Buyer",
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ))
                                   ])
                             : SizedBox(),
                         openedCard
@@ -825,7 +887,8 @@ class _packageCardState extends State<packageCard> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   !supply.isBuyerAdded ||
-                                          supply.isTransporterAdded
+                                          supply.isTransporterAdded ||
+                                          userType != fuelCompany
                                       ? SizedBox()
                                       : TextButton(
                                           onPressed: () async {
@@ -848,7 +911,8 @@ class _packageCardState extends State<packageCard> {
                                                 TextStyle(color: Colors.white),
                                           )),
                                   !supply.isBuyerAdded ||
-                                          supply.isInsuranceAdded
+                                          supply.isInsuranceAdded ||
+                                          userType != fuelCompany
                                       ? SizedBox()
                                       : TextButton(
                                           onPressed: () async {
