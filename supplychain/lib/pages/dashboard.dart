@@ -1,8 +1,7 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, curly_braces_in_flow_control_structures
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:supplychain/pages/HomePage.dart';
 import 'package:supplychain/utils/AlertBoxes.dart';
 import '../utils/supply.dart';
 import 'package:provider/provider.dart';
@@ -31,111 +30,175 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     supplyController = Provider.of<SupplyController>(context, listen: true);
-    return Container(
-      decoration: BoxDecoration(gradient: AppTheme().themeGradient),
-      child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle.dark,
-        child: Scaffold(
-          appBar: AppBar(
-            leading: IconButton(
-                icon: Icon(Icons.arrow_circle_left_rounded,
-                    color: Colors.white, size: 36),
-                onPressed: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => HomePage()),
-                      (Route<dynamic> route) => false);
-                }),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            actions: [
-              Padding(
-                padding: EdgeInsets.only(right: 15),
-                child: Container(
-                    // width: 100,
-                    width: 33,
-                    height: 33,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle, color: AppTheme.primaryColor),
-                    child: supplyController.isLoading
-                        ? Center(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 3,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Center(
-                            child: InkWell(
-                              onTap: () {
-                                print("refreshed");
-                                supplyController.getNotes();
-                                supplyController.getSuppliesOfUser();
-                                supplyController.notifyListeners();
-                                setState(() {});
-                              },
-                              child: Icon(Icons.refresh_rounded, size: 22),
-                            ),
-                          )),
-              )
-            ],
-            title: const Text(
-              "DASHBOARD",
-              style: TextStyle(fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
+    return WillPopScope(
+      onWillPop: () {
+        return Navigator.pushAndRemoveUntil(
+                context, routeToHomePage(context), (route) => false)
+            as Future<bool>;
+      },
+      child: Container(
+        decoration: BoxDecoration(gradient: AppTheme().themeGradient),
+        child: AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle.dark,
+          child: Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
+                  icon: Icon(Icons.arrow_circle_left_rounded,
+                      color: Colors.white, size: 36),
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                        routeToHomePage(context),
+                        (Route<dynamic> route) => false);
+                  }),
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              actions: [
+                Padding(
+                  padding: EdgeInsets.only(right: 15),
+                  child: Container(
+                      // width: 100,
+                      width: 33,
+                      height: 33,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle, color: AppTheme.primaryColor),
+                      child: supplyController.isLoading
+                          ? Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 3,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Center(
+                              child: InkWell(
+                                onTap: () {
+                                  print("refreshed");
+                                  supplyController.getNotes();
+                                  supplyController.getSuppliesOfUser();
+                                  supplyController.notifyListeners();
+                                  setState(() {});
+                                },
+                                child: Icon(Icons.refresh_rounded, size: 22),
+                              ),
+                            )),
+                )
+              ],
+              title: const Text(
+                "DASHBOARD",
+                style: TextStyle(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              centerTitle: true,
             ),
-            centerTitle: true,
-          ),
-          backgroundColor: Colors.transparent,
-          body: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: privateKeyLinked
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
+            backgroundColor: Colors.transparent,
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: privateKeyLinked
+                    ? GestureDetector(
+                        onPanUpdate: (details) {
+                          if (details.delta.dx > 0) {
+                            if (_selectedTag == 1) {
+                              setState(() {
+                                _selectedTag = 0;
+                              });
+                            }
+                          } else {
+                            if (_selectedTag == 0) {
+                              setState(() {
+                                _selectedTag = 1;
+                              });
+                            }
+                          }
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            CustomTabView(
-                              index: _selectedTag,
-                              changeTab: changeTab,
+                            Column(
+                              children: [
+                                CustomTabView(
+                                  index: _selectedTag,
+                                  changeTab: changeTab,
+                                ),
+                              ],
                             ),
+                            _selectedTag == 0 ? OngoingList() : CompletedList(),
                           ],
                         ),
-                        _selectedTag == 0 ? OngoingList() : const Description(),
-                      ],
-                    )
-                  : AlertBoxForPrivateKeyErrorWithoutRoute(),
+                      )
+                    : AlertBoxForPrivateKeyErrorWithoutRoute(),
+              ),
             ),
+            bottomSheet: privateKeyLinked
+                ? BottomSheet(
+                    onClosing: () {},
+                    backgroundColor: Colors.transparent,
+                    enableDrag: false,
+                    builder: (context) {
+                      return const SizedBox(
+                        height: 60,
+                        child: EnrollBottomSheet(),
+                      );
+                    },
+                  )
+                : SizedBox(),
           ),
-          bottomSheet: privateKeyLinked
-              ? BottomSheet(
-                  onClosing: () {},
-                  backgroundColor: Colors.transparent,
-                  enableDrag: false,
-                  builder: (context) {
-                    return const SizedBox(
-                      height: 60,
-                      child: EnrollBottomSheet(),
-                    );
-                  },
-                )
-              : SizedBox(),
         ),
       ),
     );
   }
 }
 
-class Description extends StatelessWidget {
-  const Description({Key? key}) : super(key: key);
+class CompletedList extends StatefulWidget {
+  const CompletedList({Key? key}) : super(key: key);
+
+  @override
+  State<CompletedList> createState() => _CompletedListState();
+}
+
+class _CompletedListState extends State<CompletedList> {
+  ScrollController _cardScrollController = new ScrollController();
+  late SupplyController supplyController;
+  late List<Supply> completedSupplyList = [];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  fetchCompletedSupplies(List<Supply> userSupplyList) {
+    for (var supply in userSupplyList) {
+      if (supply.isCompleted) {
+        completedSupplyList.add(supply);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(20.0),
-      child: Center(
-        child: Text(
-          "Not complete yet",
-          style: TextStyle(color: Colors.white),
+    supplyController = Provider.of<SupplyController>(context, listen: true);
+    fetchCompletedSupplies(supplyController.userSupply);
+
+    return Expanded(
+      child: Container(
+        color: Colors.grey.shade200,
+        child: ListView.separated(
+          controller: _cardScrollController,
+          separatorBuilder: (_, __) {
+            return const SizedBox(
+              height: 20,
+            );
+          },
+          padding: const EdgeInsets.only(top: 20, bottom: 40),
+          shrinkWrap: true,
+          itemCount: completedSupplyList.length,
+          itemBuilder: (_, index) {
+            return packageCard(
+              supply: completedSupplyList[index],
+              height: MediaQuery.of(context).size.height * 0.23,
+              width: MediaQuery.of(context).size.width * 0.9,
+              cardController: _cardScrollController,
+            );
+          },
         ),
       ),
     );
@@ -233,7 +296,6 @@ class EnrollBottomSheet extends StatefulWidget {
 class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
   late SupplyController supplyController;
   late List<Supply> myData;
-  // String email = "onkardigheofficial@gmail.com";
   late List<Supply> supplyList;
 
   @override

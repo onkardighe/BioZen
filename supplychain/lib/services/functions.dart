@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supplychain/pages/HomePage.dart';
 import 'package:supplychain/pages/LogInPage.dart';
 import 'package:supplychain/pages/profilePage.dart';
 import 'package:supplychain/pages/dashboard.dart';
@@ -25,9 +26,28 @@ checkResponse(String? response, BuildContext context,
   }
 }
 
+Route routeToHomePage(BuildContext context) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => HomePage(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = const Offset(-1, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.easeInOut;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
 Route routeToDashboard(BuildContext context) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => DashboardScreen(),
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        const DashboardScreen(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1, 0.0);
       var end = Offset.zero;
@@ -45,11 +65,12 @@ Route routeToDashboard(BuildContext context) {
 
 Route routeToProfile() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => ProfilePage(),
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        const ProfilePage(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1, 0.0);
       var end = Offset.zero;
-      var curve = Curves.ease;
+      var curve = Curves.easeInOut;
 
       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
@@ -184,5 +205,4 @@ displayAllInsurers(BuildContext context) async {
 
 displayAllOpenSupplies(BuildContext context) async {
   await ListCard.supplyListCard(context, "Select biofuel to buy");
-
 }

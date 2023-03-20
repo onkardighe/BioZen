@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:supplychain/services/DatabaseService.dart';
 import 'package:supplychain/services/supplyController.dart';
@@ -14,9 +15,17 @@ class AlertBoxes {
     TextEditingController _titleController = TextEditingController();
     TextEditingController _quantityController = TextEditingController();
     TextEditingController _temperatureController = TextEditingController();
-    showDialog(
+    showGeneralDialog(
         context: context,
-        builder: (BuildContext context) {
+        transitionBuilder: (context, animation, secondaryAnimation, child) {
+          var curve = Curves.easeInOut.transform(animation.value);
+          return ScaleTransition(
+            scale: animation,
+            alignment: Alignment.bottomCenter,
+            child: child,
+          );
+        },
+        pageBuilder: (BuildContext context, animation, secondaryAnimation) {
           return GestureDetector(
             onTap: () {
               FocusScope.of(context).requestFocus(FocusNode());
@@ -393,9 +402,17 @@ Future<void> AlertToAddBidAmount(BuildContext context, Supply supply) async {
   String? titleText = "Confirm Bid";
   TextEditingController priceController = TextEditingController();
   String? priceError = null;
-  showDialog(
+  showGeneralDialog(
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        var curve = Curves.easeInOut.transform(animation.value);
+        return ScaleTransition(
+          scale: animation,
+          alignment: Alignment.center,
+          child: child,
+        );
+      },
       context: context,
-      builder: (BuildContext context) {
+      pageBuilder: (BuildContext context, animation, secondaryAnimation) {
         return AlertDialog(
           title: titleText != null
               ? Column(

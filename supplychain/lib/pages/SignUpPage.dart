@@ -14,7 +14,6 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  // User thisUser;
   TextEditingController _nameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passController = TextEditingController();
@@ -28,7 +27,8 @@ class _SignUpPageState extends State<SignUpPage> {
   String tempUserName = "Onkar Dighe";
   bool isPasswordVisible = false,
       isConfirmPasswordVisible = false,
-      isWalletAddressVisible = false;
+      isWalletAddressVisible = false,
+      signingUp = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -322,95 +322,110 @@ class _SignUpPageState extends State<SignUpPage> {
                           const SizedBox(
                             height: 15,
                           ),
-                          Container(
-                            decoration: BoxDecoration(
-                              gradient: AppTheme().themeGradient,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: TextButton(
-                              style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.all<Color>(
-                                          Colors.transparent),
-                                  foregroundColor:
-                                      MaterialStateProperty.all<Color>(
-                                          Colors.white),
-                                  minimumSize: MaterialStateProperty.all<Size>(
-                                      const Size(200, 50)),
-                                  shape: MaterialStateProperty.all<
-                                          RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
+                          signingUp
+                              ? Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 3,
+                                    color: AppTheme.primaryColor,
+                                  ),
+                                )
+                              : Container(
+                                  decoration: BoxDecoration(
+                                    gradient: AppTheme().themeGradient,
                                     borderRadius: BorderRadius.circular(8),
-                                  ))),
-                              onPressed: () async {
-                                // check for passwords equal
-                                if (_passConfirmController.value.text ==
-                                    _passController.value.text) {
-                                  setState(() {
-                                    _errorTextPassConfirm = null;
-                                  });
-                                } else {
-                                  setState(() {
-                                    _errorTextPassConfirm =
-                                        "Password does not match !";
-                                  });
-                                }
+                                  ),
+                                  child: TextButton(
+                                    style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                                Colors.transparent),
+                                        foregroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                                Colors.white),
+                                        minimumSize:
+                                            MaterialStateProperty.all<Size>(
+                                                const Size(200, 50)),
+                                        shape: MaterialStateProperty.all<
+                                                RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ))),
+                                    onPressed: () async {
+                                      // check for passwords equal
+                                      if (_passConfirmController.value.text ==
+                                          _passController.value.text) {
+                                        setState(() {
+                                          _errorTextPassConfirm = null;
+                                        });
+                                      } else {
+                                        setState(() {
+                                          _errorTextPassConfirm =
+                                              "Password does not match !";
+                                        });
+                                      }
 
-                                // check for wallet Address
-                                if (_walletAddressController.value.text
-                                            .trim()
-                                            .length !=
-                                        42 ||
-                                    !RegExp('^0x[a-fA-F0-9]{40}').hasMatch(
-                                        _walletAddressController.value.text
-                                            .trim())) {
-                                  _errorWalletAddress =
-                                      'Invalid wallet Address !';
-                                } else {
-                                  _errorWalletAddress = null;
-                                }
+                                      // check for wallet Address
+                                      if (_walletAddressController.value.text
+                                                  .trim()
+                                                  .length !=
+                                              42 ||
+                                          !RegExp('^0x[a-fA-F0-9]{40}')
+                                              .hasMatch(_walletAddressController
+                                                  .value.text
+                                                  .trim())) {
+                                        _errorWalletAddress =
+                                            'Invalid wallet Address !';
+                                      } else {
+                                        _errorWalletAddress = null;
+                                      }
 
-                                // check for email
-                                if (_emailController.value.text.length <= 0 ||
-                                    !isValidEmail(
-                                        _emailController.value.text)) {
-                                  setState(() {
-                                    _errorTextEmail = "Invalid Email !";
-                                  });
-                                } else if (_nameController.value.text.isEmpty) {
-                                  _errorTextName = "Enter Name !";
-                                } else if (_errorTextPassConfirm != null ||
-                                    _passConfirmController.value.text.length <=
-                                        0) {
-                                  setState(() {
-                                    _errorTextPassConfirm = "Invalid Password";
-                                  });
-                                } else {
-                                  // do sign up
-                                  User? tempUser = await _SignUp();
-                                  if (tempUser != null) {
-                                    user = tempUser;
-                                    Navigator.of(context).pushReplacement(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              ProfileChooserPage(
-                                                  user: tempUser)),
-                                    );
-                                  } else {
-                                    setState(() {
-                                      _errorTextEmail = "";
-                                      _errorTextPassConfirm =
-                                          "Sign up failed, Try agin !";
-                                    });
-                                  }
-                                }
-                              },
-                              child: const Text('Sign Up',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold)),
-                            ),
-                          ),
+                                      // check for email
+                                      if (_emailController.value.text.length <=
+                                              0 ||
+                                          !isValidEmail(
+                                              _emailController.value.text)) {
+                                        setState(() {
+                                          _errorTextEmail = "Invalid Email !";
+                                        });
+                                      } else if (_nameController
+                                          .value.text.isEmpty) {
+                                        _errorTextName = "Enter Name !";
+                                      } else if (_errorTextPassConfirm !=
+                                              null ||
+                                          _passConfirmController
+                                                  .value.text.length <=
+                                              0) {
+                                        setState(() {
+                                          _errorTextPassConfirm =
+                                              "Invalid Password";
+                                        });
+                                      } else {
+                                        // do sign up
+                                        User? tempUser = await _SignUp();
+                                        if (tempUser != null) {
+                                          user = tempUser;
+                                          Navigator.of(context).pushReplacement(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ProfileChooserPage(
+                                                        user: tempUser)),
+                                          );
+                                        } else {
+                                          setState(() {
+                                            _errorTextEmail = "";
+                                            _errorTextPassConfirm =
+                                                "Sign up failed, Try agin !";
+                                          });
+                                        }
+                                      }
+                                    },
+                                    child: const Text('Sign Up',
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
                           const SizedBox(
                             height: 15,
                           ),
@@ -443,6 +458,9 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Future<User?> _SignUp() async {
+    setState(() {
+      signingUp = true;
+    });
     User? user = await Authentication.signUpWithEmail(
         context: context,
         email: _emailController.value.text,
@@ -450,6 +468,9 @@ class _SignUpPageState extends State<SignUpPage> {
         name: _nameController.value.text.trim(),
         publicWalletAddress: _walletAddressController.value.text.trim());
 
+    setState(() {
+      signingUp = false;
+    });
     return user;
   }
 

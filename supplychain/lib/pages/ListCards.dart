@@ -36,9 +36,17 @@ class ListCard {
 
   static Future<dynamic> supplyListCard(
       BuildContext context, String? title) async {
-    return await showDialog(
+    return showGeneralDialog(
         context: context,
-        builder: (context) {
+        transitionBuilder: (context, animation, secondaryAnimation, child) {
+          var curve = Curves.easeInOut.transform(animation.value);
+          return ScaleTransition(
+            scale: animation,
+            alignment: Alignment.bottomCenter,
+            child: child,
+          );
+        },
+        pageBuilder: (context, animation, secondaryAnimation) {
           return SupplyListCard(
             context: context,
             title: title,

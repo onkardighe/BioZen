@@ -18,6 +18,7 @@ class _LogInPageState extends State<LogInPage> {
   final TextEditingController _passController = TextEditingController();
   String? _errorPassText;
   bool isPasswordVisible = false;
+  bool loggingIn = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -170,58 +171,70 @@ class _LogInPageState extends State<LogInPage> {
                               const SizedBox(
                                 height: 35,
                               ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  gradient: AppTheme().themeGradient,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: TextButton(
-                                  style: ButtonStyle(
-                                      backgroundColor:
-                                          MaterialStateProperty.all<Color>(
-                                              Colors.transparent),
-                                      foregroundColor:
-                                          MaterialStateProperty.all<Color>(
-                                              Colors.white),
-                                      minimumSize:
-                                          MaterialStateProperty.all<Size>(
-                                              const Size(200, 50)),
-                                      shape: MaterialStateProperty.all<
-                                              RoundedRectangleBorder>(
-                                          RoundedRectangleBorder())),
-                                  onPressed: () async {
-                                    if (_emailController
-                                            .value.text.isNotEmpty &&
-                                        isValidEmail(
-                                            _emailController.value.text) &&
-                                        _passController.value.text.isNotEmpty) {
-                                      // log in
-                                      User? tempUser = await loginUser();
-                                      if (tempUser != null) {
-                                        user = tempUser;
-                                        Navigator.of(context).pushReplacement(
-                                          MaterialPageRoute(
-                                            builder: (context) => HomePage(),
-                                          ),
-                                        );
-                                      } else {
-                                        setState(() {
-                                          _errorPassText =
-                                              "Sign up failed, Try agin !";
-                                        });
-                                      }
-                                    } else {
-                                      setState(() {
-                                        _errorPassText = "Invalid Credentials";
-                                      });
-                                    }
-                                  },
-                                  child: const Text('Log In',
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold)),
-                                ),
-                              ),
+                              loggingIn
+                                  ? Center(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 3,
+                                        color: AppTheme.primaryColor,
+                                      ),
+                                    )
+                                  : Container(
+                                      decoration: BoxDecoration(
+                                        gradient: AppTheme().themeGradient,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: TextButton(
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty.all<
+                                                    Color>(Colors.transparent),
+                                            foregroundColor:
+                                                MaterialStateProperty.all<
+                                                    Color>(Colors.white),
+                                            minimumSize:
+                                                MaterialStateProperty.all<Size>(
+                                                    const Size(200, 50)),
+                                            shape: MaterialStateProperty.all<
+                                                    RoundedRectangleBorder>(
+                                                RoundedRectangleBorder())),
+                                        onPressed: () async {
+                                          if (_emailController
+                                                  .value.text.isNotEmpty &&
+                                              isValidEmail(_emailController
+                                                  .value.text) &&
+                                              _passController
+                                                  .value.text.isNotEmpty) {
+                                            // log in
+
+                                            User? tempUser = await loginUser();
+                                            if (tempUser != null) {
+                                              user = tempUser;
+                                              Navigator.of(context)
+                                                  .pushReplacement(
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      HomePage(),
+                                                ),
+                                              );
+                                            } else {
+                                              setState(() {
+                                                _errorPassText =
+                                                    "Sign up failed, Try agin !";
+                                              });
+                                            }
+                                          } else {
+                                            setState(() {
+                                              _errorPassText =
+                                                  "Invalid Credentials";
+                                            });
+                                          }
+                                        },
+                                        child: const Text('Log In',
+                                            style: TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
                               const SizedBox(
                                 height: 35,
                               ),
@@ -256,10 +269,16 @@ class _LogInPageState extends State<LogInPage> {
   }
 
   Future<User?> loginUser() async {
+    setState(() {
+      loggingIn = true;
+    });
     User? user = await Authentication.logInUser(
         email: _emailController.value.text,
         password: _passController.value.text,
         context: context);
+    setState(() {
+      loggingIn = false;
+    });
     return user;
   }
 

@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
 
   @override
-  State<HomePage>  createState() => _HomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
@@ -150,41 +150,48 @@ class _HomePageState extends State<HomePage> {
                                 height:
                                     MediaQuery.of(context).size.width * 0.25,
                               ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  TileIconWithName(
-                                    userProfileImage: user.photoURL,
-                                    childText: "",
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        userName,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                            fontSize: 25),
-                                      ),
-                                      SizedBox(
-                                        height: 2,
-                                      ),
-                                      Text(
-                                        userType,
-                                        style: TextStyle(
-                                          color: AppTheme.secondaryColor,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).push(routeToProfile());
+                                },
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    TileIconWithName(
+                                      userProfileImage: user.photoURL,
+                                      childText: "",
+                                      context: context,
+                                      route: routeToProfile(),
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          userName,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                              fontSize: 25),
                                         ),
-                                      )
-                                    ],
-                                  )
-                                ],
+                                        SizedBox(
+                                          height: 2,
+                                        ),
+                                        Text(
+                                          userType,
+                                          style: TextStyle(
+                                            color: AppTheme.secondaryColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                ),
                               ),
                             ],
                           )),
@@ -344,6 +351,9 @@ class _HomePageState extends State<HomePage> {
                       context, supplyController);
                 } else if (userType == fuelCompany) {
                   await displayAllOpenSupplies(context);
+                } else {
+                  print("aa gaya else mein");
+                  Navigator.of(context).push(routeToDashboard(context));
                 }
               },
               child: Container(

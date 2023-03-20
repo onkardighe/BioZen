@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supplychain/services/DatabaseService.dart';
 import 'package:supplychain/utils/appTheme.dart';
 import 'package:supplychain/services/functions.dart';
 import 'package:supplychain/services/Authentication.dart';
@@ -11,17 +12,28 @@ class AppDrawer extends StatefulWidget {
         super(key: key);
 
   @override
-  State<AppDrawer>  createState() => _AppDrawerState();
+  State<AppDrawer> createState() => _AppDrawerState();
 }
 
 class _AppDrawerState extends State<AppDrawer> {
   bool _isSigningOut = false;
-  var userType;
+  var userType, userName = '';
 
   @override
   void initState() {
     userType = widget.userType;
+    getUserData(user.uid);
     super.initState();
+  }
+
+  getUserData(String uid) async {
+    if (user.displayName != null) {
+      userName = user.displayName!;
+    } else {
+      print("getting from DB");
+      userName = await DatabaseService().fetchDataOfUser(uid, 'name') ?? "";
+    }
+    setState(() {});
   }
 
   @override
@@ -44,7 +56,7 @@ class _AppDrawerState extends State<AppDrawer> {
                           : NetworkImage(user.photoURL!),
                     ),
                     accountName: Text(
-                      user.displayName!,
+                      userName,
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
@@ -161,7 +173,7 @@ class _AppDrawerState extends State<AppDrawer> {
                       style: TextStyle(fontSize: 18),
                     ),
                     leading: Icon(
-                      Icons.settings,
+                      Icons.logout,
                       size: 25,
                       color: Colors.white,
                     ),

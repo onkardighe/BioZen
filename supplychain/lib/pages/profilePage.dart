@@ -1,11 +1,10 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:supplychain/pages/HomePage.dart';
 import 'package:supplychain/services/Authentication.dart';
+import 'package:supplychain/services/functions.dart';
 import 'package:supplychain/utils/appTheme.dart';
 import 'package:supplychain/services/DatabaseService.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:supplychain/utils/constants.dart';
 
@@ -17,8 +16,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  late String userName, userType = '';
-  User? _thisUser;
+  late String userName = '', userType = '';
   var _mobileLinkController = TextEditingController();
   var _privateAddressController = TextEditingController();
   var isMobileLinked = true;
@@ -37,7 +35,12 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void getDataOfUser(String uid) async {
-    userName = user.displayName!;
+    if (user.displayName != null) {
+      userName = user.displayName!;
+    } else {
+      userName = await DatabaseService().fetchDataOfUser(uid, 'name') ?? "";
+    }
+
     userType = await DatabaseService().fetchDataOfUser(uid, 'type') ?? "";
     privateKey =
         await DatabaseService().fetchDataOfUser(uid, 'privateAddress') ?? "";
@@ -71,223 +74,230 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        resizeToAvoidBottomInset: false,
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 10, top: 15),
-            child: Container(
-              width: 50,
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle, color: Colors.transparent),
-              child: TextButton(
-                onPressed: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => HomePage()),
-                      (Route<dynamic> route) => false);
-                },
-                child: Icon(
-                  Icons.arrow_circle_left_rounded,
-                  color: Colors.white,
-                  size: 36,
+      home: WillPopScope(
+        onWillPop: () {
+          return Navigator.pushAndRemoveUntil(
+                  context, routeToHomePage(context), (route) => false)
+              as Future<bool>;
+        },
+        child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 10, top: 15),
+              child: Container(
+                width: 50,
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle, color: Colors.transparent),
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                        routeToHomePage(context),
+                        (Route<dynamic> route) => false);
+                  },
+                  child: Icon(
+                    Icons.arrow_circle_left_rounded,
+                    color: Colors.white,
+                    size: 36,
+                  ),
                 ),
               ),
             ),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
           ),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-        ),
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: AppTheme().themeGradient,
-            // gradient: AppTheme().themeGradient,
-          ),
-          child: SafeArea(
-            child: Column(
-              children: [
-                Spacer(),
-                CircleAvatar(
-                  radius: 50.0,
-                  backgroundImage: NetworkImage(
-                      "https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png"),
-                ),
-                SizedBox(height: 10.0),
-                Text(
-                  userName,
-                  style: TextStyle(
-                      fontFamily: 'Roboto',
-                      fontSize: 40.0,
+          body: Container(
+            decoration: BoxDecoration(
+              gradient: AppTheme().themeGradient,
+              // gradient: AppTheme().themeGradient,
+            ),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  Spacer(),
+                  CircleAvatar(
+                    radius: 50.0,
+                    backgroundImage: NetworkImage(
+                        "https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png"),
+                  ),
+                  SizedBox(height: 10.0),
+                  Text(
+                    userName,
+                    style: TextStyle(
+                        fontFamily: 'Roboto',
+                        fontSize: 40.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        overflow: TextOverflow.clip),
+                  ),
+                  SizedBox(height: 15),
+                  Text(
+                    this.userType,
+                    style: TextStyle(
+                      fontFamily: 'Source Sans Pro',
+                      fontSize: 20,
+                      color: AppTheme.secondaryColor,
+                      letterSpacing: 2.5,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      overflow: TextOverflow.clip),
-                ),
-                SizedBox(height: 15),
-                Text(
-                  this.userType,
-                  style: TextStyle(
-                    fontFamily: 'Source Sans Pro',
-                    fontSize: 20,
-                    color: AppTheme.secondaryColor,
-                    letterSpacing: 2.5,
-                    fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                Spacer(),
-                SizedBox(
-                  height: 30.0,
-                  width: 150.0,
-                  child: Divider(
-                    color: Colors.teal[100],
+                  Spacer(),
+                  SizedBox(
+                    height: 30.0,
+                    width: 150.0,
+                    child: Divider(
+                      color: Colors.teal[100],
+                    ),
                   ),
-                ),
-                Card(
-                  margin:
-                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
-                  child: ListTile(
+                  Card(
+                    margin:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
+                    child: ListTile(
+                        leading: Icon(
+                          Icons.phone_android_rounded,
+                          color: AppTheme.primaryColor,
+                        ),
+                        title: isMobileLinked
+                            ? Text(
+                                number,
+                                style: TextStyle(
+                                  color: AppTheme.primaryColor,
+                                ),
+                              )
+                            : Align(
+                                alignment: Alignment.centerLeft,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    TextButton(
+                                        onPressed: () {
+                                          showAlert();
+                                        },
+                                        child: Text("Link Mobile Number !",
+                                            style: TextStyle(
+                                              color: AppTheme.primaryColor,
+                                            ))),
+                                    Icon(
+                                      Icons.edit,
+                                      color: Colors.grey,
+                                    ),
+                                  ],
+                                ),
+                              )),
+                  ),
+                  Card(
+                    margin:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
+                    child: ListTile(
                       leading: Icon(
-                        Icons.phone_android_rounded,
+                        Icons.email_outlined,
                         color: AppTheme.primaryColor,
                       ),
-                      title: isMobileLinked
-                          ? Text(
-                              number,
-                              style: TextStyle(
-                                color: AppTheme.primaryColor,
-                              ),
-                            )
-                          : Align(
-                              alignment: Alignment.centerLeft,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  TextButton(
-                                      onPressed: () {
-                                        showAlert();
-                                      },
-                                      child: Text("Link Mobile Number !",
-                                          style: TextStyle(
-                                            color: AppTheme.primaryColor,
-                                          ))),
-                                  Icon(
-                                    Icons.edit,
-                                    color: Colors.grey,
-                                  ),
-                                ],
-                              ),
-                            )),
-                ),
-                Card(
-                  margin:
-                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
-                  child: ListTile(
-                    leading: Icon(
-                      Icons.email_outlined,
-                      color: AppTheme.primaryColor,
-                    ),
-                    title: Text(
-                      email,
-                      style: TextStyle(
-                        color: AppTheme.primaryColor,
-                        fontFamily: 'Source Sans Pro',
-                        fontSize: 16,
+                      title: Text(
+                        email,
+                        style: TextStyle(
+                          color: AppTheme.primaryColor,
+                          fontFamily: 'Source Sans Pro',
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Card(
-                  margin:
-                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
-                  child: ListTile(
-                    leading: Icon(
-                      Icons.medical_information_outlined,
-                      color: AppTheme.primaryColor,
-                    ),
-                    trailing: InkWell(
-                      onTap: () async {
-                        await Clipboard.setData(ClipboardData(
-                          text: publicWalletAddress ?? "",
-                        ));
-                        setState(() {
-                          copyIcon = Icon(
-                            Icons.check_rounded,
-                            color: Colors.green,
-                          );
-                        });
-                      },
-                      child: copyIcon,
-                    ),
-                    title: Text(
-                      publicWalletAddress != null &&
-                              publicWalletAddress!.trim().isNotEmpty
-                          ? "${publicWalletAddress!.substring(0, 8)}*************${publicWalletAddress!.substring(publicWalletAddress!.length - 5, publicWalletAddress!.length)} "
-                          : "User Not Found !!",
-                      style: TextStyle(
-                        color: AppTheme.primaryColor,
-                        fontFamily: 'Source Sans Pro',
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ),
-                Card(
-                  // card for Private key
-                  margin:
-                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
-                  child: ListTile(
+                  Card(
+                    margin:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
+                    child: ListTile(
                       leading: Icon(
-                        Icons.key_rounded,
-                        color: privateKeyLinked
-                            ? AppTheme.primaryColor
-                            : Colors.red,
+                        Icons.medical_information_outlined,
+                        color: AppTheme.primaryColor,
                       ),
-                      title: isPrivateAddressLinked
-                          ? Text(
-                              publicWalletAddress != null &&
-                                      publicWalletAddress!.trim().isNotEmpty
-                                  ? privateWalletAddress.length <= 8
-                                      ? privateWalletAddress
-                                      : "${privateWalletAddress.substring(0, 8)}*************${privateWalletAddress.substring(privateWalletAddress.length - 5, privateWalletAddress.length)} "
-                                  : "User Not Found !!",
-                              style: TextStyle(
-                                color: AppTheme.primaryColor,
-                              ),
-                            )
-                          : Align(
-                              alignment: Alignment.centerLeft,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  TextButton(
-                                      onPressed: () {
-                                        showAlertForPrivateAddress();
-                                      },
-                                      child:
-                                          Text("Enter Wallet Private Address !",
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.red,
-                                              ))),
-                                  Icon(
-                                    Icons.edit,
-                                    color: Colors.red,
-                                  ),
-                                ],
-                              ),
-                            )),
-                ),
-                SizedBox(
-                  height: 30.0,
-                  width: 150.0,
-                  child: Divider(
-                    color: Colors.teal[100],
+                      trailing: InkWell(
+                        onTap: () async {
+                          await Clipboard.setData(ClipboardData(
+                            text: publicWalletAddress ?? "",
+                          ));
+                          setState(() {
+                            copyIcon = Icon(
+                              Icons.check_rounded,
+                              color: Colors.green,
+                            );
+                          });
+                        },
+                        child: copyIcon,
+                      ),
+                      title: Text(
+                        publicWalletAddress != null &&
+                                publicWalletAddress!.trim().isNotEmpty
+                            ? "${publicWalletAddress!.substring(0, 8)}*************${publicWalletAddress!.substring(publicWalletAddress!.length - 5, publicWalletAddress!.length)} "
+                            : "User Not Found !!",
+                        style: TextStyle(
+                          color: AppTheme.primaryColor,
+                          fontFamily: 'Source Sans Pro',
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                Spacer(),
-              ],
+                  Card(
+                    // card for Private key
+                    margin:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
+                    child: ListTile(
+                        leading: Icon(
+                          Icons.key_rounded,
+                          color: privateKeyLinked
+                              ? AppTheme.primaryColor
+                              : Colors.red,
+                        ),
+                        title: isPrivateAddressLinked
+                            ? Text(
+                                publicWalletAddress != null &&
+                                        publicWalletAddress!.trim().isNotEmpty
+                                    ? privateWalletAddress.length <= 8
+                                        ? privateWalletAddress
+                                        : "${privateWalletAddress.substring(0, 8)}*************${privateWalletAddress.substring(privateWalletAddress.length - 5, privateWalletAddress.length)} "
+                                    : "User Not Found !!",
+                                style: TextStyle(
+                                  color: AppTheme.primaryColor,
+                                ),
+                              )
+                            : Align(
+                                alignment: Alignment.centerLeft,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    TextButton(
+                                        onPressed: () {
+                                          showAlertForPrivateAddress();
+                                        },
+                                        child: Text(
+                                            "Enter Wallet Private Address !",
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.red,
+                                            ))),
+                                    Icon(
+                                      Icons.edit,
+                                      color: Colors.red,
+                                    ),
+                                  ],
+                                ),
+                              )),
+                  ),
+                  SizedBox(
+                    height: 30.0,
+                    width: 150.0,
+                    child: Divider(
+                      color: Colors.teal[100],
+                    ),
+                  ),
+                  Spacer(),
+                ],
+              ),
             ),
           ),
         ),
@@ -302,7 +312,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     var completeNumber = "+91" + _mobileLinkController.value.text;
-    await DatabaseService.setMobileNumber(_thisUser!.uid, completeNumber);
+    await DatabaseService.setMobileNumber(user.uid, completeNumber);
     setState(() {
       number = completeNumber;
       isMobileLinked = true;
@@ -312,14 +322,14 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   _linkPrivateAddress() async {
-    var address = _privateAddressController.value.text.trim();
+    var address = "0x" + _privateAddressController.value.text.trim();
 
     if (address.length != 66) {
       print("Address not correct");
       return;
     }
 
-    await DatabaseService.setPrivateAddress(_thisUser!.uid, address);
+    await DatabaseService.setPrivateAddress(user.uid, address);
     setState(() {
       privateWalletAddress = address;
       isPrivateAddressLinked = true;
@@ -374,9 +384,17 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> showAlertForPrivateAddress() async {
-    showDialog(
+    showGeneralDialog(
         context: context,
-        builder: (BuildContext context) {
+        transitionBuilder: (context, animation, secondaryAnimation, child) {
+          var curve = Curves.easeInOut.transform(animation.value);
+          return ScaleTransition(
+            scale: animation,
+            alignment: Alignment.bottomCenter,
+            child: child,
+          );
+        },
+        pageBuilder: (BuildContext context, animation, secondaryAnimation) {
           return AlertDialog(
             title: Text(
               "Enter Private Address",
@@ -416,9 +434,17 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> showAlert() async {
-    showDialog(
+    showGeneralDialog(
         context: context,
-        builder: (BuildContext context) {
+        transitionBuilder: (context, animation, secondaryAnimation, child) {
+          var curve = Curves.easeInOut.transform(animation.value);
+          return ScaleTransition(
+            scale: animation,
+            alignment: Alignment.center,
+            child: child,
+          );
+        },
+        pageBuilder: (BuildContext context, animation, secondaryAnimation) {
           return AlertDialog(
             title: Text(
               "Enter Mobile Number",

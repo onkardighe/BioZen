@@ -109,13 +109,16 @@ class DatabaseService {
 
   static Future<bool> isBidderPresent(
       String supplyId, String bidderAddress) async {
-    var dbSnap = FirebaseFirestore.instance.collection('bids').doc(supplyId);
-    var doc = await dbSnap.get();
-
-    if (doc.exists) {
-      var docList = doc.data() as Map<String, dynamic>;
-      return docList.containsKey(bidderAddress);
-    } else {
+    try {
+      var dbSnap = FirebaseFirestore.instance.collection('bids').doc(supplyId);
+      var doc = await dbSnap.get();
+      if (doc.exists) {
+        var docList = doc.data() as Map<String, dynamic>;
+        return docList.containsKey(bidderAddress);
+      } else {
+        return false;
+      }
+    } catch (exception) {
       return false;
     }
   }
