@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supplychain/services/DatabaseService.dart';
@@ -52,6 +50,371 @@ class ListCard {
             title: title,
           );
         });
+  }
+
+  static Future<dynamic> userSupplyListCard(BuildContext context, String? title,
+      {required var supplyList}) async {
+    return showGeneralDialog(
+        context: context,
+        transitionBuilder: (context, animation, secondaryAnimation, child) {
+          var curve = Curves.easeInOut.transform(animation.value);
+          return ScaleTransition(
+            scale: animation,
+            alignment: Alignment.bottomCenter,
+            child: child,
+          );
+        },
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return UserSupplyListCard(
+            context: context,
+            supplyList: supplyList,
+            title: title,
+          );
+        });
+  }
+}
+
+class UserSupplyListCard extends StatefulWidget {
+  final String? _title;
+  final BuildContext _context;
+  final _supplyList;
+  const UserSupplyListCard(
+      {super.key,
+      required BuildContext context,
+      required var supplyList,
+      required String? title})
+      : _title = title,
+        _supplyList = supplyList,
+        _context = context;
+
+  @override
+  State<UserSupplyListCard> createState() => _UserSupplyListCardState();
+}
+
+class _UserSupplyListCardState extends State<UserSupplyListCard> {
+  late String title;
+  late var supplyList;
+  late BuildContext context;
+  bool isFirstTime = true;
+  late SupplyController supplyController;
+  late List<Supply> toCreateSupplyList = [];
+  late List<String> addedList = [];
+  late TextStyle titleTextStyle;
+  late TextStyle nameTextStyle;
+  late TextStyle boldTextStyle;
+  late TextStyle mainTextStyle;
+  String fontName = 'roboto';
+
+  @override
+  void initState() {
+    title = widget._title!;
+    supplyList = widget._supplyList;
+    context = widget._context;
+    initFontStyle();
+    super.initState();
+  }
+
+  void getSuppliesReadyToBuy() async {
+    toCreateSupplyList.clear();
+    addedList.clear();
+    for (var supplyId in supplyList) {
+      Supply s = await supplyController.getSupplyByID(BigInt.parse(supplyId));
+      if (userType == insuranceAuthority) {
+        if (s.isInsuranceAdded) {
+          addedList.add(supplyId);
+        }
+      } else if (userType == transportAuthority) {
+        if (s.isTransporterAdded) {
+          addedList.add(supplyId);
+        }
+      }
+      toCreateSupplyList.add(s);
+    }
+    print("Supplies : ${toCreateSupplyList.toString()}");
+    print("Added Supplies : ${addedList.toString()}");
+  }
+
+  void initFontStyle() {
+    titleTextStyle = TextStyle(
+        fontFamily: fontName,
+        color: Colors.grey.shade700,
+        fontWeight: FontWeight.bold,
+        fontSize: 18,
+        decoration: TextDecoration.none);
+    nameTextStyle = TextStyle(
+        color: AppTheme.primaryColor,
+        fontFamily: fontName,
+        fontWeight: FontWeight.bold,
+        fontSize: 17,
+        decoration: TextDecoration.none);
+    boldTextStyle = TextStyle(
+        color: Colors.grey.shade800,
+        fontFamily: fontName,
+        fontSize: 15,
+        fontWeight: FontWeight.bold,
+        decoration: TextDecoration.none);
+    mainTextStyle = TextStyle(
+        fontFamily: fontName,
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+        color: Colors.grey.shade700,
+        decoration: TextDecoration.none);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    supplyController = Provider.of<SupplyController>(context, listen: true);
+    if (isFirstTime) {
+      getSuppliesReadyToBuy();
+      isFirstTime = false;
+    }
+
+    return Container(
+      margin: EdgeInsets.only(
+          top: MediaQuery.of(context).size.height * 0.1,
+          bottom: MediaQuery.of(context).size.height * 0.08),
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(color: Colors.grey.shade300),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Spacer(),
+              Text(
+                title,
+                style: titleTextStyle,
+              ),
+              Spacer(),
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: Container(
+                  height: 30,
+                  width: 30,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(90),
+                      color: AppTheme.primaryColor),
+                  child: Icon(
+                    Icons.close_rounded,
+                    color: Colors.white,
+                  ),
+                ),
+              )
+            ],
+          ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.7,
+            child: Divider(
+              color: Colors.grey.shade700,
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.only(top: 10),
+            height: MediaQuery.of(context).size.height * 0.66,
+            child: toCreateSupplyList.isEmpty
+                ? Center(
+                    child: Text(
+                      "No Ongoing Supplies found !!",
+                      style: boldTextStyle,
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: toCreateSupplyList.length,
+                    itemBuilder: (context, index) {
+                      Supply supply = toCreateSupplyList[index];
+
+                      return Container(
+                        height: MediaQuery.of(context).size.height * .25,
+                        margin: EdgeInsets.only(bottom: 20),
+                        padding: EdgeInsets.only(right: 15),
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Row(
+                          children: [
+                            Container(
+                                //container for green border
+                                width: 5,
+                                height:
+                                    MediaQuery.of(context).size.height * .25,
+                                decoration: BoxDecoration(
+                                    color: AppTheme.primaryColor,
+                                    borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(90),
+                                        bottomLeft: Radius.circular(90)))),
+                            Container(
+                              padding: EdgeInsets.only(left: 15, top: 10),
+                              width: MediaQuery.of(context).size.width * 0.82,
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "ID : ${supply.id}",
+                                        style: nameTextStyle,
+                                      ),
+                                      Icon(
+                                        Icons.info_outline_rounded,
+                                        color: AppTheme.primaryColor,
+                                      )
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        supply.title,
+                                        style: boldTextStyle,
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Quantity : ",
+                                        style: mainTextStyle,
+                                      ),
+                                      Text("${supply.quantity} Kg",
+                                          style: mainTextStyle)
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("Created at : ",
+                                          style: mainTextStyle),
+                                      Text(
+                                          "${supply.createdAt.hour}:${supply.createdAt.minute}  ${supply.createdAt.day}/${supply.createdAt.month}/${supply.createdAt.year}",
+                                          style: mainTextStyle)
+                                    ],
+                                  ),
+                                  !addedList.contains(supply.id)
+                                      ? Container(
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                              gradient:
+                                                  AppTheme().themeGradient,
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                          child: TextButton(
+                                              onPressed: (() async {
+                                                late var title;
+                                                if (userType ==
+                                                    insuranceAuthority) {
+                                                  title = "Secure  Supply";
+                                                } else if (userType ==
+                                                    transportAuthority) {
+                                                  title = "Select Package";
+                                                } else {
+                                                  title = "Select";
+                                                }
+
+                                                var res =
+                                                    await AlertToSelectSupply(
+                                                        context, supply,
+                                                        titleText: title);
+
+                                                if (res != null && res) {
+                                                  if (userType ==
+                                                      insuranceAuthority) {
+                                                    //-------------- For Insurance Authority--------------
+                                                    var addresp =
+                                                        await supplyController
+                                                            .setInsurance(
+                                                                supply.id,
+                                                                publicKey);
+                                                    if (addresp != null) {
+                                                      DatabaseService
+                                                          .removeField(
+                                                              "selectedUsers",
+                                                              insuranceAuthority,
+                                                              supply.id);
+                                                      await showRawAlert(
+                                                          context,
+                                                          "Insurance Completed !");
+                                                      setState(() {
+                                                        addedList
+                                                            .remove(supply.id);
+                                                      });
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    } else {
+                                                      showRawAlert(context,
+                                                          "Error ! try Again");
+                                                    }
+                                                  } else if (userType ==
+                                                      transportAuthority) {
+                                                    //-------------- For Transport Authority--------------
+                                                    var addresp =
+                                                        await supplyController
+                                                            .setTransporter(
+                                                                supply.id,
+                                                                publicKey);
+                                                    if (addresp != null) {
+                                                      DatabaseService
+                                                          .removeField(
+                                                              "selectedUsers",
+                                                              transportAuthority,
+                                                              supply.id);
+                                                      await showRawAlert(
+                                                          context,
+                                                          "Transport Package Selected !");
+                                                      setState(() {
+                                                        addedList
+                                                            .remove(supply.id);
+                                                      });
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    } else {
+                                                      showRawAlert(context,
+                                                          "Error ! try Again");
+                                                    }
+                                                  }
+                                                }
+                                              }),
+                                              style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStateProperty.all<
+                                                              Color>(
+                                                          Colors.transparent)),
+                                              child: Text(
+                                                userType == insuranceAuthority
+                                                    ? "Secure Supply"
+                                                    : "Select Supply",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              )),
+                                        )
+                                      : Icon(
+                                          Icons.check_circle_outline_rounded,
+                                          color: Colors.green,
+                                          size: 30,
+                                        )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+          ),
+        ],
+      ),
+    );
   }
 }
 

@@ -32,7 +32,6 @@ checkResponse(String? response, BuildContext context,
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 Route routeToHomePage(BuildContext context) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => HomePage(),
@@ -113,7 +112,6 @@ Route routeToLogInScreen() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 displayAllBidders(BuildContext context, String supplyId) async {
   var bidders = await DatabaseService.getBidders(supplyId);
   if (bidders == null) {
@@ -138,13 +136,11 @@ displayAllTransporters(BuildContext context) async {
 }
 
 displayAllInsurers(BuildContext context) async {
-  List? transporters =
-      await DatabaseService.getUsersByType('Insurance Authority');
-  if (transporters == null) {
+  List? insurers = await DatabaseService.getUsersByType('Insurance Authority');
+  if (insurers == null) {
     print("no users found");
   } else {
-    var response =
-        await ListCard.userListCard(context, transporters, "Insurer");
+    var response = await ListCard.userListCard(context, insurers, "Insurer");
     return response;
   }
 }
@@ -153,4 +149,11 @@ displayAllOpenSupplies(BuildContext context) async {
   await ListCard.supplyListCard(context, "Select biofuel to buy");
 }
 
-
+displayListSpecificSupplies(
+    BuildContext context, var list, String? title) async {
+  if (title == null) {
+    await ListCard.userSupplyListCard(context, "Explore Supply", supplyList: list);
+  } else {
+    await ListCard.userSupplyListCard(context, title, supplyList: list);
+  }
+}

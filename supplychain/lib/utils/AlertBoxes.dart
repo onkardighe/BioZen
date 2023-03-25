@@ -574,6 +574,138 @@ Future<void> AlertToAddBidAmount(BuildContext context, Supply supply) async {
       });
 }
 
+AlertToSelectSupply(BuildContext context, Supply supply,{required String titleText}) async {
+  // String? titleText = "Secure Supply";
+  return showGeneralDialog(
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        var curve = Curves.easeInOut.transform(animation.value);
+        return ScaleTransition(
+          scale: animation,
+          alignment: Alignment.center,
+          child: child,
+        );
+      },
+      context: context,
+      pageBuilder: (BuildContext context, animation, secondaryAnimation) {
+        return AlertDialog(
+          title: titleText != null
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "$titleText",
+                      style:
+                          TextStyle(color: AppTheme.primaryColor, fontSize: 18),
+                    ),
+                    Divider(
+                      thickness: 1,
+                      color: Colors.grey.shade300,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Supply Details",
+                          style: TextStyle(
+                              color: Colors.grey.shade700, fontSize: 14),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "ID :",
+                          style: TextStyle(
+                              color: Colors.grey.shade500, fontSize: 12),
+                        ),
+                        Text(
+                          "${supply.id}",
+                          style: TextStyle(
+                              color: Colors.grey.shade500, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Title :",
+                          style: TextStyle(
+                              color: Colors.grey.shade500, fontSize: 12),
+                        ),
+                        Text(
+                          "${supply.title}",
+                          style: TextStyle(
+                              color: Colors.grey.shade500, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Quantity :",
+                          style: TextStyle(
+                              color: Colors.grey.shade500, fontSize: 12),
+                        ),
+                        Text(
+                          "${supply.quantity} Kg",
+                          style: TextStyle(
+                              color: Colors.grey.shade500, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Temperature :",
+                          style: TextStyle(
+                              color: Colors.grey.shade500, fontSize: 12),
+                        ),
+                        Text(
+                          "${supply.temperature} °C",
+                          style: TextStyle(
+                              color: Colors.grey.shade500, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ],
+                )
+              : SizedBox(),
+          // content:
+          actions: [
+            ElevatedButton(
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                  AppTheme.primaryColor,
+                )),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+                child: const Text(
+                  "Cancel",
+                  style: TextStyle(color: Colors.white),
+                )),
+            ElevatedButton(
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                  AppTheme.primaryColor,
+                )),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+                child: const Text(
+                  "Confirm",
+                  style: TextStyle(color: Colors.white),
+                )),
+          ],
+        );
+      });
+}
+
 bool checkForValidPrice(String strPrice) {
   if (strPrice.isEmpty) {
     return false;

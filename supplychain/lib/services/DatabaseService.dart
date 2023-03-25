@@ -1,6 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:supplychain/utils/constants.dart';
 
 class DatabaseService {
+  static removeField(String collectionName, String docName, String fieldName) {
+    var addressDoc = FirebaseFirestore.instance
+        .collection(collectionName)
+        .doc(docName)
+        .update({fieldName: FieldValue.delete()});
+  }
+
   Future<String?> fetchDataOfUser(String uid, field) async {
     try {
       var users = FirebaseFirestore.instance.collection('users');
@@ -91,6 +99,50 @@ class DatabaseService {
       print("Exception : {$e}");
       return null;
     }
+  }
+
+  static selectInsurer(String supplyId, publicAddressInsurer) async {
+    var docRef = FirebaseFirestore.instance
+        .collection('selectedUsers')
+        .doc(insuranceAuthority);
+
+    var doc = await docRef.get();
+    if (doc.exists) {
+      await docRef.update({supplyId: publicAddressInsurer});
+    } else {
+      await docRef.update({supplyId: publicAddressInsurer});
+    }
+  }
+
+  static selectTransporter(String supplyId, publicAddressTransporter) async {
+    var docRef = FirebaseFirestore.instance
+        .collection('selectedUsers')
+        .doc(transportAuthority);
+
+    var doc = await docRef.get();
+
+    if (doc.exists) {
+      await docRef.update({supplyId: publicAddressTransporter});
+    } else {
+      await docRef.set({supplyId: publicAddressTransporter});
+    }
+  }
+
+  static getSupplyIDsOfSelectedUser(String publicAddressUser, {required String type}) async {
+    var docRef = FirebaseFirestore.instance
+        .collection('selectedUsers')
+        .doc(type);
+    var data = await docRef.get();
+    late var userData = <String, dynamic>{};
+    if (data.data() != null) {
+      userData = data.data() as Map<String, dynamic>;
+      userData.removeWhere(
+        (key, value) {
+          return value != publicAddressUser;
+        },
+      );
+    }
+    return userData.keys;
   }
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////  BIDDING PROCESS ///////////////////////////////////////////////////////////////

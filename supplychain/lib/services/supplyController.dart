@@ -4,6 +4,7 @@ import 'package:http/http.dart';
 import 'package:supplychain/services/functions.dart';
 import 'package:supplychain/utils/supply.dart';
 import 'package:supplychain/utils/constants.dart';
+import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:web_socket_channel/io.dart';
 
@@ -100,6 +101,7 @@ class SupplyController extends ChangeNotifier {
       List response = await _client
           .call(contract: _contract, function: _getSupplies, params: []);
       if (response.length == 0) {
+        isLoading = false;
         return;
       }
       List<dynamic> notesList = response[0];
@@ -154,12 +156,14 @@ class SupplyController extends ChangeNotifier {
         isInsuranceAdded: supply[9],
         isCompleted: supply[10],
       );
+      isLoading = false;
+      notifyListeners();
       return newSypply;
     } catch (e) {
+      isLoading = false;
+      notifyListeners();
       print(e);
     }
-    isLoading = false;
-    notifyListeners();
   }
 
   getSuppliesOfUser() async {
@@ -169,8 +173,10 @@ class SupplyController extends ChangeNotifier {
           contract: _contract,
           function: _getUserSupplies,
           params: [EthereumAddress.fromHex(publicKey)]);
+      isLoading = false;
 
       if (response.isEmpty) {
+        isLoading = false;
         return;
       }
       var userSupplyIDList = response[0];
@@ -186,11 +192,12 @@ class SupplyController extends ChangeNotifier {
         var newSupply = await getSupplyByID(supplyID);
         userSupply.add(newSupply);
       }
+      isLoading = false;
+      notifyListeners();
     } catch (e) {
+      isLoading = false;
       print(e);
     }
-    isLoading = false;
-    notifyListeners();
   }
 
   addSupply(String name, double quantity, double temp) async {
@@ -262,6 +269,7 @@ class SupplyController extends ChangeNotifier {
   setTransporter(String id, String transporterAddress) async {
     isLoading = true;
     notifyListeners();
+    getCreadentials();
     _updateGasPrice();
     List<dynamic> args = [
       BigInt.from(int.parse(id)),
@@ -292,7 +300,7 @@ class SupplyController extends ChangeNotifier {
 
   setInsurance(String id, String insuranceAddress) async {
     isLoading = true;
-    notifyListeners();
+    getCreadentials();
     _updateGasPrice();
     List<dynamic> args = [
       BigInt.from(int.parse(id)),
@@ -311,12 +319,13 @@ class SupplyController extends ChangeNotifier {
         chainId: 5,
       );
 
+      isLoading = false;
+      notifyListeners();
       return response;
     } catch (e) {
-      print("Error while selecting Transporter : ${e.toString()}");
+      isLoading = false;
+      print("Error while selecting Insurence : ${e.toString()}");
     }
-    isLoading = false;
-    notifyListeners();
   }
 
   getSubscribers(BigInt id, String userType) async {
@@ -350,7 +359,5 @@ class SupplyController extends ChangeNotifier {
         return "Not selected";
       }
     }
-    isLoading = false;
-    notifyListeners();
   }
 }

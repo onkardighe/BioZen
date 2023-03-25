@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:supplychain/pages/ListCards.dart';
 import 'package:supplychain/utils/AlertBoxes.dart';
 import '../utils/supply.dart';
 import 'package:provider/provider.dart';
@@ -367,6 +368,51 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
                       ),
                     ],
                   )),
+          userType == insuranceAuthority || userType == transportAuthority
+              ? TextButton(
+                  onPressed: () async {
+                    // for Insurence Authority
+                    if (userType == insuranceAuthority) {
+                      var suppliesForCurrentInsuer =
+                          await DatabaseService.getSupplyIDsOfSelectedUser(
+                              publicKey,
+                              type: insuranceAuthority);
+
+                      await displayListSpecificSupplies(
+                          context, suppliesForCurrentInsuer, "Secure supply");
+                    } else {
+                      // for Transport Authority
+                      var suppliesForCurrentTransporter =
+                          await DatabaseService.getSupplyIDsOfSelectedUser(
+                              publicKey,
+                              type: transportAuthority);
+                      await displayListSpecificSupplies(context,
+                          suppliesForCurrentTransporter, "Select Package");
+                      // print(suppliesForCurrentTransporter);
+                    }
+                  },
+                  style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)))),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Icon(
+                        Icons.post_add_sharp,
+                        size: 25,
+                        color: Colors.white,
+                      ),
+                      Text(
+                        "Explore Supply",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13),
+                      ),
+                    ],
+                  ))
+              : SizedBox(),
         ],
       ),
     );
@@ -494,7 +540,7 @@ class _packageCardState extends State<packageCard> {
       buyerName = "Not selected",
       transporterName = "Not selected",
       insuranceName = "Not selected";
-  late String userType;
+  late String userType = '';
 
   @override
   void initState() {
@@ -895,10 +941,16 @@ class _packageCardState extends State<packageCard> {
                                             var transporter =
                                                 await displayAllTransporters(
                                                     context);
+                                            print("Transporter : $transporter");
                                             if (transporter != null) {
-                                              addNewTransporter(supply.id,
+                                              DatabaseService.selectTransporter(
+                                                  supply.id,
                                                   transporter['publicAddress']);
                                             }
+                                            // if (transporter != null) {
+                                            //   addNewTransporter(supply.id,
+                                            //       transporter['publicAddress']);
+                                            // }
                                           },
                                           style: ButtonStyle(
                                               backgroundColor:
@@ -911,6 +963,7 @@ class _packageCardState extends State<packageCard> {
                                                 TextStyle(color: Colors.white),
                                           )),
                                   !supply.isBuyerAdded ||
+                                          !supply.isTransporterAdded ||
                                           supply.isInsuranceAdded ||
                                           userType != fuelCompany
                                       ? SizedBox()
@@ -920,7 +973,8 @@ class _packageCardState extends State<packageCard> {
                                                 await displayAllInsurers(
                                                     context);
                                             if (insurer != null) {
-                                              addNewInsurance(supply.id,
+                                              DatabaseService.selectInsurer(
+                                                  supply.id,
                                                   insurer['publicAddress']);
                                             }
                                           },
@@ -965,12 +1019,12 @@ class _packageCardState extends State<packageCard> {
     }
   }
 
-  void addNewInsurance(String id, String address) async {
-    String? setBuyerresponse = await supplyController.setInsurance(id, address);
-    if (mounted) {
-      await checkResponse(setBuyerresponse, context, supplyController);
-    }
-  }
+  // void addNewInsurance(String id, String address) async {
+  //   String? setBuyerresponse = await supplyController.setInsurance(id, address);
+  //   if (mounted) {
+  //     await checkResponse(setBuyerresponse, context, supplyController);
+  //   }
+  // }
 
   Widget addSpacing() {
     if (!openedCard) {
