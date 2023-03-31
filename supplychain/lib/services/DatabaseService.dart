@@ -128,10 +128,62 @@ class DatabaseService {
     }
   }
 
-  static getSupplyIDsOfSelectedUser(String publicAddressUser, {required String type}) async {
-    var docRef = FirebaseFirestore.instance
-        .collection('selectedUsers')
-        .doc(type);
+  static verifySupplyToComplete(String supplyId, String type) async {
+    var docRef =
+        FirebaseFirestore.instance.collection('completed').doc(supplyId);
+
+    var doc = await docRef.get();
+
+    var fieldsValue = Map<String, dynamic>();
+
+    var field;
+    if (type == fuelCompany) {
+      fieldsValue.addAll({"buyerReceived": true});
+    } else if (type == supplier) {
+      fieldsValue.addAll({"markedAsCompleted": true});
+    } else if (type == transportAuthority) {
+      fieldsValue.addAll({
+        "buyerReceived": false,
+        "markedAsCompleted": false,
+        "transportDelivered": true,
+        "insurerVerified": false,
+        "completedAt": DateTime.now().toString()
+      });
+    } else if (type == insuranceAuthority) {
+      fieldsValue.addAll({"insurerVerified": true});
+    } else {
+      return false;
+    }
+
+    // var checks = type == transportAuthority
+    //     ? {field: true, "completedAt": DateTime.now().toString()}
+    //     : {field: true};
+
+    if (doc.exists) {
+      await docRef.update(fieldsValue);
+    } else {
+      await docRef.set({field: true});
+    }
+    return true;
+  }
+
+  static getSupplydeliveryStatus(String supplyId) async {
+    var docData = await FirebaseFirestore.instance
+        .collection('completed')
+        .doc(supplyId)
+        .get();
+    if (!docData.exists) {
+      return null;
+    }
+    return  docData.data() as Map<String, dynamic>;
+    
+    // print(data.toString());
+  }
+
+  static getSupplyIDsOfSelectedUser(String publicAddressUser,
+      {required String type}) async {
+    var docRef =
+        FirebaseFirestore.instance.collection('selectedUsers').doc(type);
     var data = await docRef.get();
     late var userData = <String, dynamic>{};
     if (data.data() != null) {
@@ -142,20 +194,35 @@ class DatabaseService {
         },
       );
     }
+
     return userData.keys;
   }
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////  BIDDING PROCESS ///////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  static void makeBid(String supplyId, String address, int price) async {
-    var dbSnap = FirebaseFirestore.instance.collection('bids').doc(supplyId);
+  static void makeBid(
+      String supplyId, String address, int price, String destination) async {
+    var dbSnap = FirebaseFirestore.instance
+        .collection('bids')
+        .doc('buyerBids')
+        .collection(supplyId)
+        .doc(address);
     var doc = await dbSnap.get();
 
     if (doc.exists) {
-      await dbSnap.update({address: price});
+      await dbSnap.update({
+        'bidderAddress': address,
+        'bidPrice': price,
+        'destination': destination
+      });
     } else {
-      await dbSnap.set({address: price});
+      await dbSnap.set({
+        'bidderAddress': address,
+        'bidPrice': price,
+        'destination': destination
+      });
     }
   }
 
@@ -175,15 +242,31 @@ class DatabaseService {
     }
   }
 
-  static Future<Map> getBidders(String supplyId) async {
-    var biddedSupplies =
-        FirebaseFirestore.instance.collection('bids').doc(supplyId);
-    var doc = await biddedSupplies.get();
+  static getBidders(String supplyId) async {
+    var supplyBidders = FirebaseFirestore.instance
+        .collection('bids')
+        .doc('buyerBids')
+        .collection(supplyId);
+    var doc = await supplyBidders.get();
 
-    if (doc.exists) {
-      var docList = doc.data() as Map<String, dynamic>;
-      return docList;
+    if (doc.docs.isNotEmpty) {
+      var res = doc.docs.asMap();
+
+      return res;
     }
-    return Map<String, dynamic>();
+    return null;
+  }
+
+  static getRating({required String address}) async {
+    String uid = await getUidByPublicAddress(address);
+
+    var userData =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    var user = userData.data();
+    if (user != null) {
+      return user['rating'] / user['ratingNumber'];
+    }
+
+    return null;
   }
 }

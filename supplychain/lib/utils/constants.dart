@@ -12,7 +12,8 @@ String privateKey = '';
 String publicKey = '0xc6657756dbd79B760Bd27298cd6eB6B040946097';
 
 // String deployedContractAddress = '0xf0cE6395B1369cd471408Bd7eFCB7ebbbc2e764b';
-String deployedContractAddress = '0x2f5EC9271236C698C8f077ee2f6722A719244fE4';
+// String deployedContractAddress = '0x2f5EC9271236C698C8f077ee2f6722A719244fE4';
+String deployedContractAddress = '0xa3536C49B1A01FE8B91f29857846f1851c249519';
 
 bool privateKeyLinked = false;
 

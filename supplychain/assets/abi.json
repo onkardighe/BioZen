@@ -10,9 +10,50 @@
 				"internalType": "address",
 				"name": "_buyerAddress",
 				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "destinationLocation",
+				"type": "string"
 			}
 		],
 		"name": "addBuyer",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "currentLocation",
+				"type": "string"
+			}
+		],
+		"name": "addCurrentLocation",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "destinationLocation",
+				"type": "string"
+			}
+		],
+		"name": "addDestination",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -60,6 +101,11 @@
 			{
 				"internalType": "string",
 				"name": "_createdAt",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "sourceLocation",
 				"type": "string"
 			}
 		],
@@ -111,6 +157,62 @@
 				"internalType": "uint256",
 				"name": "id",
 				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "timeCompleted",
+				"type": "string"
+			}
+		],
+		"name": "completeSupply",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "completedAt",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "destinationList",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
 			}
 		],
 		"name": "getBuyer",
@@ -132,12 +234,50 @@
 				"type": "uint256"
 			}
 		],
+		"name": "getDestination",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			}
+		],
 		"name": "getInsurance",
 		"outputs": [
 			{
 				"internalType": "address",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"name": "getLocationHistory",
+		"outputs": [
+			{
+				"internalType": "string[]",
+				"name": "",
+				"type": "string[]"
 			}
 		],
 		"stateMutability": "view",
@@ -349,6 +489,30 @@
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "locationHistory",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "",
 				"type": "address"
@@ -485,6 +649,25 @@
 				"internalType": "address",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"name": "whenCompleted",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
 			}
 		],
 		"stateMutability": "view",

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:supplychain/services/DatabaseService.dart';
+import 'package:supplychain/services/functions.dart';
 import 'package:supplychain/services/supplyController.dart';
 import 'package:supplychain/utils/AlertBoxes.dart';
 import 'package:supplychain/utils/appTheme.dart';
@@ -128,6 +130,7 @@ class _UserSupplyListCardState extends State<UserSupplyListCard> {
           addedList.add(supplyId);
         }
       }
+
       toCreateSupplyList.add(s);
     }
     print("Supplies : ${toCreateSupplyList.toString()}");
@@ -706,14 +709,14 @@ class _UserListCard extends State<UserListCard> {
     super.initState();
   }
 
-  _fetchList() {
-    for (var element in users) {
+  _fetchList() async {
+    for (var user in users) {
       userCards.add(GestureDetector(
         onTap: () {
           setState(() {
-            response = element;
+            response = user;
             selected = true;
-            currentSelected = element['name'];
+            currentSelected = user['name'];
           });
         },
         child: Padding(
@@ -721,16 +724,16 @@ class _UserListCard extends State<UserListCard> {
           child: Container(
             padding: EdgeInsets.all(10),
             width: 250,
-            height: 80,
+            // height: 80,
             decoration: BoxDecoration(
                 gradient: AppTheme().themeGradient,
                 borderRadius: BorderRadius.circular(8)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Text(
-                  element['name'],
+                  user['name'],
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 17,
@@ -740,12 +743,29 @@ class _UserListCard extends State<UserListCard> {
                   height: 10,
                 ),
                 Text(
-                  element['email'],
+                  user['email'],
                   style: TextStyle(
                       color: Colors.white54,
                       fontSize: 13,
                       fontWeight: FontWeight.bold),
-                )
+                ),
+
+                SizedBox(
+                  height: 10,
+                ),
+                Divider(
+                  thickness: 1,
+                  height: 5,
+                  color: AppTheme.secondaryColor,
+                ),
+                // ------------------- STARS ------------------------------
+                Container(
+                  padding: EdgeInsets.only(top: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: getStarListFromRatings(user['rating'], 25.0),
+                  ),
+                ),
               ],
             ),
           ),
@@ -890,6 +910,8 @@ class _BidderListCard extends State<BidderListCard> {
   bool selected = false;
   late String currentSelected;
   late var response = null;
+  late var dest = null;
+  late var amount = null;
   @override
   void initState() {
     bidders = widget._bidders;
@@ -899,14 +921,20 @@ class _BidderListCard extends State<BidderListCard> {
   }
 
   _fetchList() {
-    bidders.forEach((userAddress, bidAmount) async {
-      var bidderName = await DatabaseService().getNameByAddress(userAddress);
+    bidders.forEach((id, bid) async {
+      var bidderName =
+          await DatabaseService().getNameByAddress(bid['bidderAddress']);
+      var rating =
+          await DatabaseService.getRating(address: bid['bidderAddress']);
+      print("res : $rating");
       setState(() {
         userCards.add(GestureDetector(
-          onTap: () {
+          onTap: () async {
             setState(() {
-              response = userAddress;
               selected = true;
+              response = bid['bidderAddress'];
+              dest = bid['destination'];
+              amount = bid['bidPrice'];
               currentSelected = bidderName!;
             });
           },
@@ -915,28 +943,25 @@ class _BidderListCard extends State<BidderListCard> {
             child: Container(
               padding: EdgeInsets.all(10),
               width: 250,
-              height: 80,
               decoration: BoxDecoration(
                   gradient: AppTheme().themeGradient,
                   borderRadius: BorderRadius.circular(8)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Text(
-                    "${bidderName}",
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  Divider(
-                    thickness: 1,
-                    height: 15,
-                    color: Colors.white30,
+                  Container(
+                    padding: EdgeInsets.only(bottom: 10),
+                    child: Text(
+                      "${bidderName}",
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 19,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         "Amount :",
@@ -946,14 +971,49 @@ class _BidderListCard extends State<BidderListCard> {
                             fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        "${bidAmount} ₹",
+                        "${bid['bidPrice']} ₹",
+                        style: TextStyle(
+                            color: AppTheme.secondaryColor,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Destination :",
+                        style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        "${bid['destination']}",
                         style: TextStyle(
                             color: Colors.white54,
                             fontSize: 13,
                             fontWeight: FontWeight.bold),
                       ),
                     ],
-                  )
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Divider(
+                    thickness: 1,
+                    height: 5,
+                    color: AppTheme.secondaryColor,
+                  ),
+                  // ------------------- STARS ------------------------------
+                  Container(
+                    padding: EdgeInsets.only(top: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: getStarListFromRatings(rating, 25.0),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -1037,7 +1097,11 @@ class _BidderListCard extends State<BidderListCard> {
                               onPressed: () {
                                 if (selected) {
                                   Navigator.of(context, rootNavigator: true)
-                                      .pop(response);
+                                      .pop({
+                                    "address": response,
+                                    "destination": dest,
+                                    "amount": amount
+                                  });
                                 }
                               },
                               style: ButtonStyle(

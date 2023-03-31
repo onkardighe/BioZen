@@ -112,11 +112,16 @@ class _HomePageState extends State<HomePage> {
                         ))
                     : SizedBox()
               ],
-              title: Text(
-                "Suppy Chain",
-                style: TextStyle(
-                  color: Colors.white,
-                ),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Biozen",
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             )
           : null,

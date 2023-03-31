@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supplychain/pages/ListCards.dart';
@@ -165,6 +167,7 @@ class _CompletedListState extends State<CompletedList> {
   }
 
   fetchCompletedSupplies(List<Supply> userSupplyList) {
+    completedSupplyList.clear();
     for (var supply in userSupplyList) {
       if (supply.isCompleted) {
         completedSupplyList.add(supply);
@@ -326,7 +329,7 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
                               borderRadius: BorderRadius.circular(20)))),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
+                    children: const [
                       Icon(
                         Icons.post_add_sharp,
                         size: 25,
@@ -353,7 +356,7 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
                               borderRadius: BorderRadius.circular(20)))),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
+                    children: const [
                       Icon(
                         Icons.post_add_sharp,
                         size: 25,
@@ -377,6 +380,7 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
                           await DatabaseService.getSupplyIDsOfSelectedUser(
                               publicKey,
                               type: insuranceAuthority);
+                      // print(suppliesForCurrentInsuer);
 
                       await displayListSpecificSupplies(
                           context, suppliesForCurrentInsuer, "Secure supply");
@@ -397,7 +401,7 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
                               borderRadius: BorderRadius.circular(20)))),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
+                    children: const [
                       Icon(
                         Icons.post_add_sharp,
                         size: 25,
@@ -469,17 +473,27 @@ class OngoingList extends StatefulWidget {
 class _OngoingListState extends State<OngoingList> {
   ScrollController _cardScrollController = new ScrollController();
   late SupplyController supplyController;
-  late List<Supply> supplyList;
+  List<Supply> supplyList = [];
 
   @override
   void initState() {
     super.initState();
   }
 
+  fetchOngoingSupplies(List<Supply> userSupplyList) {
+    supplyList.clear();
+    for (var supply in userSupplyList) {
+      if (!supply.isCompleted) {
+        supplyList.add(supply);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     supplyController = Provider.of<SupplyController>(context, listen: true);
-    supplyList = supplyController.userSupply;
+    fetchOngoingSupplies(supplyController.userSupply);
+    // supplyList = ;
     return Expanded(
       child: Container(
         color: Colors.grey.shade200,
@@ -536,11 +550,18 @@ class _packageCardState extends State<packageCard> {
   late bool openedCard;
   late ScrollController cardController;
   late SupplyController supplyController;
+  bool insuranceSelected = false;
   late String? supplierName = "Not selected",
       buyerName = "Not selected",
       transporterName = "Not selected",
       insuranceName = "Not selected";
+  late List locationHistoryList = [];
+  late String? sourceLocation = "Not selected",
+      destination = "Not selected",
+      currentLocation = sourceLocation;
   late String userType = '';
+  var supplyDeliveryChecks = Map<String, dynamic>();
+  bool showCompleteButton = false;
 
   @override
   void initState() {
@@ -550,16 +571,73 @@ class _packageCardState extends State<packageCard> {
     openedCard = false;
     cardController = widget._cardController;
     fetchSupplyData();
+    fetchSupplyDeliveryData();
 
     super.initState();
+  }
+
+  void fetchSupplyDeliveryData() async {
+    // supplyDeliveryChecks =
+
+    await DatabaseService()
+        .fetchDataOfUser(user.uid, 'type')
+        .then((UserType) async {
+      userType = UserType!;
+      await DatabaseService.getSupplydeliveryStatus(supply.id).then((check) {
+        if (check['markedAsCompleted']) {
+          // if already completed
+          showCompleteButton = false;
+        } else if (userType == transportAuthority) {
+          // not completed
+          showCompleteButton = !check['transportDelivered'];
+        } else if (userType == fuelCompany) {
+          showCompleteButton =
+              check['transportDelivered'] && !check['buyerReceived'];
+        } else if (userType == insuranceAuthority) {
+          showCompleteButton = check['buyerReceived'] &&
+              check['transportDelivered'] &&
+              !check['insurerVerified'];
+        } else if (userType == supplier) {
+          // for supplier
+          showCompleteButton = check['buyerReceived'] &&
+              check['transportDelivered'] &&
+              check['insurerVerified'];
+        }
+        print("__________$userType");
+        print("$showCompleteButton   = ${check['transportDelivered']}");
+        print(check);
+      });
+    });
+
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void fetchSupplyData() async {
     supplierName = await DatabaseService()
         .getNameByAddress(supply.supplierAddress.hexEip55);
-    await DatabaseService()
-        .fetchDataOfUser(user.uid, 'type')
-        .then((userTypeResponse) => {userType = userTypeResponse!});
+
+    //getting location history
+    await supplyController
+        .getLocationHistory(BigInt.parse(supply.id))
+        .then((response) {
+      if (response != null) {
+        locationHistoryList = response;
+        sourceLocation = locationHistoryList.first;
+        currentLocation = locationHistoryList.last;
+      }
+    });
+
+    // getting destination
+    await supplyController
+        .getDestination(BigInt.parse(supply.id))
+        .then((response) {
+      if (response != null) {
+        destination = response;
+        // print(response);
+      }
+    });
 
     //getBuyer
     if (supply.isBuyerAdded) {
@@ -633,7 +711,7 @@ class _packageCardState extends State<packageCard> {
               height: height,
               width: width,
               padding: EdgeInsets.only(right: 15),
-              decoration: BoxDecoration(boxShadow: [
+              decoration: BoxDecoration(boxShadow: const [
                 BoxShadow(
                     color: Colors.black26,
                     blurRadius: 10,
@@ -647,7 +725,8 @@ class _packageCardState extends State<packageCard> {
                       width: 5,
                       height: height - 3,
                       decoration: BoxDecoration(
-                          color: Colors.amber,
+                          color:
+                              supply.isCompleted ? Colors.green : Colors.amber,
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(90),
                               bottomLeft: Radius.circular(90)))),
@@ -698,7 +777,7 @@ class _packageCardState extends State<packageCard> {
                         SizedBox(
                           height: 5,
                         ),
-                        addSpacing(),
+                        openedCard ? addSpacing() : SizedBox(),
                         openedCard
                             ? Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -739,7 +818,7 @@ class _packageCardState extends State<packageCard> {
                                 ],
                               )
                             : SizedBox(),
-                        addSpacing(),
+                        openedCard ? addSpacing() : SizedBox(),
                         openedCard
                             ? Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -758,7 +837,7 @@ class _packageCardState extends State<packageCard> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("From : ",
+                                  Text("Supplier : ",
                                       style: TextStyle(
                                           color: Colors.grey.shade700)),
                                   Text(supplierName ?? "Supplier",
@@ -772,7 +851,7 @@ class _packageCardState extends State<packageCard> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("To : ",
+                                  Text("Buyer : ",
                                       style: TextStyle(
                                           color: Colors.grey.shade700)),
                                   Text(
@@ -836,7 +915,73 @@ class _packageCardState extends State<packageCard> {
                                         TextStyle(color: Colors.grey.shade700))
                           ],
                         ),
-                        addSpacing(),
+                        openedCard ? addSpacing() : SizedBox(),
+                        // Column(
+                        //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        //   crossAxisAlignment: CrossAxisAlignment.start,
+                        //   children: [
+                        openedCard
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Location Details",
+                                    style: TextStyle(
+                                        color: Colors.grey.shade700,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              )
+                            : SizedBox(),
+                        openedCard
+                            ? Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "From : ",
+                                    style:
+                                        TextStyle(color: Colors.grey.shade700),
+                                  ),
+                                  Text(sourceLocation!,
+                                      style: TextStyle(
+                                          color: Colors.grey.shade700))
+                                ],
+                              )
+                            : SizedBox(),
+                        supply.isBuyerAdded && openedCard
+                            ? Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "To : ",
+                                    style:
+                                        TextStyle(color: Colors.grey.shade700),
+                                  ),
+                                  Text(destination!,
+                                      style: TextStyle(
+                                          color: Colors.grey.shade700))
+                                ],
+                              )
+                            : SizedBox(),
+                        !supply.isCompleted
+                            ? Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Current Location : ",
+                                    style:
+                                        TextStyle(color: Colors.grey.shade700),
+                                  ),
+                                  Text(currentLocation!,
+                                      style: TextStyle(
+                                          color: Colors.grey.shade700))
+                                ],
+                              )
+                            : SizedBox(),
+                        openedCard ? SizedBox(height: 10) : SizedBox(),
                         SizedBox(
                           height: !openedCard ? 15 : 0,
                         ),
@@ -896,7 +1041,7 @@ class _packageCardState extends State<packageCard> {
                             ),
                           ],
                         ),
-                        addSpacing(),
+                        openedCard ? addSpacing() : SizedBox(),
                         openedCard
                             ? Row(
                                 mainAxisAlignment:
@@ -908,18 +1053,23 @@ class _packageCardState extends State<packageCard> {
                                             ? SizedBox()
                                             : TextButton(
                                                 onPressed: () async {
-                                                  var bidder =
+                                                  var bidderDetails =
                                                       await displayAllBidders(
                                                           context, supply.id);
-                                                  if (bidder != null) {
+                                                  if (bidderDetails != null) {
                                                     addNewBuyer(
-                                                        supply.id, bidder);
+                                                        supply.id,
+                                                        bidderDetails[
+                                                            'address'],
+                                                        bidderDetails[
+                                                            'destination']);
                                                   }
                                                 },
                                                 style: ButtonStyle(
                                                     backgroundColor:
                                                         MaterialStatePropertyAll<
-                                                            Color>(Colors.red)),
+                                                                Color>(
+                                                            Colors.amber)),
                                                 child: Text(
                                                   "Select Buyer",
                                                   style: TextStyle(
@@ -929,8 +1079,7 @@ class _packageCardState extends State<packageCard> {
                             : SizedBox(),
                         openedCard
                             ? Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   !supply.isBuyerAdded ||
                                           supply.isTransporterAdded ||
@@ -947,6 +1096,8 @@ class _packageCardState extends State<packageCard> {
                                                   supply.id,
                                                   transporter['publicAddress']);
                                             }
+                                            showRawAlert(context,
+                                                "${transporter['name']}\nSelected as Transporter\nWaiting for their Response !");
                                             // if (transporter != null) {
                                             //   addNewTransporter(supply.id,
                                             //       transporter['publicAddress']);
@@ -955,7 +1106,7 @@ class _packageCardState extends State<packageCard> {
                                           style: ButtonStyle(
                                               backgroundColor:
                                                   MaterialStatePropertyAll<
-                                                      Color>(Colors.red)),
+                                                      Color>(Colors.amber)),
                                           child: Text(
                                             "Select Transporter",
                                             overflow: TextOverflow.ellipsis,
@@ -972,24 +1123,136 @@ class _packageCardState extends State<packageCard> {
                                             var insurer =
                                                 await displayAllInsurers(
                                                     context);
+
                                             if (insurer != null) {
-                                              DatabaseService.selectInsurer(
-                                                  supply.id,
-                                                  insurer['publicAddress']);
+                                              await DatabaseService
+                                                  .selectInsurer(supply.id,
+                                                      insurer['publicAddress']);
+                                              await showRawAlert(context,
+                                                  "Selected ${insurer['name']}\nas Insurer ! ");
+                                            }
+                                            if (mounted) {
+                                              setState(() {
+                                                insuranceSelected = true;
+                                              });
                                             }
                                           },
                                           style: ButtonStyle(
                                               backgroundColor:
                                                   MaterialStatePropertyAll<
-                                                      Color>(Colors.red)),
+                                                          Color>(
+                                                      insuranceSelected
+                                                          ? Colors.grey
+                                                          : Colors.amber)),
                                           child: Text(
                                             "Select Insurance",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          )),
+                                  userType != transportAuthority ||
+                                          !supply.isTransporterAdded
+                                      ? SizedBox()
+                                      : TextButton(
+                                          onPressed: () async {
+                                            if (!supply.isInsuranceAdded) {
+                                              var buyer = await showRawAlert(
+                                                  context,
+                                                  "Waiting for ${buyerName!.contains("Not selected") ? "buyer" : buyerName}\nto add insurance ");
+                                            } else {
+                                              var updated = await AlertBoxes
+                                                  .showAlertForUpdateLocation(
+                                                      context,
+                                                      supplyController,
+                                                      supply);
+                                              if (updated != null) {
+                                                print("Updaed : $updated");
+                                                return await showRawAlert(
+                                                    context,
+                                                    "Updated Successfully !\n");
+                                              } else {
+                                                print("Got : $updated");
+                                              }
+                                            }
+                                          },
+                                          style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStatePropertyAll<
+                                                          Color>(
+                                                      supply.isInsuranceAdded
+                                                          ? Colors.amber
+                                                          : Colors.grey)),
+                                          child: Text(
+                                            "Update Location",
                                             style:
                                                 TextStyle(color: Colors.white),
                                           )),
                                 ],
                               )
                             : SizedBox(),
+                        !openedCard || !supply.isInsuranceAdded
+                            ? SizedBox()
+                            : !showCompleteButton
+                                ? SizedBox()
+                                : Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      TextButton(
+                                          onPressed: () async {
+                                            if (userType == supplier) {
+                                              // if supplier - > chenges on BCT
+                                              await supplyController
+                                                  .completeSupply(supply.id,
+                                                      DateTime.now().toString())
+                                                  .then((res) async {
+                                                if (res == null ||
+                                                    res.contains('Error')) {
+                                                  // Error Found
+                                                  await showRawAlert(context,
+                                                      'Error !! Try again !');
+                                                } else {
+                                                  await DatabaseService
+                                                          .verifySupplyToComplete(
+                                                              supply.id,
+                                                              userType)
+                                                      .then((DBres) async {
+                                                    await showRawAlert(context,
+                                                        'Supply Completed !!');
+                                                  });
+                                                }
+                                              });
+                                            } else {
+                                              await DatabaseService
+                                                  .verifySupplyToComplete(
+                                                      supply.id, userType);
+
+                                              if (mounted) {
+                                                await showRawAlert(context,
+                                                    'Supply Completed !');
+                                                setState(() {
+                                                  showCompleteButton = false;
+                                                });
+                                              }
+                                            }
+                                          },
+                                          style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStatePropertyAll<
+                                                      Color>(Colors.amber)),
+                                          child: Text(
+                                            userType == transportAuthority
+                                                ? "Deliver Supply"
+                                                : userType == insuranceAuthority
+                                                    ? "Verify Supply"
+                                                    : userType == fuelCompany
+                                                        ? "Supply Received"
+                                                        : userType == supplier
+                                                            ? "Mark Supply Completed"
+                                                            : "",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          )),
+                                    ],
+                                  )
                       ],
                     ),
                   ),
@@ -1002,8 +1265,10 @@ class _packageCardState extends State<packageCard> {
     );
   }
 
-  void addNewBuyer(String id, String address) async {
-    String? setBuyerresponse = await supplyController.setBuyer(id, address);
+  void addNewBuyer(String id, String address, String destination) async {
+    print("Address : $address \n destination : $destination");
+    String? setBuyerresponse =
+        await supplyController.setBuyer(id, address, destination);
 
     if (mounted) {
       await checkResponse(setBuyerresponse, context, supplyController);
@@ -1016,26 +1281,6 @@ class _packageCardState extends State<packageCard> {
 
     if (mounted) {
       await checkResponse(setTransporterresponse, context, supplyController);
-    }
-  }
-
-  // void addNewInsurance(String id, String address) async {
-  //   String? setBuyerresponse = await supplyController.setInsurance(id, address);
-  //   if (mounted) {
-  //     await checkResponse(setBuyerresponse, context, supplyController);
-  //   }
-  // }
-
-  Widget addSpacing() {
-    if (!openedCard) {
-      return SizedBox(
-        height: 0,
-      );
-    } else {
-      return Container(
-        height: 2,
-        color: Colors.grey.shade100,
-      );
     }
   }
 }

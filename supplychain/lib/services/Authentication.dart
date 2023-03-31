@@ -83,8 +83,13 @@ class Authentication {
     var doc = await userSnap.get();
 
     if (!doc.exists) {
-      await userSnap.set(
-          {'email': email, 'name': name, 'publicAddress': publicWalletAddress});
+      await userSnap.set({
+        'email': email,
+        'name': name,
+        'publicAddress': publicWalletAddress,
+        'rating': 4,
+        'ratingNumber': 1
+      });
     }
   }
 

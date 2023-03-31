@@ -25,6 +25,7 @@ class _ProfilePageState extends State<ProfilePage> {
   var privateWalletAddress = '';
   late String? publicWalletAddress = '';
   var copyIcon = Icon(Icons.copy_rounded);
+  double ratings = 0.0;
 
   @override
   void initState() {
@@ -44,8 +45,14 @@ class _ProfilePageState extends State<ProfilePage> {
     userType = await DatabaseService().fetchDataOfUser(uid, 'type') ?? "";
     privateKey =
         await DatabaseService().fetchDataOfUser(uid, 'privateAddress') ?? "";
-    publicWalletAddress =
-        await DatabaseService().fetchDataOfUser(uid, 'publicAddress');
+    await DatabaseService()
+        .fetchDataOfUser(uid, 'publicAddress')
+        .then((address) async {
+      if (address != null && !address.contains("Error")) {
+        publicWalletAddress = address;
+        ratings = await DatabaseService.getRating(address: address);
+      }
+    });
 
     if (this.mounted) {
       setState(() {});
@@ -110,7 +117,6 @@ class _ProfilePageState extends State<ProfilePage> {
           body: Container(
             decoration: BoxDecoration(
               gradient: AppTheme().themeGradient,
-              // gradient: AppTheme().themeGradient,
             ),
             child: SafeArea(
               child: Column(
@@ -122,6 +128,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         "https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png"),
                   ),
                   SizedBox(height: 10.0),
+                  // ------------------- NAME ----------------------------------
                   Text(
                     userName,
                     style: TextStyle(
@@ -131,7 +138,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         color: Colors.white,
                         overflow: TextOverflow.clip),
                   ),
-                  SizedBox(height: 15),
+                  // ------------------- TYPE ----------------------------------
                   Text(
                     this.userType,
                     style: TextStyle(
@@ -147,7 +154,21 @@ class _ProfilePageState extends State<ProfilePage> {
                     height: 30.0,
                     width: 150.0,
                     child: Divider(
-                      color: Colors.teal[100],
+                      color: AppTheme.secondaryColor,
+                    ),
+                  ),
+                  // ------------------- RATINGS ----------------------------------
+                  SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: getStarListFromRatings(ratings, 30.0),
+                  ),
+                  SizedBox(height: 15),
+                  SizedBox(
+                    height: 30.0,
+                    width: 150.0,
+                    child: Divider(
+                      color: AppTheme.secondaryColor,
                     ),
                   ),
                   Card(
@@ -253,8 +274,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         title: isPrivateAddressLinked
                             ? Text(
-                                publicWalletAddress != null &&
-                                        publicWalletAddress!.trim().isNotEmpty
+                                privateWalletAddress.trim().isNotEmpty
                                     ? privateWalletAddress.length <= 8
                                         ? privateWalletAddress
                                         : "${privateWalletAddress.substring(0, 8)}*************${privateWalletAddress.substring(privateWalletAddress.length - 5, privateWalletAddress.length)} "
@@ -292,7 +312,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     height: 30.0,
                     width: 150.0,
                     child: Divider(
-                      color: Colors.teal[100],
+                      color: AppTheme.secondaryColor,
                     ),
                   ),
                   Spacer(),
