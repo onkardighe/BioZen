@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:supplychain/pages/ListCards.dart';
+// import 'package:supplychain/pages/ListCards.dart';
 import 'package:supplychain/utils/AlertBoxes.dart';
 import '../utils/supply.dart';
 import 'package:provider/provider.dart';
@@ -555,13 +555,14 @@ class _packageCardState extends State<packageCard> {
       buyerName = "Not selected",
       transporterName = "Not selected",
       insuranceName = "Not selected";
+  String transporterAddress = "", insurerAddress = "", fuelCompanyAddress = "";
   late List locationHistoryList = [];
   late String? sourceLocation = "Not selected",
       destination = "Not selected",
       currentLocation = sourceLocation;
   late String userType = '';
   var supplyDeliveryChecks = Map<String, dynamic>();
-  bool showCompleteButton = false;
+  bool showCompleteButton = false, showlocationinfo = false;
 
   @override
   void initState() {
@@ -626,6 +627,7 @@ class _packageCardState extends State<packageCard> {
         locationHistoryList = response;
         sourceLocation = locationHistoryList.first;
         currentLocation = locationHistoryList.last;
+        showlocationinfo = true;
       }
     });
 
@@ -635,6 +637,7 @@ class _packageCardState extends State<packageCard> {
         .then((response) {
       if (response != null) {
         destination = response;
+        showlocationinfo = true;
         // print(response);
       }
     });
@@ -644,6 +647,7 @@ class _packageCardState extends State<packageCard> {
       await supplyController
           .getSubscribers(BigInt.parse(supply.id), fuelCompany)
           .then((responseAddress) async {
+        fuelCompanyAddress = responseAddress.hexEip55;
         buyerName =
             await DatabaseService().getNameByAddress(responseAddress.hexEip55);
         if (mounted) {
@@ -660,6 +664,8 @@ class _packageCardState extends State<packageCard> {
         if (responseAddress == null) {
           return;
         }
+        transporterAddress = responseAddress.hexEip55;
+
         transporterName =
             await DatabaseService().getNameByAddress(responseAddress.hexEip55);
         if (mounted) {
@@ -676,6 +682,8 @@ class _packageCardState extends State<packageCard> {
         if (responseAddress == null) {
           return;
         }
+        insurerAddress = responseAddress.hexEip55;
+
         insuranceName =
             await DatabaseService().getNameByAddress(responseAddress.hexEip55);
         if (mounted) {
@@ -916,22 +924,43 @@ class _packageCardState extends State<packageCard> {
                           ],
                         ),
                         openedCard ? addSpacing() : SizedBox(),
-                        // Column(
-                        //   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        //   crossAxisAlignment: CrossAxisAlignment.start,
-                        //   children: [
                         openedCard
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Location Details",
-                                    style: TextStyle(
-                                        color: Colors.grey.shade700,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              )
+                            ? Stack(children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Location Details",
+                                      style: TextStyle(
+                                          color: Colors.grey.shade700,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                                showlocationinfo
+                                    ? Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () async {
+                                              print("clicked");
+                                              Navigator.of(context).push(
+                                                  AlertBoxes.LocationInfoAlert(
+                                                      context: context,
+                                                      supply: supply,
+                                                      destLocation: destination,
+                                                      history:
+                                                          locationHistoryList));
+                                              ;
+                                            },
+                                            child: Icon(Icons.info,
+                                                color: Colors.grey.shade700),
+                                          ),
+                                        ],
+                                      )
+                                    : SizedBox()
+                              ])
                             : SizedBox(),
                         openedCard
                             ? Row(
@@ -1095,9 +1124,9 @@ class _packageCardState extends State<packageCard> {
                                               DatabaseService.selectTransporter(
                                                   supply.id,
                                                   transporter['publicAddress']);
+                                              showRawAlert(context,
+                                                  "${transporter['name']}\nSelected as Transporter\nWaiting for their Response !");
                                             }
-                                            showRawAlert(context,
-                                                "${transporter['name']}\nSelected as Transporter\nWaiting for their Response !");
                                             // if (transporter != null) {
                                             //   addNewTransporter(supply.id,
                                             //       transporter['publicAddress']);
@@ -1152,40 +1181,42 @@ class _packageCardState extends State<packageCard> {
                                   userType != transportAuthority ||
                                           !supply.isTransporterAdded
                                       ? SizedBox()
-                                      : TextButton(
-                                          onPressed: () async {
-                                            if (!supply.isInsuranceAdded) {
-                                              var buyer = await showRawAlert(
-                                                  context,
-                                                  "Waiting for ${buyerName!.contains("Not selected") ? "buyer" : buyerName}\nto add insurance ");
-                                            } else {
-                                              var updated = await AlertBoxes
-                                                  .showAlertForUpdateLocation(
+                                      : !showCompleteButton
+                                          ? SizedBox()
+                                          : TextButton(
+                                              onPressed: () async {
+                                                if (!supply.isInsuranceAdded) {
+                                                  var buyer = await showRawAlert(
                                                       context,
-                                                      supplyController,
-                                                      supply);
-                                              if (updated != null) {
-                                                print("Updaed : $updated");
-                                                return await showRawAlert(
-                                                    context,
-                                                    "Updated Successfully !\n");
-                                              } else {
-                                                print("Got : $updated");
-                                              }
-                                            }
-                                          },
-                                          style: ButtonStyle(
-                                              backgroundColor:
-                                                  MaterialStatePropertyAll<
-                                                          Color>(
-                                                      supply.isInsuranceAdded
+                                                      "Waiting for ${buyerName!.contains("Not selected") ? "buyer" : buyerName}\nto add insurance ");
+                                                } else {
+                                                  var updated = await AlertBoxes
+                                                      .showAlertForUpdateLocation(
+                                                          context,
+                                                          supplyController,
+                                                          supply);
+                                                  if (updated != null) {
+                                                    print("Updaed : $updated");
+                                                    return await showRawAlert(
+                                                        context,
+                                                        "Updated Successfully !\n");
+                                                  } else {
+                                                    print("Got : $updated");
+                                                  }
+                                                }
+                                              },
+                                              style: ButtonStyle(
+                                                  backgroundColor:
+                                                      MaterialStatePropertyAll<
+                                                          Color>(supply
+                                                              .isInsuranceAdded
                                                           ? Colors.amber
                                                           : Colors.grey)),
-                                          child: Text(
-                                            "Update Location",
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          )),
+                                              child: Text(
+                                                "Update Current Location",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              )),
                                 ],
                               )
                             : SizedBox(),
@@ -1198,6 +1229,28 @@ class _packageCardState extends State<packageCard> {
                                     children: [
                                       TextButton(
                                           onPressed: () async {
+                                            late var addressToRate;
+                                            switch (userType) {
+                                              case "Fuel Company":
+                                                addressToRate =
+                                                    transporterAddress;
+                                                break;
+                                              case "Insurance Authority":
+                                                addressToRate = supply
+                                                    .supplierAddress.hexEip55;
+                                                break;
+                                              case "Transport Authority":
+                                                addressToRate =
+                                                    fuelCompanyAddress;
+                                                break;
+                                              case "Supplier":
+                                                addressToRate = insurerAddress;
+                                                break;
+                                              default:
+                                                addressToRate = supply
+                                                    .supplierAddress.hexEip55;
+                                            }
+
                                             if (userType == supplier) {
                                               // if supplier - > chenges on BCT
                                               await supplyController
@@ -1210,20 +1263,68 @@ class _packageCardState extends State<packageCard> {
                                                   await showRawAlert(context,
                                                       'Error !! Try again !');
                                                 } else {
-                                                  await DatabaseService
-                                                          .verifySupplyToComplete(
-                                                              supply.id,
-                                                              userType)
-                                                      .then((DBres) async {
-                                                    await showRawAlert(context,
-                                                        'Supply Completed !!');
+                                                  // AlertBox for Getting Ratings
+                                                  await AlertBoxes.getRatings(
+                                                          context)
+                                                      .then((ratings) async {
+                                                    await DatabaseService
+                                                            .verifySupplyToComplete(
+                                                                supply.id,
+                                                                userType)
+                                                        .then((res) async {
+                                                      if (ratings == null) {
+                                                        return;
+                                                      }
+
+                                                      // address of transporter
+                                                      if (addressToRate != "") {
+                                                        print(
+                                                            "Ratings got : $ratings");
+                                                        await DatabaseService
+                                                            .updateRating(
+                                                                address:
+                                                                    addressToRate,
+                                                                ratings:
+                                                                    ratings);
+                                                      }
+                                                    });
                                                   });
+
+                                                  if (mounted) {
+                                                    await showRawAlert(context,
+                                                        'Supply Completed !');
+                                                    setState(() {
+                                                      showCompleteButton =
+                                                          false;
+                                                    });
+                                                  }
                                                 }
                                               });
                                             } else {
-                                              await DatabaseService
-                                                  .verifySupplyToComplete(
-                                                      supply.id, userType);
+                                              // AlertBox for Getting Ratings
+                                              await AlertBoxes.getRatings(
+                                                      context)
+                                                  .then((ratings) async {
+                                                await DatabaseService
+                                                        .verifySupplyToComplete(
+                                                            supply.id, userType)
+                                                    .then((res) async {
+                                                  if (ratings == null) {
+                                                    return;
+                                                  }
+
+                                                  // address of transporter
+                                                  if (addressToRate != "") {
+                                                    print(
+                                                        "Ratings got : $ratings");
+                                                    await DatabaseService
+                                                        .updateRating(
+                                                            address:
+                                                                addressToRate,
+                                                            ratings: ratings);
+                                                  }
+                                                });
+                                              });
 
                                               if (mounted) {
                                                 await showRawAlert(context,
@@ -1240,7 +1341,7 @@ class _packageCardState extends State<packageCard> {
                                                       Color>(Colors.amber)),
                                           child: Text(
                                             userType == transportAuthority
-                                                ? "Deliver Supply"
+                                                ? "Mark as Delivered"
                                                 : userType == insuranceAuthority
                                                     ? "Verify Supply"
                                                     : userType == fuelCompany

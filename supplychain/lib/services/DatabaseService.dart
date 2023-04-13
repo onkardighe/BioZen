@@ -128,6 +128,22 @@ class DatabaseService {
     }
   }
 
+  static addSupplyToDB(String supplyId, String currDateTime) async {
+    var docRef =
+        FirebaseFirestore.instance.collection('completed').doc(supplyId);
+    var doc = await docRef.get();
+
+    if (!doc.exists) {
+      await docRef.set({
+        'buyerReceived': false,
+        'completedAt': currDateTime,
+        'insurerVerified': false,
+        'markedAsCompleted': false,
+        'transportDelivered': false
+      });
+    }
+  }
+
   static verifySupplyToComplete(String supplyId, String type) async {
     var docRef =
         FirebaseFirestore.instance.collection('completed').doc(supplyId);
@@ -175,8 +191,8 @@ class DatabaseService {
     if (!docData.exists) {
       return null;
     }
-    return  docData.data() as Map<String, dynamic>;
-    
+    return docData.data() as Map<String, dynamic>;
+
     // print(data.toString());
   }
 
@@ -266,6 +282,27 @@ class DatabaseService {
     if (user != null) {
       return user['rating'] / user['ratingNumber'];
     }
+
+    return null;
+  }
+
+  // Update Ratings of User
+
+  static updateRating({required String address, required int ratings}) async {
+    await getUidByPublicAddress(address).then((uid) async {
+      var userRef = FirebaseFirestore.instance.collection('users').doc(uid);
+      await userRef.get().then((user) async {
+        var userData = user.data();
+        if (user != null) {
+          var prevRatings = user['rating'];
+          var prevRatingsNumber = user['ratingNumber'];
+          await userRef.update({
+            'rating': (prevRatings + ratings) / 2,
+            'ratingNumber': prevRatingsNumber += 1
+          });
+        }
+      });
+    });
 
     return null;
   }

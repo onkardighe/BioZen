@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:rating_dialog/rating_dialog.dart';
 import 'package:supplychain/services/DatabaseService.dart';
 import 'package:supplychain/services/supplyController.dart';
 import 'package:supplychain/utils/appTheme.dart';
@@ -9,7 +11,56 @@ import 'package:supplychain/services/functions.dart';
 import 'package:supplychain/utils/constants.dart';
 import 'package:supplychain/utils/supply.dart';
 
+import '../pages/utilPages/locationInfoPage.dart';
+
 class AlertBoxes {
+  static getRatings(BuildContext context) async {
+    var res = null;
+    await showDialog(
+        context: context,
+        builder: (context) {
+          return RatingDialog(
+              title: const Text("Rate your experience"),
+              // message: Text("Tjis is message", style: TextStyle(fontSize: 15)),
+              starSize: 35,
+              enableComment: false,
+              submitButtonText: "Submit",
+              submitButtonTextStyle: TextStyle(
+                  color: AppTheme.primaryColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 17),
+              onSubmitted: (RatingDialogResponse ratings) {
+                print("INter Ratings : ${ratings.rating}");
+                res = ratings.rating;
+                return ratings;
+              });
+        });
+
+    return res != null ? res.toInt() : null;
+  }
+
+  static LocationInfoAlert(
+      {required BuildContext context,
+      required Supply supply,
+      required var destLocation,
+      required var history}) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => LocationInfoPage(
+        supply: supply,
+        destination: destLocation,
+        history: history,
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        var curve = Curves.easeInOut.transform(animation.value);
+        return ScaleTransition(
+          scale: animation,
+          alignment: Alignment.center,
+          child: child,
+        );
+      },
+    );
+  }
+
   static Future<void> showAlertForCreateSupply(
       BuildContext context, SupplyController supplyController) async {
     TextEditingController _titleController = TextEditingController();
@@ -243,8 +294,14 @@ class AlertBoxes {
 
   static _addNewSupply(BuildContext context, SupplyController supplyController,
       String title, double quantity, double temp, String sourceLocation) async {
-    String? supplyAddress =
-        await supplyController.addSupply(title, quantity, temp, sourceLocation);
+    var currDateTime = DateTime.now().toString();
+    String? supplyAddress = await supplyController.addSupply(
+        title, quantity, temp, sourceLocation, currDateTime);
+
+    // Addd to DB to verify later
+    // if (supplyAddress != null && !supplyAddress.contains("Error")) {
+    //   DatabaseService.addSupplyToDB(supplyId, currDateTime)
+    // }
     Navigator.of(context).pop();
     checkResponse(supplyAddress, context, supplyController);
   }

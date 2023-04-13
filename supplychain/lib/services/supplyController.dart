@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
-import 'package:supplychain/services/functions.dart';
+// import 'package:supplychain/services/functions.dart';
 import 'package:supplychain/utils/supply.dart';
 import 'package:supplychain/utils/constants.dart';
-import 'package:web3dart/crypto.dart';
+// import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:web_socket_channel/io.dart';
 
@@ -62,9 +62,10 @@ class SupplyController extends ChangeNotifier {
   }
 
   _updateGasPrice() async {
-    _gasPrice = await _client
-        .getBlockInformation()
-        .then((value) => value.baseFeePerGas!);
+    await _client.getBlockInformation().then((value) {
+      _gasPrice = value.baseFeePerGas!;
+      return _gasPrice;
+    });
   }
 
   Future<void> getAbi() async {
@@ -218,9 +219,8 @@ class SupplyController extends ChangeNotifier {
     }
   }
 
-  addSupply(
-      String name, double quantity, double temp, String sourceLocation) async {
-    String currentStamp = DateTime.now().toString();
+  addSupply(String name, double quantity, double temp, String sourceLocation,
+      String currentStamp) async {
     await getCreadentials();
     await _updateGasPrice().then((res) async {
       publicKey = _credentials.address.toString();
@@ -248,6 +248,7 @@ class SupplyController extends ChangeNotifier {
 
         isLoading = false;
         notifyListeners();
+        print("Added : ${response.toString()}");
         return response;
       } catch (e) {
         print("Error : ${e.toString()}");
@@ -320,32 +321,33 @@ class SupplyController extends ChangeNotifier {
   setTransporter(String id, String transporterAddress) async {
     isLoading = true;
     getCreadentials();
-    _updateGasPrice();
-    List<dynamic> args = [
-      BigInt.from(int.parse(id)),
-      EthereumAddress.fromHex(transporterAddress)
-    ];
+    return await _updateGasPrice().then((gasPrice) async {
+      List<dynamic> args = [
+        BigInt.from(int.parse(id)),
+        EthereumAddress.fromHex(transporterAddress)
+      ];
 
-    try {
-      String response = await _client.sendTransaction(
-        _credentials,
-        Transaction.callContract(
-          gasPrice: _gasPrice,
-          contract: _contract,
-          function: _addTransporter,
-          parameters: args,
-        ),
-        chainId: 5,
-      );
+      try {
+        String response = await _client.sendTransaction(
+          _credentials,
+          Transaction.callContract(
+            gasPrice: _gasPrice,
+            contract: _contract,
+            function: _addTransporter,
+            parameters: args,
+          ),
+          chainId: 5,
+        );
 
-      isLoading = false;
-      notifyListeners();
-      return response;
-    } catch (e) {
-      print("Error while selecting Transporter : ${e.toString()}");
-      isLoading = false;
-      notifyListeners();
-    }
+        isLoading = false;
+        notifyListeners();
+        return response;
+      } catch (e) {
+        print("Error while selecting Transporter : ${e.toString()}");
+        isLoading = false;
+        notifyListeners();
+      }
+    });
   }
 
   setInsurance(String id, String insuranceAddress) async {
@@ -453,28 +455,29 @@ class SupplyController extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
     getCreadentials();
-    _updateGasPrice();
-    List<dynamic> args = [BigInt.from(int.parse(id)), currentAddress];
+    return await _updateGasPrice().then((resp) async {
+      List<dynamic> args = [BigInt.from(int.parse(id)), currentAddress];
 
-    try {
-      String response = await _client.sendTransaction(
-        _credentials,
-        Transaction.callContract(
-          gasPrice: _gasPrice,
-          contract: _contract,
-          function: _updateLocation,
-          parameters: args,
-        ),
-        chainId: 5,
-      );
+      try {
+        String response = await _client.sendTransaction(
+          _credentials,
+          Transaction.callContract(
+            gasPrice: _gasPrice,
+            contract: _contract,
+            function: _updateLocation,
+            parameters: args,
+          ),
+          chainId: 5,
+        );
 
-      isLoading = false;
-      notifyListeners();
-      return response;
-    } catch (e) {
-      isLoading = false;
-      notifyListeners();
-      print("Error while Updating Location : ${e.toString()}");
-    }
+        isLoading = false;
+        notifyListeners();
+        return response;
+      } catch (e) {
+        isLoading = false;
+        notifyListeners();
+        print("Error while Updating Location : ${e.toString()}");
+      }
+    });
   }
 }

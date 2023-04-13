@@ -114,20 +114,18 @@ Route routeToLogInScreen() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  Widget addSpacing() {
-return Container(
-        height: 2,
-        color: Colors.grey.shade100,
-      );
-    }
-  
-
+Widget addSpacing() {
+  return Container(
+    height: 2,
+    color: Colors.grey.shade100,
+  );
+}
 
 displayAllBidders(BuildContext context, String supplyId) async {
   var bidList = await DatabaseService.getBidders(supplyId);
   if (bidList == null) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Error fetching bidders for Supply ID : ${supplyId}")));
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("No bidders for Supply ID : ${supplyId}")));
   } else {
     var response = await ListCard.bidderListCard(context, bidList, "Bidder");
     return response;
@@ -162,29 +160,30 @@ displayAllOpenSupplies(BuildContext context) async {
 
 displayListSpecificSupplies(
     BuildContext context, var list, String? title) async {
-
   if (title == null) {
-    await ListCard.userSupplyListCard(context, "Explore Supply",
-        supplyList: list,);
+    await ListCard.userSupplyListCard(
+      context,
+      "Explore Supply",
+      supplyList: list,
+    );
   } else {
     await ListCard.userSupplyListCard(context, title, supplyList: list);
   }
 }
 
 getStarListFromRatings(var rating, var size) {
-
-  return [ SizedBox(
-                          width: 5,
-                        ),
-                        for (var i = 1; i <= 5; i++)
-                          Icon(
-                            Icons.star,
-                            size: size,
-                            color: i <= rating
-                                ? Colors.amber
-                                : AppTheme.secondaryColor,
-                          ),
-                        SizedBox(
-                          width: 5,
-                        ),];
+  return [
+    SizedBox(
+      width: 5,
+    ),
+    for (var i = 1; i <= 5; i++)
+      Icon(
+        Icons.star,
+        size: size,
+        color: i <= rating ? Colors.amber : AppTheme.secondaryColor,
+      ),
+    SizedBox(
+      width: 5,
+    ),
+  ];
 }
