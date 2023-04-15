@@ -280,7 +280,8 @@ class DatabaseService {
         await FirebaseFirestore.instance.collection('users').doc(uid).get();
     var user = userData.data();
     if (user != null) {
-      return user['rating'] / user['ratingNumber'];
+      return user['rating'];
+      // return user['rating'] / user['ratingNumber'];
     }
 
     return null;

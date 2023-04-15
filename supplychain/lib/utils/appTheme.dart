@@ -18,6 +18,14 @@ class AppTheme {
     ],
   );
 
+  //////////////////////// Temp Purple Theme //////////////////////////////////
+
+  // static Color primaryColor = Colors.deepPurple.shade600;
+  // static Color secondaryColor = Colors.indigo.shade600;
+  // static Color primaryDark = Colors.indigo.shade500;
+  // static Color secondaryDark = Colors.blue.shade800;
+  // static Color shadowColor = Colors.blue.shade800;
+
   // LinearGradient themeGradient = LinearGradient(
   //   begin: Alignment.bottomRight,
   //   end: Alignment.topLeft,

@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:supplychain/utils/AlertBoxes.dart';
 import '../utils/supply.dart';
 import 'package:provider/provider.dart';
-import 'package:supplychain/utils/appTheme.dart';
+import 'package:supplychain/utils/AppTheme.dart';
 import 'package:supplychain/utils/constants.dart';
 import 'package:supplychain/services/supplyController.dart';
 import 'package:supplychain/services/DatabaseService.dart';
@@ -320,8 +320,10 @@ class _EnrollBottomSheetState extends State<EnrollBottomSheet> {
               ? SizedBox()
               : TextButton(
                   onPressed: () {
-                    AlertBoxes.showAlertForCreateSupply(
-                        context, supplyController);
+                    // AlertBoxes.showAlertForCreateSupply(
+                    //     context, supplyController);
+                    AlertBoxes.createSupplyAlertBox(
+                        context: context, supplyController: supplyController);
                   },
                   style: ButtonStyle(
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -585,6 +587,9 @@ class _packageCardState extends State<packageCard> {
         .then((UserType) async {
       userType = UserType!;
       await DatabaseService.getSupplydeliveryStatus(supply.id).then((check) {
+        if (check == null) {
+          return;
+        }
         if (check['markedAsCompleted']) {
           // if already completed
           showCompleteButton = false;

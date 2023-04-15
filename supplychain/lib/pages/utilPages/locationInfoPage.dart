@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:supplychain/utils/appTheme.dart';
+import 'package:supplychain/utils/AppTheme.dart';
 
 import '../../utils/supply.dart';
 

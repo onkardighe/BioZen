@@ -5,7 +5,7 @@ import 'package:supplychain/services/DatabaseService.dart';
 import 'package:supplychain/services/functions.dart';
 import 'package:supplychain/services/supplyController.dart';
 import 'package:supplychain/utils/AlertBoxes.dart';
-import 'package:supplychain/utils/appTheme.dart';
+import 'package:supplychain/utils/AppTheme.dart';
 import 'package:supplychain/utils/constants.dart';
 import 'package:supplychain/utils/supply.dart';
 

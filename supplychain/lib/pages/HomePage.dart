@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:supplychain/services/functions.dart';
 import 'package:supplychain/utils/constants.dart';
 import 'package:supplychain/utils/AlertBoxes.dart';
-import '../utils/appTheme.dart';
+import '../utils/AppTheme.dart';
 import '../services/supplyController.dart';
 import 'package:supplychain/utils/Drawer.dart';
 import 'package:supplychain/services/DatabaseService.dart';
@@ -52,10 +52,12 @@ class _HomePageState extends State<HomePage> {
     String key =
         await DatabaseService().fetchDataOfUser(uid, 'privateAddress') ?? "";
     if (!key.contains("Error") && key.length == 66) {
-      setState(() {
-        privateKey = key;
-        privateKeyLinked = true;
-      });
+      if (mounted) {
+        setState(() {
+          privateKey = key;
+          privateKeyLinked = true;
+        });
+      }
     }
 
     setState(() {});

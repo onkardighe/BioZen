@@ -73,6 +73,7 @@ class SupplyController extends ChangeNotifier {
   }
 
   Future<void> getCreadentials() async {
+    print("Private Key $privateKey");
     _credentials = EthPrivateKey.fromHex(privateKey);
   }
 
@@ -222,7 +223,8 @@ class SupplyController extends ChangeNotifier {
   addSupply(String name, double quantity, double temp, String sourceLocation,
       String currentStamp) async {
     await getCreadentials();
-    await _updateGasPrice().then((res) async {
+    return await _updateGasPrice().then((res) async {
+      print("Enteres");
       publicKey = _credentials.address.toString();
       List<dynamic> args = [
         name,
@@ -243,7 +245,7 @@ class SupplyController extends ChangeNotifier {
             function: _addSupply,
             parameters: args,
           ),
-          chainId: 5,
+          chainId: 0xaa36a7,
         );
 
         isLoading = false;
@@ -425,6 +427,26 @@ class SupplyController extends ChangeNotifier {
       }
       isLoading = false;
       return response[0];
+    } catch (e) {
+      isLoading = false;
+      var res = e.toString();
+      print(res);
+    }
+  }
+
+  getTotalNumberOfSupplies() async {
+    // isLoading = true;
+    notifyListeners();
+
+    try {
+      var response = await _client
+          .call(contract: _contract, function: _totalSupplies, params: []);
+      if (response.isEmpty) {
+        isLoading = false;
+        return;
+      }
+      isLoading = false;
+      return int.tryParse(response[0].toString());
     } catch (e) {
       isLoading = false;
       var res = e.toString();

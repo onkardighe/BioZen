@@ -12,7 +12,7 @@ import 'package:supplychain/services/DatabaseService.dart';
 import 'package:flutter/services.dart';
 import 'package:web3dart/web3dart.dart';
 
-import '../utils/appTheme.dart';
+import '../utils/AppTheme.dart';
 
 checkResponse(String? response, BuildContext context,
     SupplyController supplyController) async {
