@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:supplychain/utils/InsurancePolicies.dart';
 import 'package:supplychain/utils/constants.dart';
 
 class DatabaseService {
@@ -273,6 +274,10 @@ class DatabaseService {
     return null;
   }
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////  RATINGS         ///////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   static getRating({required String address}) async {
     String uid = await getUidByPublicAddress(address);
 
@@ -280,7 +285,11 @@ class DatabaseService {
         await FirebaseFirestore.instance.collection('users').doc(uid).get();
     var user = userData.data();
     if (user != null) {
-      return user['rating'];
+      if (user['rating'].runtimeType == int) {
+        print("converted to double");
+        return user['rating'].toDouble();
+      }
+      return user['rating'] / 1.0;
       // return user['rating'] / user['ratingNumber'];
     }
 
@@ -306,5 +315,71 @@ class DatabaseService {
     });
 
     return null;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////  INSURANCE POLICY //////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  static createPolicy({
+    required String uid,
+    required InsurancePolicy newPolicy,
+  }) async {
+    var user = FirebaseFirestore.instance.collection('users').doc(uid);
+    var userData = await user.get();
+    var res = null;
+    if (userData.exists) {
+      var data = userData.data();
+
+      var policy = [
+        {
+          "coverageAmount": newPolicy.coverageAmount,
+          "price": newPolicy.price,
+          "coverage": newPolicy.coverages
+        }
+      ];
+
+      // update policy field
+
+      return await user
+          .update({"policy": FieldValue.arrayUnion(policy)}).then((value) {
+        return true;
+      });
+    }
+
+    return res;
+  }
+
+  static getPolicies({
+    required String uid,
+  }) async {
+    var user = FirebaseFirestore.instance.collection('users').doc(uid);
+    var userData = await user.get();
+    List<InsurancePolicy> res = [];
+    if (userData.exists) {
+      var data = userData.data();
+
+      // User is NOT Insurance Authority
+      if (data!["type"] != insuranceAuthority) {
+        return null;
+      }
+
+      //User dont have any policies
+      if (!data.containsKey("policy")) {
+        return res;
+      }
+
+      // extract all policies
+
+      for (var p in data['policy']) {
+        InsurancePolicy newPolicy =
+            InsurancePolicy(p['price'], p['coverageAmount'], p['coverage']);
+        res.add(newPolicy);
+      }
+      return res.reversed.toList();
+      // print(data['policy'].toString());
+    }
+
+    return res;
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:rating_dialog/rating_dialog.dart';
+import 'package:supplychain/pages/utilPages/InsurancePoliciesInputs.dart';
 import 'package:supplychain/pages/utilPages/newSupplyPage.dart';
 import 'package:supplychain/services/DatabaseService.dart';
 import 'package:supplychain/services/supplyController.dart';
@@ -72,6 +73,16 @@ class AlertBoxes {
       builder: (context) => AddNewSupply(
         supplyController: supplyController,
       ),
+    );
+  }
+
+  static createPolicyAlertBox(
+      {required BuildContext context, required Function callback}) {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (context) => CreateNewPolicy(callback: callback),
     );
   }
 
@@ -215,7 +226,6 @@ class AlertBoxes {
         });
   }
 }
-
 
 class AlertBoxForPrivateKeyError extends StatefulWidget {
   final User _user;

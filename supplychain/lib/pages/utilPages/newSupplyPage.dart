@@ -358,7 +358,7 @@ class _InputNewSupplyState extends State<InputNewSupply> {
 class supplyTypeSelector extends StatefulWidget {
   Function callback;
   supplyTypeSelector({super.key, required Function callback})
-      : this.callback = callback;
+      : callback = callback;
 
   @override
   State<supplyTypeSelector> createState() => _supplyTypeSelectorState();

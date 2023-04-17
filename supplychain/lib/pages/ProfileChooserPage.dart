@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:supplychain/services/DatabaseService.dart';
+import 'package:supplychain/utils/AlertBoxes.dart';
 import 'package:supplychain/utils/AppTheme.dart';
 import 'package:supplychain/services/Authentication.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,16 +11,26 @@ import 'package:supplychain/utils/constants.dart';
 
 class ProfileChooserPage extends StatefulWidget {
   final User _user;
+  static double _cardHeight = 180, _cardWidth = 120;
+
   const ProfileChooserPage({Key? key, required User user})
       : _user = user,
         super(key: key);
 
   @override
   _ProfileChooserPageState createState() => _ProfileChooserPageState();
+
+  static void _routeToHomeScreen(BuildContext context, String type) {
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => HomePage(),
+        ),
+        (Route route) => false);
+  }
 }
 
 class _ProfileChooserPageState extends State<ProfileChooserPage> {
-  double _cardHeight = 220, _cardWidth = 160;
+  double _cardHeight = 100, _cardWidth = 140;
   User? _thisUser;
   var userType;
 
@@ -28,7 +39,7 @@ class _ProfileChooserPageState extends State<ProfileChooserPage> {
     _thisUser = widget._user;
     getType();
     if (userType != null) {
-      _routeToHomeScreen(userType);
+      ProfileChooserPage._routeToHomeScreen(context, userType);
       return;
     }
     super.initState();
@@ -40,6 +51,16 @@ class _ProfileChooserPageState extends State<ProfileChooserPage> {
     if (this.mounted) {
       setState(() {});
     }
+  }
+
+  updateUser(String type) {
+    setState(() {
+      userType = type;
+    });
+  }
+
+  updateState() {
+    setState(() {});
   }
 
   @override
@@ -56,86 +77,161 @@ class _ProfileChooserPageState extends State<ProfileChooserPage> {
       body: Center(
         child: Container(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Spacer(),
               Text(
                 "Are You ?",
                 style: TextStyle(fontWeight: FontWeight.w900, fontSize: 30),
               ),
+              Text("$userType",
+                  style: TextStyle(
+                      color: AppTheme.primaryColor,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold)),
               SizedBox(
                 height: 40,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  profileCard(Icons.factory_rounded, supplier),
+                  ProfileCard(
+                    icon: Icons.factory_rounded,
+                    type: supplier,
+                    callbackToUpdateUser: updateUser,
+                  ),
                   SizedBox(width: 20),
-                  profileCard(Icons.local_gas_station_rounded, fuelCompany),
+                  ProfileCard(
+                      icon: Icons.local_gas_station_rounded,
+                      type: fuelCompany,
+                      callbackToUpdateUser: updateUser),
                 ],
               ),
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  profileCard(Icons.local_shipping_rounded, transportAuthority),
+                  ProfileCard(
+                      icon: Icons.local_shipping_rounded,
+                      type: transportAuthority,
+                      callbackToUpdateUser: updateUser),
                   SizedBox(width: 20),
-                  profileCard(
-                    Icons.shield_rounded,
-                    insuranceAuthority,
-                  ),
+                  ProfileCard(
+                      icon: Icons.shield_rounded,
+                      type: insuranceAuthority,
+                      callbackToUpdateUser: updateUser),
                 ],
               ),
-              Spacer()
+              SizedBox(
+                height: 35,
+              ),
+              GestureDetector(
+                onTap: () async {
+                  Authentication.updateUserType(user.uid, userType);
+
+                  if (userType == insuranceAuthority) {
+                    var policies =
+                        await DatabaseService.getPolicies(uid: user.uid);
+
+                    if (policies.length == 0) {
+                      AlertBoxes.createPolicyAlertBox(
+                          context: context, callback: updateState);
+                    } else {
+                      ProfileChooserPage._routeToHomeScreen(context, userType);
+                    }
+                  } else {
+                    ProfileChooserPage._routeToHomeScreen(context, userType);
+                  }
+                },
+                child: Container(
+                    child: Icon(
+                      Icons.arrow_circle_right,
+                      size: 55,
+                      color: Colors.white,
+                    ),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 8,
+                              blurStyle: BlurStyle.normal)
+                        ])),
+              ),
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  Widget profileCard(IconData icon, String type) {
-    return SizedBox.fromSize(
-      size: Size(_cardWidth, _cardHeight),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(90),
-        child: Material(
-          color: Colors.blueGrey.shade100,
-          child: InkWell(
-            splashColor: AppTheme.primaryColor, // splash color
-            onTap: () {
-              Authentication.updateUserType(_thisUser!.uid, type);
+class ProfileCard extends StatefulWidget {
+  Function callbackToUpdateUser;
+  final IconData _icon;
+  final String _type;
+  ProfileCard(
+      {super.key,
+      required IconData icon,
+      required String type,
+      required Function this.callbackToUpdateUser})
+      : _type = type,
+        _icon = icon;
 
-              _routeToHomeScreen(type);
-            }, // button pressed
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Spacer(),
-                Icon(
-                  icon,
-                  size: 80,
-                ),
-                Text(
-                  type,
-                  textAlign: TextAlign.center,
-                  softWrap: true,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                Spacer()
-              ],
+  @override
+  State<ProfileCard> createState() => _ProfileCardState();
+}
+
+class _ProfileCardState extends State<ProfileCard> {
+  late IconData icon;
+  late String type;
+
+  @override
+  void initState() {
+    icon = widget._icon;
+    type = widget._type;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          userType = type;
+          widget.callbackToUpdateUser(type);
+        });
+      },
+      child: Container(
+        width: 130,
+        height: 180,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(90),
+            color: type == userType
+                ? AppTheme.primaryColor
+                : Colors.blueGrey.shade100),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Spacer(),
+            Icon(
+              icon,
+              size: 60,
+              color: type == userType ? Colors.white : null,
             ),
-          ),
+            Text(
+              type,
+              textAlign: TextAlign.center,
+              softWrap: true,
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+                color: type == userType ? Colors.white : null,
+              ),
+            ),
+            Spacer()
+          ],
         ),
       ),
     );
-  }
-
-  void _routeToHomeScreen(String type) {
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) => HomePage(
-          ),
-        ),
-        (Route route) => false);
   }
 }

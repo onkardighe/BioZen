@@ -25,7 +25,7 @@ class _ProfilePageState extends State<ProfilePage> {
   var privateWalletAddress = '';
   late String? publicWalletAddress = '';
   var copyIcon = Icon(Icons.copy_rounded);
-  double ratings = 0.0;
+  num ratings = 0.0;
 
   @override
   void initState() {
@@ -50,7 +50,10 @@ class _ProfilePageState extends State<ProfilePage> {
         .then((address) async {
       if (address != null && !address.contains("Error")) {
         publicWalletAddress = address;
-        ratings = await DatabaseService.getRating(address: address);
+        await DatabaseService.getRating(address: address).then((res) {
+          print(" type : ${res.runtimeType}");
+          ratings = res;
+        });
       }
     });
 

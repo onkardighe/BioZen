@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:supplychain/pages/utilPages/InsurancePoliciesInputs.dart';
 import 'package:supplychain/services/functions.dart';
 import 'package:supplychain/utils/constants.dart';
 import 'package:supplychain/utils/AlertBoxes.dart';
@@ -354,8 +355,8 @@ class _HomePageState extends State<HomePage> {
           ? GestureDetector(
               onTap: () async {
                 if (userType == supplier) {
-                  AlertBoxes.showAlertForCreateSupply(
-                      context, supplyController);
+                  AlertBoxes.createSupplyAlertBox(
+                      context: context, supplyController: supplyController);
                 } else if (userType == fuelCompany) {
                   await displayAllOpenSupplies(context);
                 } else {

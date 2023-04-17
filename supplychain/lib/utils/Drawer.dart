@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supplychain/pages/utilPages/InsurancePoliciesInputs.dart';
 import 'package:supplychain/services/DatabaseService.dart';
 import 'package:supplychain/utils/AppTheme.dart';
 import 'package:supplychain/services/functions.dart';
@@ -119,31 +120,41 @@ class _AppDrawerState extends State<AppDrawer> {
                   ),
                 ),
               ),
-              Container(
-                margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(90),
-                      )),
-                      backgroundColor:
-                          MaterialStateProperty.all(AppTheme.primaryDark)),
-                  onPressed: () {},
-                  child: const ListTile(
-                    textColor: Colors.white,
-                    title: Text(
-                      "Settings",
-                      style: TextStyle(fontSize: 18),
+              userType != insuranceAuthority
+                  ? SizedBox()
+                  : Container(
+                      margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(90),
+                            )),
+                            backgroundColor: MaterialStateProperty.all(
+                                AppTheme.primaryDark)),
+                        onPressed: () {
+                          if (userType == insuranceAuthority) {
+                            Navigator.push(context, PageRouteBuilder(
+                                pageBuilder:
+                                    ((context, animation, secondaryAnimation) {
+                              return InsurancePoliciesInput();
+                            })));
+                          }
+                        },
+                        child: const ListTile(
+                          textColor: Colors.white,
+                          title: Text(
+                            "Settings",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          leading: Icon(
+                            Icons.settings,
+                            size: 25,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                     ),
-                    leading: Icon(
-                      Icons.settings,
-                      size: 25,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
               Container(
                 margin:
                     EdgeInsets.only(top: 200, left: 20, right: 20, bottom: 20),
