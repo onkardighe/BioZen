@@ -286,7 +286,6 @@ class DatabaseService {
     var user = userData.data();
     if (user != null) {
       if (user['rating'].runtimeType == int) {
-        print("converted to double");
         return user['rating'].toDouble();
       }
       return user['rating'] / 1.0;
@@ -381,5 +380,31 @@ class DatabaseService {
     }
 
     return res;
+  }
+
+  static selectPolicyForSupply({
+    required String supplyId,
+    required InsurancePolicy newPolicy,
+  }) async {
+    var idDoc =
+        FirebaseFirestore.instance.collection('selectedPolicies').doc(supplyId);
+    var docData = await idDoc.get();
+
+    var policy = {
+      "coverageAmount": newPolicy.coverageAmount,
+      "price": newPolicy.price,
+      "coverage": newPolicy.coverages
+    };
+
+    // update policy field
+    if (docData.exists) {
+      return await idDoc.update(policy).then((value) {
+        return true;
+      });
+    } else {
+      return await idDoc.set(policy).then((value) {
+        return true;
+      });
+    }
   }
 }

@@ -132,24 +132,25 @@ displayAllBidders(BuildContext context, String supplyId) async {
   }
 }
 
-displayAllTransporters(BuildContext context) async {
+displayAllTransporters(BuildContext context, String supplyID) async {
   List? transporters =
       await DatabaseService.getUsersByType('Transport Authority');
   if (transporters == null) {
     print("no users found");
   } else {
-    var response =
-        await ListCard.userListCard(context, transporters, "Transporter");
+    var response = await ListCard.userListCard(
+        context, transporters, "Transporter", supplyID);
     return response;
   }
 }
 
-displayAllInsurers(BuildContext context) async {
+displayAllInsurers(BuildContext context, String supplyID) async {
   List? insurers = await DatabaseService.getUsersByType('Insurance Authority');
   if (insurers == null) {
     print("no users found");
   } else {
-    var response = await ListCard.userListCard(context, insurers, "Insurer");
+    var response =
+        await ListCard.userListCard(context, insurers, "Insurer", supplyID);
     return response;
   }
 }

@@ -11,13 +11,14 @@ import 'package:supplychain/utils/supply.dart';
 
 class ListCard {
   static Future<dynamic> userListCard(
-      BuildContext context, List users, String? title) async {
+      BuildContext context, List users, String? title, String supplyId) async {
     return await showDialog(
         context: context,
         builder: (context) {
           return UserListCard(
-            suppliers: users,
+            users: users,
             title: title,
+            supplyId: supplyId,
           );
         });
   }
@@ -685,9 +686,14 @@ class _SupplyListCardState extends State<SupplyListCard> {
 class UserListCard extends StatefulWidget {
   final List _users;
   final String? _title;
+  final String supplyId;
+  // static
   const UserListCard(
-      {super.key, required List suppliers, required String? title})
-      : _users = suppliers,
+      {super.key,
+      required List users,
+      required String? title,
+      required this.supplyId})
+      : _users = users,
         _title = title;
 
   @override
@@ -697,34 +703,47 @@ class UserListCard extends StatefulWidget {
 class _UserListCard extends State<UserListCard> {
   late List users;
   late String? title;
-  late List<Widget> userCards = [];
   bool selected = false;
-  late String currentSelected;
+  late List<Widget> userCards = [];
+  // bool selected = false;
+  late String currentSelected = '';
   late var response = null;
   @override
   void initState() {
     users = widget._users;
     title = widget._title;
+
     _fetchList();
     super.initState();
   }
 
   _fetchList() async {
     for (var user in users) {
+      print(user.toString());
       userCards.add(GestureDetector(
-        onTap: () {
+        onTap: () async {
           setState(() {
             response = user;
             selected = true;
             currentSelected = user['name'];
           });
+
+          if (user.containsKey('policy')) {
+            await AlertBoxes.selectPolicyAlertBox(
+                context: context,
+                policies: user['policy'],
+                supplyId: widget.supplyId);
+          } else {
+            await AlertBoxes.selectPolicyAlertBox(
+                context: context, policies: [], supplyId: widget.supplyId);
+          }
+          setState(() {});
         },
         child: Padding(
           padding: const EdgeInsets.only(bottom: 20),
           child: Container(
             padding: EdgeInsets.all(10),
             width: 250,
-            // height: 80,
             decoration: BoxDecoration(
                 gradient: AppTheme().themeGradient,
                 borderRadius: BorderRadius.circular(8)),

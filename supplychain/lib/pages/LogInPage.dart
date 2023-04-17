@@ -1,7 +1,10 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:supplychain/services/Authentication.dart';
+import 'package:supplychain/services/DatabaseService.dart';
+import 'package:supplychain/services/supplyController.dart';
 import 'package:supplychain/utils/AppTheme.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,11 +19,13 @@ class LogInPage extends StatefulWidget {
 class _LogInPageState extends State<LogInPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
+  late SupplyController supplyController;
   String? _errorPassText;
   bool isPasswordVisible = false;
   bool loggingIn = false;
   @override
   Widget build(BuildContext context) {
+    supplyController = Provider.of<SupplyController>(context, listen: true);
     return Scaffold(
         appBar: AppBar(
           flexibleSpace: Container(
@@ -205,17 +210,30 @@ class _LogInPageState extends State<LogInPage> {
                                               _passController
                                                   .value.text.isNotEmpty) {
                                             // log in
-
                                             User? tempUser = await loginUser();
                                             if (tempUser != null) {
                                               user = tempUser;
-                                              Navigator.of(context)
-                                                  .pushReplacement(
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      HomePage(),
-                                                ),
-                                              );
+                                              await DatabaseService()
+                                                  .fetchDataOfUser(
+                                                      user.uid, 'publicAddress')
+                                                  .then((value) async {
+                                                if (value == null) {
+                                                  return;
+                                                }
+
+                                                publicKey = value;
+                                                await supplyController
+                                                    .getSuppliesOfUser()
+                                                    .then((res) {
+                                                  Navigator.of(context)
+                                                      .pushReplacement(
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          HomePage(),
+                                                    ),
+                                                  );
+                                                });
+                                              });
                                             } else {
                                               setState(() {
                                                 _errorPassText =

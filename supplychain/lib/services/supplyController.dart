@@ -73,7 +73,6 @@ class SupplyController extends ChangeNotifier {
   }
 
   Future<void> getCreadentials() async {
-    print("Private Key $privateKey");
     _credentials = EthPrivateKey.fromHex(privateKey);
   }
 
@@ -276,7 +275,7 @@ class SupplyController extends ChangeNotifier {
           function: _completeSupply,
           parameters: args,
         ),
-        chainId: 5,
+        chainId: 0xaa36a7,
       );
       isLoading = false;
       notifyListeners();
@@ -308,7 +307,7 @@ class SupplyController extends ChangeNotifier {
           function: _addBuyer,
           parameters: args,
         ),
-        chainId: 5,
+        chainId: 0xaa36a7,
       );
       isLoading = false;
       notifyListeners();
@@ -338,7 +337,7 @@ class SupplyController extends ChangeNotifier {
             function: _addTransporter,
             parameters: args,
           ),
-          chainId: 5,
+          chainId: 0xaa36a7,
         );
 
         isLoading = false;
@@ -370,7 +369,7 @@ class SupplyController extends ChangeNotifier {
           function: _addInsurance,
           parameters: args,
         ),
-        chainId: 5,
+        chainId: 0xaa36a7,
       );
 
       isLoading = false;
@@ -489,7 +488,7 @@ class SupplyController extends ChangeNotifier {
             function: _updateLocation,
             parameters: args,
           ),
-          chainId: 5,
+          chainId: 0xaa36a7,
         );
 
         isLoading = false;

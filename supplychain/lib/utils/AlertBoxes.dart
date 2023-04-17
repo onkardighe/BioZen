@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:rating_dialog/rating_dialog.dart';
 import 'package:supplychain/pages/utilPages/InsurancePoliciesInputs.dart';
+import 'package:supplychain/pages/utilPages/SelectInsurancePolicy.dart';
 import 'package:supplychain/pages/utilPages/newSupplyPage.dart';
 import 'package:supplychain/services/DatabaseService.dart';
 import 'package:supplychain/services/supplyController.dart';
@@ -84,6 +85,22 @@ class AlertBoxes {
       context: context,
       builder: (context) => CreateNewPolicy(callback: callback),
     );
+  }
+
+  static selectPolicyAlertBox(
+      {required BuildContext context,
+      required String supplyId,
+      required List<dynamic> policies}) {
+    showModalBottomSheet(
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) {
+          return SelectInsurancePolicy(
+            supplyID: supplyId,
+            policyList: policies,
+          );
+        });
   }
 
   static Future<void> showAlertForCreateSupply(

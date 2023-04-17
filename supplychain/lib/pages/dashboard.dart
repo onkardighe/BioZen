@@ -72,7 +72,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           : Center(
                               child: InkWell(
                                 onTap: () {
-                                  print("refreshed");
                                   supplyController.getNotes();
                                   supplyController.getSuppliesOfUser();
                                   supplyController.notifyListeners();
@@ -609,9 +608,6 @@ class _packageCardState extends State<packageCard> {
               check['transportDelivered'] &&
               check['insurerVerified'];
         }
-        print("__________$userType");
-        print("$showCompleteButton   = ${check['transportDelivered']}");
-        print(check);
       });
     });
 
@@ -949,7 +945,6 @@ class _packageCardState extends State<packageCard> {
                                         children: [
                                           GestureDetector(
                                             onTap: () async {
-                                              print("clicked");
                                               Navigator.of(context).push(
                                                   AlertBoxes.LocationInfoAlert(
                                                       context: context,
@@ -1123,7 +1118,7 @@ class _packageCardState extends State<packageCard> {
                                           onPressed: () async {
                                             var transporter =
                                                 await displayAllTransporters(
-                                                    context);
+                                                    context, supply.id);
                                             print("Transporter : $transporter");
                                             if (transporter != null) {
                                               DatabaseService.selectTransporter(
@@ -1156,7 +1151,7 @@ class _packageCardState extends State<packageCard> {
                                           onPressed: () async {
                                             var insurer =
                                                 await displayAllInsurers(
-                                                    context);
+                                                    context, supply.id);
 
                                             if (insurer != null) {
                                               await DatabaseService
@@ -1164,11 +1159,11 @@ class _packageCardState extends State<packageCard> {
                                                       insurer['publicAddress']);
                                               await showRawAlert(context,
                                                   "Selected ${insurer['name']}\nas Insurer ! ");
-                                            }
-                                            if (mounted) {
-                                              setState(() {
-                                                insuranceSelected = true;
-                                              });
+                                              if (mounted) {
+                                                setState(() {
+                                                  insuranceSelected = true;
+                                                });
+                                              }
                                             }
                                           },
                                           style: ButtonStyle(
@@ -1372,7 +1367,8 @@ class _packageCardState extends State<packageCard> {
   }
 
   void addNewBuyer(String id, String address, String destination) async {
-    print("Address : $address \n destination : $destination");
+    print("Bidder Address : $address \n Bidder destination : $destination");
+
     String? setBuyerresponse =
         await supplyController.setBuyer(id, address, destination);
 
