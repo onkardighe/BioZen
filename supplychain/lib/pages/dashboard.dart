@@ -762,16 +762,17 @@ class _packageCardState extends State<packageCard> {
                                 ? Container(
                                     height: 35,
                                     decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: AppTheme.secondaryColor),
+                                      shape: BoxShape.circle,
+                                      // color: AppTheme.secondaryColor
+                                    ),
                                     child: TextButton(
                                       onPressed: () {
                                         toggleSize();
                                       },
                                       child: Icon(
-                                        Icons.close_rounded,
-                                        color: Colors.white,
-                                        size: 20,
+                                        Icons.info_outline_rounded,
+                                        color: Colors.red.shade300,
+                                        size: 27,
                                       ),
                                     ),
                                   )

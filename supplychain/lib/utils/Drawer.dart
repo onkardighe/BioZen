@@ -43,7 +43,7 @@ class _AppDrawerState extends State<AppDrawer> {
         elevation: 0,
         child: Container(
           decoration: BoxDecoration(gradient: AppTheme().themeGradient),
-          child: ListView(
+          child: Column(
             children: <Widget>[
               SizedBox(
                 height: 210,
@@ -155,9 +155,9 @@ class _AppDrawerState extends State<AppDrawer> {
                         ),
                       ),
                     ),
+              Spacer(),
               Container(
-                margin:
-                    EdgeInsets.only(top: 200, left: 20, right: 20, bottom: 20),
+                margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
                 child: ElevatedButton(
                   style: ButtonStyle(
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
