@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:supplychain/pages/utilPages/InsurancePoliciesInputs.dart';
 import 'package:supplychain/services/functions.dart';
@@ -119,10 +120,11 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Biozen",
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
+                    "BioZen",
+                    style: GoogleFonts.kaushanScript(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 25),
                   ),
                 ],
               ),

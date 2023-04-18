@@ -3,6 +3,7 @@ import 'package:supplychain/pages/HomePage.dart';
 import 'package:supplychain/pages/SignUpPage.dart';
 import 'package:supplychain/pages/LogInPage.dart';
 import 'package:provider/provider.dart';
+import 'package:supplychain/utils/SplashScreen.dart';
 import 'package:supplychain/utils/constants.dart';
 import 'services/supplyController.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -35,9 +36,10 @@ class _MyAppState extends State<MyApp> {
           builder: ((context, snapshot) {
             if (snapshot.hasData) {
               user = snapshot.data!;
-              return HomePage();
+
+              return SplashScreen(launchScreen: HomePage());
             } else {
-              return LogInPage();
+              return SplashScreen(launchScreen: LogInPage());
             }
           }),
         ),
