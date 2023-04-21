@@ -745,7 +745,6 @@ class _packageCardState extends State<packageCard> {
                   Container(
                     padding: EdgeInsets.all(10),
                     width: width * 0.9,
-                    // color: Colors.red,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1354,7 +1353,31 @@ class _packageCardState extends State<packageCard> {
                                                 TextStyle(color: Colors.white),
                                           )),
                                     ],
-                                  )
+                                  ),
+                        !openedCard
+                            ? SizedBox()
+                            : GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context)
+                                      .push(routeToSupportPage());
+                                },
+                                child: Container(
+                                  height: 35,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Icon(Icons.question_answer_sharp,
+                                          color: Colors.grey.shade700),
+                                      Text("Facing issues ? Contact Support"),
+                                      Icon(
+                                          Icons
+                                              .keyboard_double_arrow_right_rounded,
+                                          color: Colors.grey.shade700),
+                                    ],
+                                  ),
+                                ),
+                              )
                       ],
                     ),
                   ),

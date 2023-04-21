@@ -1,0 +1,54 @@
+{
+	"Supplier": {
+	  "Communication issues": {
+		"Transporter not responding": "Follow up with transporter and ensure effective communication channels are established."
+	  },
+	  "Quality control issues": {
+		"Supply got damaged": "Ensure proper handling and packaging of supply.",
+		"Supplier does not provide supply with high quality-raw materials": "Establish clear quality standards and ensure compliance from supplier.",
+		"Supply provided by suppliers do not meet appropriate quality standards": "Establish clear quality standards and ensure compliance from supplier."
+	  },
+	  "Supply Transport related issues": {
+		"Transportation getting delayed": "Plan ahead and ensure timely transportation."
+	  }
+	},
+	"Transport Authority": {
+	  "Communication issues": {
+		"Supplier not responding": "Follow up with supplier and ensure effective communication channels are established."
+	  },
+	  "Quality control issues": {
+		"Supply got damaged": "Ensure proper handling and transportation of supply.",
+		"Supplier does not provide supply with high quality-raw materials": "Notify supplier and request supply with high-quality raw materials.",
+		"Supply provided by suppliers do not meet appropriate quality standards": "Notify supplier and request supply that meets appropriate quality standards."
+	  },
+	  "Supply Transport related issues": {
+		"Transportation getting delayed": "Plan ahead and ensure timely transportation."
+	  }
+	},
+	"Fuel Company": {
+	  "Communication issues": {
+		"Supplier not responding": "Follow up with supplier and ensure effective communication channels are established.",
+		"Transporter not responding": "Follow up with transporter and ensure effective communication channels are established.",
+		"Insurance Authority not responding": "Follow up with insurance authority and ensure effective communication channels are established."
+	  },
+	  "Quality control issues": {
+		"Supplier does not provide supply with high quality-raw materials": "Establish clear quality standards and ensure compliance from supplier.",
+		"Supply provided by suppliers do not meet appropriate quality standards": "Establish clear quality standards and ensure compliance from supplier."
+	  },
+	  "Supply Transport related issues": {
+		"Transportation getting delayed": "Plan ahead and ensure timely transportation."
+	  }
+	},
+	"Insurance Authority": {
+	  "Communication issues": {
+		"Supplier not responding": "Follow up with supplier and ensure effective communication channels are established.",
+		"Transporter not responding": "Follow up with transporter and ensure effective communication channels are established."
+	  },
+	  "Quality control issues": {
+		"Insurance selected by fuel company is NOT adequate": "Recommend appropriate insurance options to fuel company.",
+		"Transporter not obeying regulatory requirements related to insurance coverage": "Ensure transporter complies with regulatory requirements.",
+		"Supply provided by suppliers do not meet appropriate quality standards": "Establish clear quality standards and ensure compliance from supplier."
+	  }
+	}
+  }
+  

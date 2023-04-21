@@ -4,6 +4,7 @@ import 'package:supplychain/pages/LogInPage.dart';
 import 'package:supplychain/pages/profilePage.dart';
 import 'package:supplychain/pages/dashboard.dart';
 import 'package:supplychain/pages/ListCards.dart';
+import 'package:supplychain/pages/utilPages/SupportPage.dart';
 import 'package:supplychain/services/supplyController.dart';
 import 'package:supplychain/utils/constants.dart';
 import 'package:supplychain/utils/AlertBoxes.dart';
@@ -95,6 +96,24 @@ Route routeToLogInScreen() {
     pageBuilder: (context, animation, secondaryAnimation) => LogInPage(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(-1.0, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route routeToSupportPage() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => SupportPage(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1, 0.0);
       var end = Offset.zero;
       var curve = Curves.ease;
 

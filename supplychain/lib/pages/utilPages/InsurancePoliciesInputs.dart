@@ -550,7 +550,7 @@ class _NewPolicyInputsState extends State<NewPolicyInputs> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Spacer(),
+                              // Spacer(),
                               coverageList.contains(cov)
                                   ? Icon(
                                       Icons.check_box_rounded,
@@ -565,7 +565,6 @@ class _NewPolicyInputsState extends State<NewPolicyInputs> {
                                 width: MediaQuery.of(context).size.width * 0.65,
                                 padding: EdgeInsets.only(
                                     top: 10, bottom: 10, left: 20),
-                                // margin: EdgeInsets.symmetric(vertical: 5),
                                 child: Text(
                                   cov,
                                   style: TextStyle(fontSize: 16),
