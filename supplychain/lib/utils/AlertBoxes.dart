@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +14,8 @@ import 'package:supplychain/utils/AppTheme.dart';
 import 'package:supplychain/services/functions.dart';
 import 'package:supplychain/utils/constants.dart';
 import 'package:supplychain/utils/supply.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../pages/utilPages/locationInfoPage.dart';
 
@@ -380,6 +383,50 @@ Future<void> showRawAlert(
           actions: [
             ElevatedButton(
                 style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                  AppTheme.primaryColor,
+                )),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text(
+                  "Ok",
+                  style: TextStyle(color: Colors.white),
+                )),
+          ],
+        );
+      });
+}
+
+Future<void> showTransactionAlert(
+    BuildContext context, String? titleText, String transactionAddress) async {
+  double size = 16.0;
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: titleText != null
+              ? Text(
+                  titleText,
+                  style:
+                      TextStyle(color: AppTheme.primaryColor, fontSize: size),
+                )
+              : SizedBox(),
+          actions: [
+            ElevatedButton(
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                  AppTheme.primaryColor,
+                )),
+                onPressed: () {
+                  openLinkInBrowser(url: etherScanUrl + transactionAddress);
+                },
+                child: const Text(
+                  "Check Status",
+                  style: TextStyle(color: Colors.white),
+                )),
+            ElevatedButton(
+                style: ButtonStyle(   
                     backgroundColor: MaterialStateProperty.all<Color>(
                   AppTheme.primaryColor,
                 )),

@@ -104,15 +104,21 @@ class _HomePageState extends State<HomePage> {
                                     color: Colors.white,
                                   ),
                                 )
-                              : Container(
-                                  width: 33,
-                                  decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AppTheme.primaryColor),
-                                  child: Icon(
-                                    Icons.notifications,
-                                    size: 22,
-                                  )),
+                              : GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context)
+                                        .push(routeToNotificationPage(context));
+                                  },
+                                  child: Container(
+                                      width: 33,
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: AppTheme.primaryColor),
+                                      child: Icon(
+                                        Icons.notifications,
+                                        size: 22,
+                                      )),
+                                ),
                         ))
                     : SizedBox()
               ],

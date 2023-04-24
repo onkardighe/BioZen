@@ -6,6 +6,8 @@ String goreli_url =
 String ws_url =
     'wss://eth-sepolia.g.alchemy.com/v2/L7PIjXac9MTPD9TRDvLYEqhIyMuhLd84';
 
+String etherScanUrl = 'https://sepolia.etherscan.io/tx/';
+
 String privateKey = '';
 // '0x0d12481ebecd4132d9f79b60d7a86b38c8a60ab59f2a42b596db02d7bb4e4737';
 

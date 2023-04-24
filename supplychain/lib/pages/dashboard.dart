@@ -1158,7 +1158,7 @@ class _packageCardState extends State<packageCard> {
                                                   .selectInsurer(supply.id,
                                                       insurer['publicAddress']);
                                               await showRawAlert(context,
-                                                  "Selected ${insurer['name']}\nas Insurer ! ");
+                                                  "${insurer['name']} Selected as Insurer !\nWaiting for their Response !");
                                               if (mounted) {
                                                 setState(() {
                                                   insuranceSelected = true;
@@ -1393,12 +1393,13 @@ class _packageCardState extends State<packageCard> {
   void addNewBuyer(String id, String address, String destination) async {
     print("Bidder Address : $address \n Bidder destination : $destination");
 
-    String? setBuyerresponse =
-        await supplyController.setBuyer(id, address, destination);
-
-    if (mounted) {
-      await checkResponse(setBuyerresponse, context, supplyController);
-    }
+    await supplyController
+        .setBuyer(id, address, destination)
+        .then((setBuyerresponse) async {
+      if (mounted) {
+        await checkResponse(setBuyerresponse, context, supplyController);
+      }
+    });
   }
 
   void addNewTransporter(String id, String address) async {

@@ -39,6 +39,7 @@ dependencies:
   provider:
   flutter_launcher_icons:
   rating_dialog: ^2.0.4
+  url_launcher:
   flutter:
     sdk: flutter
 

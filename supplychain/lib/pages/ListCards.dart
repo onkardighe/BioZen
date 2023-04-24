@@ -338,18 +338,22 @@ class _UserSupplyListCardState extends State<UserSupplyListCard> {
                                                                 supply.id,
                                                                 publicKey);
                                                     if (addresp != null) {
-                                                      DatabaseService
-                                                          .removeField(
-                                                              "selectedUsers",
-                                                              insuranceAuthority,
+                                                      await DatabaseService
+                                                              .removeField(
+                                                                  "selectedUsers",
+                                                                  insuranceAuthority,
+                                                                  supply.id)
+                                                          .then((res) async {
+                                                        await showTransactionAlert(
+                                                            context,
+                                                            "Insurance Completed !",
+                                                            addresp);
+                                                        setState(() {
+                                                          addedList.remove(
                                                               supply.id);
-                                                      await showRawAlert(
-                                                          context,
-                                                          "Insurance Completed !");
-                                                      setState(() {
-                                                        addedList
-                                                            .remove(supply.id);
+                                                        });
                                                       });
+
                                                       Navigator.of(context)
                                                           .pop();
                                                       Navigator.of(context)
@@ -728,6 +732,10 @@ class _UserListCard extends State<UserListCard> {
             currentSelected = user['name'];
           });
 
+          if (user['type'] != insuranceAuthority) {
+            setState(() {});
+            return;
+          }
           if (user.containsKey('policy')) {
             await AlertBoxes.selectPolicyAlertBox(
                 context: context,

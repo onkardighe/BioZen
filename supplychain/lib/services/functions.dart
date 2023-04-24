@@ -4,6 +4,7 @@ import 'package:supplychain/pages/LogInPage.dart';
 import 'package:supplychain/pages/profilePage.dart';
 import 'package:supplychain/pages/dashboard.dart';
 import 'package:supplychain/pages/ListCards.dart';
+import 'package:supplychain/pages/utilPages/NotificationPage.dart';
 import 'package:supplychain/pages/utilPages/SupportPage.dart';
 import 'package:supplychain/services/supplyController.dart';
 import 'package:supplychain/utils/constants.dart';
@@ -11,6 +12,8 @@ import 'package:supplychain/utils/AlertBoxes.dart';
 import 'package:supplychain/services/DatabaseService.dart';
 
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:web3dart/web3dart.dart';
 
 import '../utils/AppTheme.dart';
@@ -24,7 +27,8 @@ checkResponse(String? response, BuildContext context,
     print("\n________________________________");
     print("Added : $response");
     print("\n________________________________");
-    showRawAlert(context, "Added Successfully !");
+    supplyController.recentTransactions.add(response);
+    await showTransactionAlert(context, "Added Successfully !", response);
     await supplyController.getSuppliesOfUser();
   }
 }
@@ -57,6 +61,25 @@ Route routeToDashboard(BuildContext context) {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) =>
         const DashboardScreen(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var begin = Offset(1, 0.0);
+      var end = Offset.zero;
+      var curve = Curves.ease;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
+  );
+}
+
+Route routeToNotificationPage(BuildContext context) {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        const NotificationPage(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(1, 0.0);
       var end = Offset.zero;
@@ -206,4 +229,10 @@ getStarListFromRatings(var rating, var size) {
       width: 5,
     ),
   ];
+}
+
+openLinkInBrowser({required String url}) async {
+  final Uri _url = Uri.parse(url);
+
+  await launchUrl(_url, mode: LaunchMode.externalApplication);
 }

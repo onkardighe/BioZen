@@ -1,20 +1,20 @@
 {
 	"Supplier": {
 	  "Communication issues": {
-		"Transporter not responding": "Follow up with transporter and ensure effective communication channels are established."
+		"Transporter not responding": "Follow up with Fuel Company and ensure effective communication channels are established."
 	  },
 	  "Quality control issues": {
-		"Supply got damaged": "Ensure proper handling and packaging of supply.",
-		"Supplier does not provide supply with high quality-raw materials": "Establish clear quality standards and ensure compliance from supplier.",
-		"Supply provided by suppliers do not meet appropriate quality standards": "Establish clear quality standards and ensure compliance from supplier."
+		"Supply got damaged": "Contact to Fuel Comapny\nEnsure proper handling and packaging of supply.",
+		"Transporter does not provide quality service with ensuring regulations": "Contact transporter & Fuel company to ensure better transport",
+		"Insurance provided by Insurer do not meet appropriate quality standards": "Establish standards and ensure compliance from Insurer."
 	  },
 	  "Supply Transport related issues": {
-		"Transportation getting delayed": "Plan ahead and ensure timely transportation."
+		"Transportation getting delayed": "Contact transporter, Plan ahead and ensure timely transportation."
 	  }
 	},
 	"Transport Authority": {
 	  "Communication issues": {
-		"Supplier not responding": "Follow up with supplier and ensure effective communication channels are established."
+		"Supplier not responding": "Follow up with supplier & Fuel company and ensure effective communication channels are established."
 	  },
 	  "Quality control issues": {
 		"Supply got damaged": "Ensure proper handling and transportation of supply.",
@@ -27,16 +27,16 @@
 	},
 	"Fuel Company": {
 	  "Communication issues": {
-		"Supplier not responding": "Follow up with supplier and ensure effective communication channels are established.",
-		"Transporter not responding": "Follow up with transporter and ensure effective communication channels are established.",
-		"Insurance Authority not responding": "Follow up with insurance authority and ensure effective communication channels are established."
+		"Supplier not responding": "Follow up with supplier and otherwise drop the supply and mark its ratings.",
+		"Transporter not responding": "Follow up with transporter and otherwise assign different transporter",
+		"Insurance Authority not responding": "Follow up with insurance authority and otherwise assign different Insurer"
 	  },
 	  "Quality control issues": {
 		"Supplier does not provide supply with high quality-raw materials": "Establish clear quality standards and ensure compliance from supplier.",
-		"Supply provided by suppliers do not meet appropriate quality standards": "Establish clear quality standards and ensure compliance from supplier."
+		"Supply provided by suppliers do not meet appropriate quality standards": "Notify clear quality standards and ensure compliance from supplier."
 	  },
 	  "Supply Transport related issues": {
-		"Transportation getting delayed": "Plan ahead and ensure timely transportation."
+		"Transportation getting delayed": "Plan ahead and ensure timely transportation eith contact to transporter."
 	  }
 	},
 	"Insurance Authority": {

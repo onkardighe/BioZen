@@ -11,6 +11,7 @@ import 'package:web_socket_channel/io.dart';
 class SupplyController extends ChangeNotifier {
   List<Supply> allSupplies = [];
   List<Supply> userSupply = [];
+  List<String> recentTransactions = [];
   bool isLoading = false;
   late int noteCount;
   final String _rpcUrl = goreli_url;
