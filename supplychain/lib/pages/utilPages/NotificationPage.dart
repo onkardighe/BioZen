@@ -34,40 +34,43 @@ class _NotificationPageState extends State<NotificationPage> {
               padding: EdgeInsets.all(20),
               child: SingleChildScrollView(
                   child: Column(
-                children: [
-                  for (String transaction in transactionList.reversed)
-                    Container(
-                      padding: EdgeInsets.all(10),
-                      margin: EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 10,
-                                blurStyle: BlurStyle.normal)
-                          ]),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Text(transaction.substring(0, 10) +
-                              "***" +
-                              transaction.substring(transaction.length - 4)),
-                          ElevatedButton(
-                              style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.all<Color>(
-                                          AppTheme.primaryColor)),
-                              onPressed: () {
-                                openLinkInBrowser(
-                                    url: etherScanUrl + transaction);
-                              },
-                              child: Text("Check Status"))
-                        ],
-                      ),
-                    )
-                ],
+                children: transactionList.isEmpty
+                    ? [Center(child: Text("No recent transactions found"))]
+                    : [
+                        for (String transaction in transactionList.reversed)
+                          Container(
+                            padding: EdgeInsets.all(10),
+                            margin: EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: Colors.black26,
+                                      blurRadius: 10,
+                                      blurStyle: BlurStyle.normal)
+                                ]),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Text(transaction.substring(0, 10) +
+                                    "***" +
+                                    transaction
+                                        .substring(transaction.length - 4)),
+                                ElevatedButton(
+                                    style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                                AppTheme.primaryColor)),
+                                    onPressed: () {
+                                      openLinkInBrowser(
+                                          url: etherScanUrl + transaction);
+                                    },
+                                    child: Text("Check Status"))
+                              ],
+                            ),
+                          )
+                      ],
               )),
             ),
           ],
