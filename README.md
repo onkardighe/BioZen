@@ -8,6 +8,9 @@
 
 > 4️⃣ PPT https://docs.google.com/presentation/d/1ZDAhdRKlKnFRCsQ2qQdequ0XimmxDK59/edit?usp=sharing&ouid=106896568852697073175&rtpof=true&sd=true
 
+
+> 4️⃣ PO-PSOs https://docs.google.com/document/d/1gmWqPwNV5BcwUAGfjpy5lxPqE-o5sdmM/edit?usp=sharing&ouid=106896568852697073175&rtpof=true&sd=true
+
 > 5️⃣ Formats https://drive.google.com/drive/folders/1IiAx7gvfDD9POV21mNqLsq9e_nUSBUZF?usp=sharing
 
 <br><br>
