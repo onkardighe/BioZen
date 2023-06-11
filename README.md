@@ -13,7 +13,7 @@
 
 > 5️⃣ Formats https://drive.google.com/drive/folders/1IiAx7gvfDD9POV21mNqLsq9e_nUSBUZF?usp=sharing -->
 
-> A supply chain for Biofuels
+> An Ethereum based flutter application for supply chain for Biofuels
 
 <br><br>
 
