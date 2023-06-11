@@ -1,6 +1,6 @@
-# biofuels-supplychain
+# BioZen
 
-> 1️⃣ UI - Login Module  https://whimsical.com/login-module-GZhHyDrRV82kCJnPYty1hs
+<!-- > 1️⃣ UI - Login Module  https://whimsical.com/login-module-GZhHyDrRV82kCJnPYty1hs
  
 > 2️⃣ Code - Repo  https://github.com/onkardighe/biofuels-supplychain/settings/access
 
@@ -11,27 +11,38 @@
 
 > 4️⃣ PO-PSOs https://docs.google.com/document/d/1gmWqPwNV5BcwUAGfjpy5lxPqE-o5sdmM/edit?usp=sharing&ouid=106896568852697073175&rtpof=true&sd=true
 
-> 5️⃣ Formats https://drive.google.com/drive/folders/1IiAx7gvfDD9POV21mNqLsq9e_nUSBUZF?usp=sharing
+> 5️⃣ Formats https://drive.google.com/drive/folders/1IiAx7gvfDD9POV21mNqLsq9e_nUSBUZF?usp=sharing -->
+
+> A supply chain for Biofuels
 
 <br><br>
 
 
 
-* ## Login Module
+* ## Login  🔐
 <div align="center">
 
+![1 Splash Screen](https://github.com/onkardighe/BioZen/assets/72162692/d4d62678-75fb-4040-b4f9-dbf39529b050)
+ 
+![Image](https://github.com/onkardighe/BioZen/assets/72162692/010d2b9b-27bc-42eb-9a98-64a36c24a03d)
+ 
+ </div>
+ 
 
+* ## Home  🏠
+ <div align="center">
+ 
+![New Supply](https://github.com/onkardighe/BioZen/assets/72162692/c5ef7703-5950-41c7-bf0d-55948906c905)
+![Notifications](https://github.com/onkardighe/BioZen/assets/72162692/493c77b6-2cdd-4c33-836b-9f2331a8bd68)
+ 
+  </div>
+ 
+ * ## Dashboard  📱
+  <div align="center">
+ 
+![Dashboard](https://github.com/onkardighe/BioZen/assets/72162692/a0b4f436-40f5-46ed-860a-fc7a558fa303)
+ ![Open Supply](https://github.com/onkardighe/BioZen/assets/72162692/73a4fd83-caed-487d-a16e-99c232d861d3) 
 
-![Screen Recording 2023-02-02 at 11 00 01 AM](https://user-images.githubusercontent.com/72162692/216239987-0deee07c-2781-432a-b541-cc3d03a17c06.gif)
-![Screen Recording 2023-02-02 at 10 46 46 AM](https://user-images.githubusercontent.com/72162692/216238691-656b15d9-cc3a-4f01-a4f6-563102d19f10.gif)
-
-![Screen Recording 2023-02-02 at 10 46 46 AM 2](https://user-images.githubusercontent.com/72162692/216239002-7deb712b-d230-4a05-8460-b9efde144849.gif)
-![Screen Recording 2023-02-02 at 10 46 46 AM 3](https://user-images.githubusercontent.com/72162692/216239167-a60c876c-750b-4be7-b0da-9c364f80eb5f.gif)
-
-</div>
-
-
-
-
-
+ 
+   </div>
 
