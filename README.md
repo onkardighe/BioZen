@@ -21,7 +21,7 @@
 * ## Home  🏠
  <div align="center">
  
- ![Splash Screen](https://github.com/onkardighe/BioZen/assets/72162692/d4d62678-75fb-4040-b4f9-dbf39529b050)
+![Splash Screen](https://github.com/onkardighe/BioZen/assets/72162692/0a157aac-c11b-4f23-b010-cb9ce1f22ec9)
  
 ![New Supply](https://github.com/onkardighe/BioZen/assets/72162692/c5ef7703-5950-41c7-bf0d-55948906c905)
 <img src="https://github.com/onkardighe/BioZen/assets/72162692/cec2a48e-f021-4db7-891c-21708888dd6f" alt="Home" width="230"/>
