@@ -1,4 +1,11 @@
+<div align="center">
+
 # BioZen
+
+> An Ethereum based flutter application for supply chain for Biofuels
+
+ 
+</div>
 
 <!-- > 1️⃣ UI - Login Module  https://whimsical.com/login-module-GZhHyDrRV82kCJnPYty1hs
  
@@ -13,7 +20,7 @@
 
 > 5️⃣ Formats https://drive.google.com/drive/folders/1IiAx7gvfDD9POV21mNqLsq9e_nUSBUZF?usp=sharing -->
 
-> An Ethereum based flutter application for supply chain for Biofuels
+
 
 <br>
 
