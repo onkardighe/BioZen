@@ -2,8 +2,16 @@
 
 # BioZen
 
-> An Ethereum based flutter application for supply chain for Biofuels
+An Ethereum based flutter application for supply chain for Biofuels
 
+
+<div align="center">
+ 
+![1 copy](https://github.com/onkardighe/BioZen/assets/72162692/fe43b845-f0d1-4ee8-8e18-55744a7e1657)
+![2](https://github.com/onkardighe/BioZen/assets/72162692/b586f383-c347-4a83-9d79-49a3146a6071)
+
+ 
+</div>
  
 </div>
 
